@@ -1,24 +1,80 @@
-import React from "react";
+import React, { useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendar, faCar, faCarRear, faCartArrowDown, faChevronCircleDown, faChevronCircleLeft, faChevronLeft, faClipboard, faFileInvoice, faFileInvoiceDollar, faHome, faMoneyBills, faMoneyCheck, faQuoteLeft, faSignOut, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
+
+const MiComponente = () => (
+  <div>
+    <FontAwesomeIcon icon={faHome} />
+    Inicio
+  </div>
+);
+
 
 
 const Dashboard = () => {
-    return (
-            <div className="dashboard">
-        <div className="dashboard-menu">
-            <h2>Menu</h2>
-            <ul>
-                <li>Inicio</li>
-                <li>Clientes</li>
-                <li>Facturas</li>
-                <li>Pagos</li>
-                <li>Cotización</li>
-            </ul>
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
+  const cerrarSesion = () => {
+    console.log("Cerrar sesión");
+  };
+
+  return (
+    <div className="dashboard">
+      <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
+        <h2>Bienvenido usuario</h2>
+        <ul>
+          <li><a href=""><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+          <li><a href=""><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></a></li>
+          <li><a href=""><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></a></li>
+          <li><a href=""><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></a></li>
+          <li><a href=""><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></a></li>
+          <li><a href=""><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></a></li>
+          <li><a href=""><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></a></li>
+          <li><a href=""> <FontAwesomeIcon icon={faClipboard} /><span>Inventario</span></a></li>
+          <li><a href=""><FontAwesomeIcon icon={faCartArrowDown} /> <span>Tienda</span></a></li>
+        </ul>
+        <ul>
+          <li className="Cerrarsesion"><a href="#" onClick={cerrarSesion}><FontAwesomeIcon icon={faSignOut} /><span>Cerrar sesión</span></a></li>
+        </ul>
+        <button className="toggle-btn" onClick={toggleSidebar}><FontAwesomeIcon icon={faChevronLeft} /></button>
+      </div>
+
+      <div className="dashboard-content">
+        <h2>Bienvenido al sistema de gestión de electricidad</h2>
+        <div className="widgets">
+          <div className="widget cita">
+            <h3>Próximas citas</h3>
+            <div id="lista-citas">
+              <p>Cargando...</p>
+            </div>
+          </div>
+
+          <div className="widget">
+            <h3>Servicios pendientes</h3>
+            <div id="lista-servicios">
+              <p>Cargando...</p>
+            </div>
+          </div>
+
+          <div className="widget">
+            <h3>Servicios atrasados</h3>
+            <div id="lista-servicios-atrasados">
+              <p>Cargando...</p>
+            </div>
+          </div>
+
+          <div className="widget">
+            <h3>Estadísticas de servicios</h3>
+            <canvas id="graficoTareas"></canvas>
+          </div>
         </div>
-        <h1>Dashboard</h1>
-        <div className="dashboard-content">
-            <h2>Bienvenido al sistema de gestión de electricidad</h2>
-           </div>
-        </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
+
 export default Dashboard;

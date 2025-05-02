@@ -166,5 +166,182 @@ h1 {
     justify-content: center;
     margin-top: 1rem;
   }
-  
+}
+.dashboard {
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #040293;
+  color: white;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 20px;
+  text-align: center;
+  transition: width 0.3s, padding 0.3s, opacity 0.3s;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+  padding: 20px 10px;
+}
+
+.sidebar h2, .sidebar ul li a span {
+  transition: opacity 0.3s, width 0.3s;
+  opacity: 1;
+  width: auto;
+}
+
+.sidebar.collapsed h2, .sidebar.collapsed ul li a span {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.sidebar.collapsed ul li a {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.sidebar.collapsed ul li a i {
+  transition: opacity 0.3s;
+  margin-right: 0;
+}
+
+.sidebar.collapsed .Cerrarsesion {
+  width: 60px;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.sidebar h2 {
+  margin: 0;
+  font-size: 28px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  padding-left: 0;
+  text-align: left;
+}
+
+.sidebar ul li {
+  margin: 10px 0;
+  font-size: 18px;
+}
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: white;
+  display: block;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.sidebar ul li a:hover {
+  background-color: #040293;
+}
+
+.Cerrarsesion {
+  position: fixed;
+  bottom: 0;
+  width: 250px;
+  text-align: center;
+  padding: 10px;
+  background-color: #040293;
+  color: white;
+  text-decoration: none;
+  display: block;
+  border-radius: 0 0 5px 5px;
+  transition: background-color 0.1s;
+}
+
+.toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  background-color: #040293;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: right 0.3s, transform 0.3s;
+  z-index: 1000;
+  transform: translateY(-50%);
+}
+
+.sidebar.collapsed .toggle-btn {
+  right: -20px;
+}
+
+.toggle-btn i {
+  transition: transform 0.3s;
+}
+
+.sidebar.collapsed .toggle-btn i {
+  transform: rotate(180deg);
+}
+
+.dashboard-content {
+  margin-left: 270px;
+  padding: 20px;
+  flex-grow: 1;
+  transition: margin-left 0.3s;
+}
+
+.sidebar.collapsed ~ .dashboard-content {
+  margin-left: 80px;
+}
+
+.widgets {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  margin-left: 10px;
+}
+
+.widget {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  flex: 1;
+  min-width: 300px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.widget h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+#graficoTareas {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  flex: 1;
+  max-width: 200px;
+  max-height: 200px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-left: 110px;
+}
+
+.dashboard h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
 }
