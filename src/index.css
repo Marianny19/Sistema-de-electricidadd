@@ -250,19 +250,7 @@ h1 {
   background-color: #040293;
 }
 
-.Cerrarsesion {
-  position: fixed;
-  bottom: 0;
-  width: 250px;
-  text-align: center;
-  padding: 10px;
-  background-color: #040293;
-  color: white;
-  text-decoration: none;
-  display: block;
-  border-radius: 0 0 5px 5px;
-  transition: background-color 0.1s;
-}
+
 
 .toggle-btn {
   position: absolute;
@@ -344,4 +332,210 @@ h1 {
 .dashboard h2 {
   margin: 0 0 10px;
   font-size: 20px;
+}
+
+.Cerrarsesion {
+  position: fixed;
+  bottom: 0;
+  align-items: center;
+  text-align: center;
+  width: 250px;
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+  border-radius: 0 0 5px 5px;
+  transition: background-color 0.3s, width 0.3s, padding 0.3s, opacity 0.3s; 
+}
+
+.main-content {
+  margin-left: 0px;
+  padding: 20px;
+}
+.dashboard-content {
+  margin-left: 280px;
+  font-size: 16px;
+  color: #040293;
+}	
+.dashboard-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px auto;
+}
+
+.Verclientes {
+  max-width: 150%;
+  margin: 20px auto;
+  padding: 20px;
+  overflow-x: auto; 
+  
+}
+.tabla-clientes {
+  width: 500px;
+  border-collapse: collapse;
+  margin: 10px auto;
+}
+
+caption {
+  text-align: left;
+  font-size: 30px;
+  margin: 10px;
+  color: #080808;
+  font-family: 'Franklin Gothic Medium';
+}
+
+table, th, td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+
+}
+table thead {
+  background-color: #040293;
+  color: #fff;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+table tbody td {
+  text-align: left; 
+  font-family: 'Franklin Gothic Medium Cond';
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis; 
+}
+
+table button {
+  padding: 4px 2px; 
+  background-color: #040293;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  margin: 0 2px;
+  cursor: pointer;
+  font-size: 0.8em; 
+  width: 50px; 
+}
+
+table button:hover {
+  background-color: #040293;
+}
+
+table button:last-child:hover {
+  background-color: #c0392b;
+}
+
+.wrap-text {
+  font-size: 0.8em; 
+  word-wrap: break-word;
+  white-space: normal;
+  max-height: 3em; 
+  overflow-y: auto; 
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-left: 1100px;
+  max-width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #fff;
+  position: relative;
+}
+
+.input-container i {
+  color: gray;
+  margin-left: 5px;
+}
+
+.Buscar {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding-left: 5px;
+  height: 25px;
+  font-size: 14px;
+  
+}
+
+.alinear {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 99%;
+}
+
+.alinear h2 {
+  margin: 0;
+  font-size: 24px;
+  flex: 1;
+}
+
+.Registro {
+  padding: 10px;
+  background-color: #040293;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 20px;
+  margin-bottom: 20px;
+  margin-left: 1150px;
+  white-space: nowrap;
+}
+
+.contenedor-cita {
+  background: rgba(179, 203, 255, 0.769);
+  padding: 40px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 700px;
+  margin: 100px auto;
+  color: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.titulo-cita {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+
+.formulario-cita {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.campo-cita {
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 16px;
+  outline: none;
+}
+
+.boton-cita {
+  grid-column: span 2;
+  background-color: #040293;
+  color: white;
+  font-size: 18px;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.boton-cita:hover {
+  background-color: #040293;
 }

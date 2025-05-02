@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faCar, faCarRear, faCartArrowDown, faChevronCircleDown, faChevronCircleLeft, faChevronLeft, faClipboard, faFileInvoice, faFileInvoiceDollar, faHome, faMoneyBills, faMoneyCheck, faQuoteLeft, faSignOut, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
+  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
+  faSignOut, faUser, faUsers
+} from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
 
 const MiComponente = () => (
   <div>
@@ -8,9 +13,6 @@ const MiComponente = () => (
     Inicio
   </div>
 );
-
-
-
 const Dashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -28,9 +30,9 @@ const Dashboard = () => {
         <h2>Bienvenido usuario</h2>
         <ul>
           <li><a href=""><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
-          <li><a href=""><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></a></li>
-          <li><a href=""><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></a></li>
-          <li><a href=""><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></a></li>
+          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+          <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
+          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><a href=""><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></a></li>
           <li><a href=""><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></a></li>
           <li><a href=""><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></a></li>

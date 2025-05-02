@@ -5,14 +5,22 @@ import './index.css';
 import Iniciosesion from './Iniciosesion.jsx';
 import Identificacion from './Identificacion.jsx'; 
 import Dashboard from './Dashboard.jsx';
+import Clienteempleado from './Clienteempleado.jsx';
+import Empleado from './Empleado.jsx';
+import FormularioCita from './FormularioCitas.jsx'; // Importa el componente FormularioCita
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Router>
       <Routes>
         {}
-        <Route path="/" element={<Dashboard />} /> {}
+        <Route path="/dashboard" element={<Dashboard />} /> {}
+        <Route path='/clienteempleado' element={<Clienteempleado />} /> {}
+        <Route path='/empleado' element={<Empleado />} /> {}
         <Route path="/Iniciosesion" element={<Iniciosesion />} /> {}
+        <Route path='/formulariocita' element={<FormularioCita />} /> {/* Ruta para el formulario de citas */}
+        
       </Routes>
     </Router>
   </StrictMode>
