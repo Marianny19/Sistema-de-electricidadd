@@ -3,11 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers, faSearch
+  faSignOut, faUser, faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
-const Clienteempleado = () => {
+const CrearCliente = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -18,7 +18,7 @@ const Clienteempleado = () => {
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido usuario</h2>
         <ul>
-          <li><Link to="/Dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
@@ -41,38 +41,28 @@ const Clienteempleado = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de Clientes</h2>
-
-        <div className="main-content">
-               <Link to="/crearcliente"><button className="Registro">+ Nuevo cliente</button></Link>
-              <div className="input-container-wrapper">
-                <div className="input-container">
-                  <input id="buscar-cliente" className="Buscar" type="search" placeholder="Buscar cliente" />
-                  <FontAwesomeIcon icon={faSearch} />
-                </div>
-
-            <table className='tabla-clientes'>
-              <caption>Lista de clientes</caption>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Teléfono</th>
-                  <th>Cédula</th>
-                  <th>Dirección</th>
-                  <th>Correo electrónico</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-clientes">
-                {}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <h2>Bienvenido a la sección de citas</h2>
+        <FormularioCliente />
       </div>
     </div>
   );
 };
 
-export default Clienteempleado;
+function FormularioCliente() {
+  return (
+    <div className="contenedor-cita">
+      <h1 className="titulo-cita">CREAR CLIENTE</h1>
+      <form className="formulario-cita">
+        <input type="number" placeholder="Código" className="campo-cita" />
+        <input type="text" placeholder="Cedula" className="campo-cita" />
+        <input type="text" placeholder="Nombre" className="campo-cita" />
+        <input type="text"  placeholder= "Apellido"className="campo-cita" />
+        <input type="text" placeholder="Dirrecion" className="campo-cita" />
+        <input type="text" placeholder="Numero" className="campo-cita" />
+        <button type="submit" className="boton-cita">Crear cliente</button>
+      </form>
+    </div>
+  );
+}
+
+export default CrearCliente;
