@@ -8,6 +8,7 @@ import Dashboard from './Dashboard.jsx';
 import Clienteempleado from './Clienteempleado.jsx';
 import Empleado from './Empleado.jsx';
 import FormularioCita from './FormularioCitas.jsx'; // Importa el componente FormularioCita
+import Crearcita from './Crearcita.jsx';
 
 
 createRoot(document.getElementById('root')).render(
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')).render(
         <Route path='/empleado' element={<Empleado />} /> {}
         <Route path="/Iniciosesion" element={<Iniciosesion />} /> {}
         <Route path='/formulariocita' element={<FormularioCita />} /> {/* Ruta para el formulario de citas */}
+        <Route path='/crearcita' element={<Crearcita />} /> {/* Ruta para crear una cita */}
         
       </Routes>
     </Router>

@@ -3,11 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers, faSearch
+  faSignOut, faUser, faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
-const FormularioCitas = () => {
+const Crearcita = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -42,36 +42,28 @@ const FormularioCitas = () => {
 
       <div className="dashboard-content">
         <h2>Bienvenido a la sección de citas</h2>
-
-        <div className="main-content">
-        <Link to="/crearcita"><button className="Registro">+ Nueva cita</button></Link>
-              <div className="input-container-wrapper">
-                <div className="input-container">
-                  <input id="buscar-empleado" className="Buscar" type="search" placeholder="Buscar cita" />
-                  <FontAwesomeIcon icon={faSearch} />
-                </div>
-
-            <table className='tabla-empleados'>
-              <caption>Lista de citas</caption>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Teléfono</th>
-                  <th>Cédula</th>
-                  <th>Dirección</th>
-                  <th>Correo electrónico</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-empleados">
-                {}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <Crearcitas />
       </div>
     </div>
   );
 };
-export default FormularioCitas;
+
+
+function Crearcitas() {
+  return (
+    <div className="contenedor-cita">
+      <h1 className="titulo-cita">REALIZAR CITA</h1>
+      <form className="formulario-cita">
+        <input type="number" placeholder="Codigo" className="campo-cita" />
+        <input type="number" placeholder="Codigo cliente" className="campo-cita" />
+        <input type="text" placeholder="Servicio" className="campo-cita" />
+        <input type="date" className="campo-cita" />
+        <input type="text" placeholder="Detalle" className="campo-cita" />
+        <input type="time" className="campo-cita" />
+        <button type="submit" className="boton-cita">Realizar cita</button>
+      </form>
+    </div>
+  );
+}
+
+export default Crearcita;
