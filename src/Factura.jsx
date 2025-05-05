@@ -48,7 +48,7 @@ const Factura = () => {
       <div className="dashboard-content">
         <h2>Bienvenido a la sección de Factura</h2>
         <div className="main-content">
-                    
+        <button className="Registro" onClick={() => console.log("Generar reporte")}> Generar reporte </button>
                      <div className="input-container-wrapper">
                        <div className="input-container">
                          <input id="buscar-factura" className="Buscar" type="search" placeholder="Buscar facturas" />

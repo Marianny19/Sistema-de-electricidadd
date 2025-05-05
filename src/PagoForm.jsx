@@ -58,7 +58,7 @@ function Crearcitas() {
         <input type="date" placeholder= "Fecha" className="campo-cita" />
         <input type="time" placeholder="Hora" className="campo-cita" />
         <input type="text" placeholder = "Detalle" className="campo-cita" />
-        <button type="submit" className="boton-cita">Registrar pago</button>
+        <button type="submit" className="boton-cita">Generar Factura</button>
       </form>
     </div>
   );
