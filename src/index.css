@@ -539,3 +539,73 @@ table button:last-child:hover {
 .boton-cita:hover {
   background-color: #040293;
 }
+
+.factura-container {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 50px auto;
+  font-family: 'Arial', sans-serif;
+}
+
+.factura-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #040293;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.factura-details {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.factura-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.factura-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.factura-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.factura-input:focus {
+  border-color: #040293;
+}
+
+.factura-button {
+  background-color: #040293;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+}
+
+.factura-button:hover {
+  background-color: #03027a;
+}
+.tabla-factura {
+  width: 500px;
+  border-collapse: collapse;
+  margin: 10px auto;
+}
