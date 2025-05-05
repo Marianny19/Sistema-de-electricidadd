@@ -33,7 +33,7 @@ const Dashboardcliente = () => {
           <li><a href="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
           <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
           <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><a href=""><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></a></li>
+          <li><a href="/cotizacionregistro"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></a></li>
           <li><Link to="/recomendacion"><FontAwesomeIcon icon={faReceipt} /> <span>Recomendación</span></Link></li>
           <li><a href="/notasregistro"> <FontAwesomeIcon icon={faClipboard} /><span>Notas</span></a></li>
         </ul>
