@@ -16,6 +16,7 @@ import Dashboardcliente from './Dashboardcliente.jsx';
 import Clienteregistro from './Clienteregistro.jsx';
 import Citaregistro from './Citaregistro.jsx';
 import Notasregistro from './Notasregistro.jsx';
+import Recomendacion from './recomendacion.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -36,6 +37,7 @@ createRoot(document.getElementById('root')).render(
         <Route path='/clienteregistro' element={<Clienteregistro />} /> {}
         <Route path='/citaregistro' element={<Citaregistro />} /> {}
         <Route path='/notasregistro' element={<Notasregistro />} /> {}
+        <Route path='/recomendacion' element={<Recomendacion />} /> {}
       </Routes>
     </Router>
   </StrictMode>
