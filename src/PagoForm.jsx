@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
-const Crearcita = () => {
+const PagoForm = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -39,7 +39,7 @@ const Crearcita = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de citas</h2>
+        <h2>Bienvenido a la sección de pagos</h2>
         <Crearcitas />
       </div>
     </div>
@@ -50,18 +50,18 @@ const Crearcita = () => {
 function Crearcitas() {
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">REALIZAR CITA</h1>
+      <h1 className="titulo-cita">REGISTRAR PAGO</h1>
       <form className="formulario-cita">
         <input type="number" placeholder="Codigo" className="campo-cita" />
-        <input type="number" placeholder="Codigo cliente" className="campo-cita" />
-        <input type="text" placeholder="Servicio" className="campo-cita" />
-        <input type="date" className="campo-cita" />
-        <input type="text" placeholder="Detalle" className="campo-cita" />
-        <input type="time" className="campo-cita" />
-        <button type="submit" className="boton-cita">Realizar cita</button>
+        <input type="number" placeholder="Codigo Cotizacion" className="campo-cita" />
+        <input type="number" placeholder="Monto" className="campo-cita" />
+        <input type="date" placeholder= "Fecha" className="campo-cita" />
+        <input type="time" placeholder="Hora" className="campo-cita" />
+        <input type="text" placeholder = "Detalle" className="campo-cita" />
+        <button type="submit" className="boton-cita">Registrar pago</button>
       </form>
     </div>
   );
 }
 
-export default Crearcita;
+export default PagoForm;

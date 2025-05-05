@@ -11,12 +11,13 @@ import FormularioCita from './FormularioCitas.jsx';
 import Crearcita from './Crearcita.jsx';
 import CrearCliente from './CrearCliente.jsx';
 import Factura from './Factura.jsx';
-import Facturaform from './Facturaform.jsx'; 
 import Dashboardcliente from './Dashboardcliente.jsx';
 import Clienteregistro from './Clienteregistro.jsx';
 import Citaregistro from './Citaregistro.jsx';
 import Notasregistro from './Notasregistro.jsx';
 import Recomendacion from './recomendacion.jsx';
+import Pago from './Pago.jsx';
+import PagoForm from './PagoForm.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -33,11 +34,14 @@ createRoot(document.getElementById('root')).render(
         <Route path='/crearcita' element={<Crearcita />} /> {}
         <Route path='/crearcliente' element={<CrearCliente />} /> {}
         <Route path='/factura' element={<Factura />} /> {}
-        <Route path='/facturaform' element={<Facturaform />} /> {}
         <Route path='/clienteregistro' element={<Clienteregistro />} /> {}
         <Route path='/citaregistro' element={<Citaregistro />} /> {}
         <Route path='/notasregistro' element={<Notasregistro />} /> {}
         <Route path='/recomendacion' element={<Recomendacion />} /> {}
+        <Route path='/pago' element={<Pago />} /> {}
+        <Route path='/pagoform' element={<PagoForm />} /> {}
+
+
       </Routes>
     </Router>
   </StrictMode>
