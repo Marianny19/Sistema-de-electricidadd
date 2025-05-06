@@ -14,12 +14,14 @@ const Cotizacion = () => {
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido cliente</h2>
         <ul>
-          <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
-          <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/cotizacionregistro"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
-          <li><Link to="/recomendacion"><FontAwesomeIcon icon={faReceipt} /> <span>Recomendación</span></Link></li>
-          <li><Link to="/notasregistro"><FontAwesomeIcon icon={faClipboard} /> <span>Notas</span></Link></li>
+          <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+          <li><Link to="/empleado"><FontAwesomeIcon icon={faCalendar} /> <span>Empleados</span></Link></li>
+          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faFileInvoice} /> <span>Citas</span></Link></li>
+          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faReceipt} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/factura"><FontAwesomeIcon icon={faClipboard} /> <span>Factura</span></Link></li>
+          <li><Link to="/pago"><FontAwesomeIcon icon={faClipboard} /> <span>Pago</span></Link></li>
+
         </ul>
         <ul>
           <li className="Cerrarsesion">
