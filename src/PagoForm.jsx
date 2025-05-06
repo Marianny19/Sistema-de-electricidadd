@@ -3,11 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers, faSearch
+  faSignOut, faUser, faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
-const Empleado = () => {
+const PagoForm = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -39,37 +39,29 @@ const Empleado = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de empleados</h2>
-
-        <div className="main-content">
-              <button className="Registro" onClick={() => console.log("Registrar empleado")}>+ Nuevo empleado </button>
-              <div className="input-container-wrapper">
-                <div className="input-container">
-                  <input id="buscar-empleado" className="Buscar" type="search" placeholder="Buscar empleado" />
-                  <FontAwesomeIcon icon={faSearch} />
-                </div>
-
-            <table className='tabla-empleados'>
-              <caption>Lista de empleados</caption>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Teléfono</th>
-                  <th>Cédula</th>
-                  <th>Dirección</th>
-                  <th>Correo electrónico</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-empleados">
-                {}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <h2>Bienvenido a la sección de pagos</h2>
+        <Crearcitas />
       </div>
     </div>
   );
 };
-export default Empleado;
+
+
+function Crearcitas() {
+  return (
+    <div className="contenedor-cita">
+      <h1 className="titulo-cita">REGISTRAR PAGO</h1>
+      <form className="formulario-cita">
+        <input type="number" placeholder="Codigo" className="campo-cita" />
+        <input type="number" placeholder="Codigo Cotizacion" className="campo-cita" />
+        <input type="number" placeholder="Monto" className="campo-cita" />
+        <input type="date" placeholder= "Fecha" className="campo-cita" />
+        <input type="time" placeholder="Hora" className="campo-cita" />
+        <input type="text" placeholder = "Detalle" className="campo-cita" />
+        <button type="submit" className="boton-cita">Generar Factura</button>
+      </form>
+    </div>
+  );
+}
+
+export default PagoForm;

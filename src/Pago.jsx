@@ -9,10 +9,11 @@ import {
 import './index.css';
 
 
+const Crearcitas = () => <div>Contenido de Facturas aquí</div>;
 const cerrarSesion = () => alert('Sesión cerrada');
 const toggleSidebar = () => alert('Toggle sidebar');
 
-const Factura = () => {
+const Pago = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const handleToggleSidebar = () => {
@@ -28,10 +29,9 @@ const Factura = () => {
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
+          <li><Link to="/cotizacionregistro"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
-         
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -46,9 +46,9 @@ const Factura = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de Factura</h2>
+        <h2>Bienvenido a la sección de Pagos</h2>
         <div className="main-content">
-        <button className="Registro" onClick={() => console.log("Generar reporte")}> Generar reporte </button>
+                      <Link to="/pagoform"><button className="Registro">+ Nuevo Pago</button></Link>
                      <div className="input-container-wrapper">
                        <div className="input-container">
                          <input id="buscar-factura" className="Buscar" type="search" placeholder="Buscar facturas" />
@@ -56,10 +56,10 @@ const Factura = () => {
                        </div>
        
                    <table className='tabla-factura'>
-                     <caption>Lista de facturas</caption>
+                     <caption>Lista de Pagos</caption>
                      <thead>
                        <tr>
-                         <th>Numero de factura</th>
+                         <th>Numero de Cotizacion</th>
                          <th>Fecha</th>
                          <th>Hora</th>
                          <th>Monto</th>
@@ -76,4 +76,4 @@ const Factura = () => {
            </div>
          );
        }
-export default Factura;
+export default Pago;

@@ -22,11 +22,10 @@ const FormularioCitas = () => {
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="#"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
-          <li><Link to="#"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><Link to="#"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
-          <li><Link to="#"><FontAwesomeIcon icon={faClipboard} /> <span>Inventario</span></Link></li>
-          <li><Link to="#"><FontAwesomeIcon icon={faCartArrowDown} /> <span>Tienda</span></Link></li>
+          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+          <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
+
         </ul>
         <ul>
           <li className="Cerrarsesion">

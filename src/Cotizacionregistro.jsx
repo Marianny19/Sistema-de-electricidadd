@@ -3,11 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
+  faReceipt,
   faSignOut, faUser, faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
-const Crearcita = () => {
+const Cotizacionregisto = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -18,13 +19,15 @@ const Crearcita = () => {
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido usuario</h2>
         <ul>
-          <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-          <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
-          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
-          <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
+          <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
+          <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+          <li><a href="/cotizacionregistro"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></a></li>
+          <li><a href="/recomendacion"><FontAwesomeIcon icon={faReceipt} /> <span>Recomendación</span></a></li>
+          <li><a href="/notasregistro"> <FontAwesomeIcon icon={faClipboard} /><span>Notas</span></a></li>
+
+          
+        
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -39,29 +42,26 @@ const Crearcita = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de citas</h2>
-        <Crearcitas />
+        <h2>Bienvenido a la sección de cotizaciones</h2>
+        <FormularioCliente />
       </div>
     </div>
   );
 };
 
-
-function Crearcitas() {
+function FormularioCliente() {
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">REALIZAR CITA</h1>
+      <h1 className="titulo-cita">SOLICITUD DE COTIZACION</h1>
       <form className="formulario-cita">
-        <input type="number" placeholder="Codigo" className="campo-cita" />
-        <input type="number" placeholder="Codigo cliente" className="campo-cita" />
+        <input type="number" placeholder="Código" className="campo-cita" />
         <input type="text" placeholder="Servicio" className="campo-cita" />
-        <input type="date" className="campo-cita" />
+        <input type="text"  placeholder= "Presupuesto"className="campo-cita" />
         <input type="text" placeholder="Detalle" className="campo-cita" />
-        <input type="time" className="campo-cita" />
-        <button type="submit" className="boton-cita">Realizar cita</button>
+        <button type="submit" className="boton-cita">SOLICITAR</button>
       </form>
     </div>
   );
 }
 
-export default Crearcita;
+export default Cotizacionregisto;

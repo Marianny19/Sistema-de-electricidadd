@@ -33,11 +33,9 @@ const Dashboard = () => {
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><a href=""><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></a></li>
+          <li><a href="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></a></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><a href=""><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></a></li>
-          <li><a href=""> <FontAwesomeIcon icon={faClipboard} /><span>Inventario</span></a></li>
-          <li><a href=""><FontAwesomeIcon icon={faCartArrowDown} /> <span>Tienda</span></a></li>
+          <li><a href="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></a></li>
         </ul>
         <ul>
           <li className="Cerrarsesion"><a href="#" onClick={cerrarSesion}><FontAwesomeIcon icon={faSignOut} /><span>Cerrar sesión</span></a></li>

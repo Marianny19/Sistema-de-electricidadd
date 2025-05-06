@@ -6,13 +6,15 @@ const Identificacion = () => {
     return (
         <div className="identificacion">
 
-            <h2>Bienvenido al sistema de gestión de electricidad de Servicios Múltiples Pérez</h2>
+            <h2>Bienvenido al sistema de gestión de Servicios Múltiples Pérez</h2>
             <div className='logo_identificacion'>
             <img src={logo} alt="Logo" />
             </div>
             <h1>Elige como deseas iniciar sesión</h1> 
             <div className="botones">
+            <Link to= "/dashboardcliente">
             <button className="btn">Cliente </button>
+            </Link>
             <Link to= "/Iniciosesion">
             <button className="btn">Empleado</button>
             </Link>
