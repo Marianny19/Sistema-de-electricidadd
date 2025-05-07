@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
-const Crearempleado = () => {
+const CrearEmpleadoPage = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -40,38 +40,87 @@ const Crearempleado = () => {
 
       <div className="dashboard-content">
         <h2>Bienvenido a la sección de crear usuario</h2>
-        <Crearcitas />
+        <FormularioEmpleado />
       </div>
     </div>
   );
 };
 
+function FormularioEmpleado() {
+  const [formulario, setFormulario] = useState({
+    nombre: '',
+    apellido: '',
+    telefono: '',
+    email: '',
+    cargo: '',
+    salario: '',
+    fecha_ingreso: '',
+    fecha_nacimiento: '',
+    direccion: '',
+    estado: ''
+  });
 
-function Crearcitas() {
+  const handleChange = (e) => {
+    setFormulario({
+      ...formulario,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const respuesta = await fetch('http://localhost:8081/empleados', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formulario)
+      });
+
+      if (respuesta.ok) {
+        alert('Empleado registrado correctamente');
+        setFormulario({
+          nombre: '',
+          apellido: '',
+          telefono: '',
+          email: '',
+          cargo: '',
+          salario: '',
+          fecha_ingreso: '',
+          fecha_nacimiento: '',
+          direccion: '',
+          estado: ''
+        });
+      } else {
+        alert('Error al registrar el empleado');
+      }
+    } catch (error) {
+      console.error('Error en el registro:', error);
+      alert('Error de red al registrar empleado');
+    }
+  };
+
   return (
     <div className="contenedor-cita">
       <h1 className="titulo-cita">CREAR NUEVO EMPLEADO</h1>
-      <form className="formulario-cita">
-        <input type="number" placeholder="Codigo" className="campo-cita" />
-        <input type="text" placeholder="Nombre" className="campo-cita" />
-        <input type="text" placeholder = "Apellido" className="campo-cita" />
-        <input type="text" placeholder="Email" className="campo-cita" />
-        <input type="text" placeholder = "Cargo" className="campo-cita" />
-        <input type="number" placeholder = "Salario" className="campo-cita" />
-        <input type="date" placeholder = "Fecha ingreso" className="campo-cita" />
-        <input type="date" placeholder = "Fecha nacimiento" className="campo-cita" />
-        <input type="text" placeholder = "Direccion" className="campo-cita" />
-        <select className="campo-cita">
-      <option value="">Estado</option>
-      <option value="activo">activo</option>
-      <option value="inactivo">inactivo</option>
-
-    </select>
-
-        <button type="submit" className="boton-cita">Realizar cita</button>
+      <form className="formulario-cita" onSubmit={handleSubmit}>
+        <input type="text" name="nombre" placeholder="Nombre" className="campo-cita" value={formulario.nombre} onChange={handleChange} />
+        <input type="text" name="apellido" placeholder="Apellido" className="campo-cita" value={formulario.apellido} onChange={handleChange} />
+        <input type="text" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} />
+        <input type="text" name="cargo" placeholder="Cargo" className="campo-cita" value={formulario.cargo} onChange={handleChange} />
+        <input type="number" name="salario" placeholder="Salario" className="campo-cita" value={formulario.salario} onChange={handleChange} />
+        <input type="date" name="fecha_ingreso" placeholder="Fecha ingreso" className="campo-cita" value={formulario.fecha_ingreso} onChange={handleChange} />
+        <input type="date" name="fecha_nacimiento" placeholder="Fecha nacimiento" className="campo-cita" value={formulario.fecha_nacimiento} onChange={handleChange} />
+        <input type="text" name="direccion" placeholder="Direccion" className="campo-cita" value={formulario.direccion} onChange={handleChange} />
+        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange}>
+          <option value="">Estado</option>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+        <button type="submit" className="boton-cita">Registrar empleado</button>
       </form>
     </div>
   );
 }
 
-export default Crearempleado;
+export default CrearEmpleadoPage;
