@@ -56,12 +56,11 @@ function FormularioCliente() {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita">
-        <input type="number" placeholder="Código" className="campo-cita" />
-        <input type="text" placeholder="Cedula" className="campo-cita" />
         <input type="text" placeholder="Nombre" className="campo-cita" />
-        <input type="text"  placeholder= "Apellido"className="campo-cita" />
-        <input type="text" placeholder="Dirrecion" className="campo-cita" />
-        <input type="text" placeholder="Numero" className="campo-cita" />
+        <input type="text" placeholder="Apellido" className="campo-cita" />
+        <input type="text"  placeholder= "Telefono"className="campo-cita" />
+        <input type="text" placeholder="Email" className="campo-cita" />
+        <input type="text" placeholder="Direccion" className="campo-cita" />
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

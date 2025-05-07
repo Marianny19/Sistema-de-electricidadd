@@ -52,12 +52,15 @@ function Crearcitas() {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">REGISTRAR PAGO</h1>
       <form className="formulario-cita">
-        <input type="number" placeholder="Codigo" className="campo-cita" />
-        <input type="number" placeholder="Codigo Cotizacion" className="campo-cita" />
+        <input type="number" placeholder="Cotizacion" className="campo-cita" />
         <input type="number" placeholder="Monto" className="campo-cita" />
         <input type="date" placeholder= "Fecha" className="campo-cita" />
-        <input type="time" placeholder="Hora" className="campo-cita" />
-        <input type="text" placeholder = "Detalle" className="campo-cita" />
+        <select className="campo-cita">
+      <option value="">Metodo pago</option>
+      <option value="efectivo">efectivo</option>
+      <option value="tarjeta">tarjeta</option>
+      <option value="tranferencia">transferencia</option>
+    </select>
         <button type="submit" className="boton-cita">Generar Factura</button>
       </form>
     </div>

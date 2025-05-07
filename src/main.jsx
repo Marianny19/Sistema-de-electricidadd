@@ -20,6 +20,9 @@ import Pago from './Pago.jsx';
 import PagoForm from './PagoForm.jsx';
 import Cotizacionregisto from './Cotizacionregistro.jsx';
 import Cotizacion from './Cotizacion.jsx';
+import Crearempleado from './Crearempleado.jsx';
+import Iniciosesioncliente from './Iniciosesioncliente.jsx';
+import Registratecliente from './Registratecliente.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -44,6 +47,12 @@ createRoot(document.getElementById('root')).render(
         <Route path='/pagoform' element={<PagoForm />} /> {}
         <Route path='/cotizacionregistro' element={<Cotizacionregisto />} /> {}
         <Route path='/cotizacion' element={<Cotizacion />} /> {}
+        <Route path='/crearempleado' element={<Crearempleado />} /> {}
+        <Route path='/iniciosesioncliente' element={<Iniciosesioncliente />} /> {}
+        <Route path='/registratecliente' element={<Registratecliente />} /> {}
+
+
+
 
 
 

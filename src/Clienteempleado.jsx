@@ -53,13 +53,12 @@ const Clienteempleado = () => {
               <caption>Lista de clientes</caption>
               <thead>
                 <tr>
+                   <th>Codigo</th>
                   <th>Nombre</th>
                   <th>Apellido</th>
                   <th>Teléfono</th>
-                  <th>Cédula</th>
+                  <th>Email</th>
                   <th>Dirección</th>
-                  <th>Correo electrónico</th>
-                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-clientes">

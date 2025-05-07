@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
-const Crearcita = () => {
+const Crearempleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -39,7 +39,7 @@ const Crearcita = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de citas</h2>
+        <h2>Bienvenido a la sección de crear usuario</h2>
         <Crearcitas />
       </div>
     </div>
@@ -50,28 +50,28 @@ const Crearcita = () => {
 function Crearcitas() {
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
+      <h1 className="titulo-cita">CREAR NUEVO EMPLEADO</h1>
       <form className="formulario-cita">
-      <select className="campo-cita">
-      <option value="">Selecciona un servicio</option>
-      <option value="electricidad">Instalacion electrica</option>
-      <option value="reparacion">Reparacion electrica</option>
-      <option value="lampara">Instalacion de lampara u inversor</option>
-      <option value="mantenimiento">Mantenimiento electrico</option>
-      <option value="plomeria">Plomeria</option>
-      <option value="aire">Aire/ac</option>
-    </select>
-        <input type="datetime-local" placeholder="Fecha" className="campo-cita" />
+        <input type="number" placeholder="Codigo" className="campo-cita" />
+        <input type="text" placeholder="Nombre" className="campo-cita" />
+        <input type="text" placeholder = "Apellido" className="campo-cita" />
+        <input type="text" placeholder="Email" className="campo-cita" />
+        <input type="text" placeholder = "Cargo" className="campo-cita" />
+        <input type="number" placeholder = "Salario" className="campo-cita" />
+        <input type="date" placeholder = "Fecha ingreso" className="campo-cita" />
+        <input type="date" placeholder = "Fecha nacimiento" className="campo-cita" />
+        <input type="text" placeholder = "Direccion" className="campo-cita" />
         <select className="campo-cita">
       <option value="">Estado</option>
-      <option value="agendada">agendada</option>
-      <option value="programada">programada</option>
-      <option value="cancelada">cancelada</option>
+      <option value="activo">activo</option>
+      <option value="inactivo">inactivo</option>
+
     </select>
-        <button type="submit" className="boton-cita">REGISTRAR</button>
+
+        <button type="submit" className="boton-cita">Realizar cita</button>
       </form>
     </div>
   );
 }
 
-export default Crearcita;
+export default Crearempleado;

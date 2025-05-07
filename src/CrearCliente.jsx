@@ -24,9 +24,8 @@ const CrearCliente = () => {
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><Link to="#"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
-          <li><Link to="#"><FontAwesomeIcon icon={faClipboard} /> <span>Inventario</span></Link></li>
-          <li><Link to="#"><FontAwesomeIcon icon={faCartArrowDown} /> <span>Tienda</span></Link></li>
+          <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
+        
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -51,15 +50,14 @@ const CrearCliente = () => {
 function FormularioCliente() {
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">CREAR CLIENTE</h1>
+      <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita">
-        <input type="number" placeholder="Código" className="campo-cita" />
-        <input type="text" placeholder="Cedula" className="campo-cita" />
         <input type="text" placeholder="Nombre" className="campo-cita" />
-        <input type="text"  placeholder= "Apellido"className="campo-cita" />
-        <input type="text" placeholder="Dirrecion" className="campo-cita" />
-        <input type="text" placeholder="Numero" className="campo-cita" />
-        <button type="submit" className="boton-cita">Crear cliente</button>
+        <input type="text" placeholder="Apellido" className="campo-cita" />
+        <input type="text"  placeholder= "Telefono"className="campo-cita" />
+        <input type="text" placeholder="Email" className="campo-cita" />
+        <input type="text" placeholder="Direccion" className="campo-cita" />
+        <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>
   );
