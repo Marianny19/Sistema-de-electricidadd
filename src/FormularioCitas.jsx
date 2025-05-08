@@ -60,6 +60,8 @@ const FormularioCitas = () => {
                   <th>Fecha</th>
                   <th>Dirección</th>
                   <th>Estado</th>
+                  <th>Acciones</th>
+
                 </tr>
               </thead>
               <tbody id="tabla-empleados">

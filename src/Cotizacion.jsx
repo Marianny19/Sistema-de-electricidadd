@@ -64,6 +64,7 @@ const Cotizacion = () => {
                   <th>Subtotal</th>
                   <th>Costo</th>
                   <th>Total mano de obra</th>
+                  <th>Acciones</th>
 
                 </tr>
               </thead>

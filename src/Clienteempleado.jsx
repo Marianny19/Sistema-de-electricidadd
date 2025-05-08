@@ -58,7 +58,7 @@ const Clienteempleado = () => {
                   <th>Apellido</th>
                   <th>Teléfono</th>
                   <th>Email</th>
-                  <th>Dirección</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-clientes">

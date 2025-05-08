@@ -65,6 +65,8 @@ const Factura = () => {
                          <th>Fecha</th>
                          <th>Total</th>
                          <th>Estado</th>
+                         <th>Acciones</th>
+
                        </tr>
                      </thead>
                      <tbody id="tabla-factura">

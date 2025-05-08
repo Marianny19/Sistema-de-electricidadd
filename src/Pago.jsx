@@ -64,6 +64,8 @@ const Pago = () => {
                          <th>Monto</th>
                          <th>Fecha</th>
                          <th>metodo pago</th>
+                         <th>Acciones</th>
+
                        </tr>
                      </thead>
                      <tbody id="tabla-factura">

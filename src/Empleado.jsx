@@ -64,6 +64,7 @@ const Empleado = () => {
                   <th>Fecha nacimiento</th>
                   <th>Direccion</th>
                   <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-empleados">
