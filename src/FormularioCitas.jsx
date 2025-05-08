@@ -54,13 +54,14 @@ const FormularioCitas = () => {
               <caption>Lista de citas</caption>
               <thead>
                 <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Teléfono</th>
-                  <th>Cédula</th>
+                  <th>Codigo</th>
+                  <th>Cliente</th>
+                  <th>Servicio </th>
+                  <th>Fecha</th>
                   <th>Dirección</th>
-                  <th>Correo electrónico</th>
+                  <th>Estado</th>
                   <th>Acciones</th>
+
                 </tr>
               </thead>
               <tbody id="tabla-empleados">

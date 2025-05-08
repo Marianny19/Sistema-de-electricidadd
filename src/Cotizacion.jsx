@@ -42,29 +42,30 @@ const Cotizacion = () => {
             <div className="invoice-grid">
               <div className="input-group">
                 <label>Cliente</label>
-                <input type="text"/>
+                <input type="number"/>
               </div>
               <div className="input-group">
-                <label>Correo</label>
-                <input type="email" />
-              </div>
-              <div className="input-group">
-                <label>Telefono</label>
-                <input type="tel"/>
+                <label>Mano de obra</label>
+                <input type="number" />
               </div>
               <div className="input-group">
                 <label>Fecha</label>
-                <input type="date" />
+                <input type="date"/>
               </div>
+             
             </div>
 
             <table className="invoice-table">
               <thead>
                 <tr>
-                  <th>Producto</th>
+                  <th>Servicio</th>
+                  <th>Material</th>
                   <th>Cantidad</th>
-                  <th>Precio Unitario</th>
                   <th>Subtotal</th>
+                  <th>Costo</th>
+                  <th>Total mano de obra</th>
+                  <th>Acciones</th>
+
                 </tr>
               </thead>
              
@@ -80,12 +81,16 @@ const Cotizacion = () => {
             <div className="summary-row">
               <span>Imp</span>
             </div>
-            <div className="summary-row">
-              <span>Descuento</span>
-            </div>
             <div className="summary-total">
               <span>Total</span>
             </div>
+            <select className="campo-cita">
+      <option value="">Estado</option>
+      <option value="pendiente">pendiente</option>
+      <option value="aceptada">aceptada</option>
+      <option value="rechazada">rechazada</option>
+    </select>
+           
 
             <div className="button-group">
               <button className="save">Guardar</button>

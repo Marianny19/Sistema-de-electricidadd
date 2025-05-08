@@ -54,12 +54,22 @@ function FormularioCliente() {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita">
-        <input type="number" placeholder="Código" className="campo-cita" />
-        <input type="number" placeholder="Código cliente" className="campo-cita" />
-        <input type="text" placeholder="Dirección" className="campo-cita" />
-        <input type="text"  placeholder= "Servicio"className="campo-cita" />
-        <input type="date" placeholder="Fecha" className="campo-cita" />
-        <input type="time" placeholder="Hora" className="campo-cita" />
+      <select className="campo-cita">
+      <option value="">Selecciona un servicio</option>
+      <option value="electricidad">Instalacion electrica</option>
+      <option value="reparacion">Reparacion electrica</option>
+      <option value="lampara">Instalacion de lampara u inversor</option>
+      <option value="mantenimiento">Mantenimiento electrico</option>
+      <option value="plomeria">Plomeria</option>
+      <option value="aire">Aire/ac</option>
+    </select>
+        <input type="datetime-local" placeholder="Fecha" className="campo-cita" />
+        <select className="campo-cita">
+      <option value="">Estado</option>
+      <option value="agendada">agendada</option>
+      <option value="programada">programada</option>
+      <option value="cancelada">cancelada</option>
+    </select>
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

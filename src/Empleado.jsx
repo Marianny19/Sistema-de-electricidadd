@@ -42,7 +42,7 @@ const Empleado = () => {
         <h2>Bienvenido a la sección de empleados</h2>
 
         <div className="main-content">
-              <button className="Registro" onClick={() => console.log("Registrar empleado")}>+ Nuevo empleado </button>
+              <Link to="/crearempleado"><button className="Registro">+ Nuevo empleado</button></Link>
               <div className="input-container-wrapper">
                 <div className="input-container">
                   <input id="buscar-empleado" className="Buscar" type="search" placeholder="Buscar empleado" />
@@ -53,12 +53,17 @@ const Empleado = () => {
               <caption>Lista de empleados</caption>
               <thead>
                 <tr>
+                <th>Codigo</th>
                   <th>Nombre</th>
                   <th>Apellido</th>
                   <th>Teléfono</th>
-                  <th>Cédula</th>
-                  <th>Dirección</th>
-                  <th>Correo electrónico</th>
+                  <th>Email</th>
+                  <th>Cargo</th>
+                  <th>Salario</th>
+                  <th>Fecha ingreso</th>
+                  <th>Fecha nacimiento</th>
+                  <th>Direccion</th>
+                  <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>

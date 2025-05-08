@@ -53,12 +53,17 @@ function FormularioCliente() {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">DEJANOS UNA NOTA O SUGERENCIA</h1>
       <form className="formulario-cita">
-        <input type="number" placeholder="Código" className="campo-cita" />
-        <input type="number" placeholder="Código servicio" className="campo-cita" />
+      <input type="number" placeholder="Codigo servicio" className="campo-cita" />
         <input type="text" placeholder="Comentario" className="campo-cita" />
         <input type="date" placeholder="Fecha" className="campo-cita" />
-        <input type="time" placeholder="Hora" className="campo-cita" />
-        <input type="number"  placeholder= "Estrellas"className="campo-cita" />
+        <select className="campo-cita">
+      <option value="">Estrellas</option>
+      <option value="uno">1/5</option>
+      <option value="dos">2/5</option>
+      <option value="tres">3/5</option>
+      <option value="cuatro">4/5</option>
+      <option value="cinco">5/5</option>
+    </select>
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

@@ -12,7 +12,7 @@ const Identificacion = () => {
             </div>
             <h1>Elige como deseas iniciar sesión</h1> 
             <div className="botones">
-            <Link to= "/dashboardcliente">
+            <Link to= "/iniciosesioncliente">
             <button className="btn">Cliente </button>
             </Link>
             <Link to= "/Iniciosesion">

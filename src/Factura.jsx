@@ -59,11 +59,14 @@ const Factura = () => {
                      <caption>Lista de facturas</caption>
                      <thead>
                        <tr>
-                         <th>Numero de factura</th>
-                         <th>Fecha</th>
-                         <th>Hora</th>
-                         <th>Monto</th>
+                         <th>Codigo</th>
                          <th>Cliente</th>
+                         <th>Cotizacion</th>
+                         <th>Fecha</th>
+                         <th>Total</th>
+                         <th>Estado</th>
+                         <th>Acciones</th>
+
                        </tr>
                      </thead>
                      <tbody id="tabla-factura">
