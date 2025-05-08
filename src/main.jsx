@@ -20,7 +20,6 @@ import PagoForm from './PagoForm.jsx';
 import Recomendacion from './Recomendacion.jsx';
 import Cotizacion from './Cotizacion.jsx';
 import Crearempleado from './Crearempleado.jsx';
-import Iniciosesioncliente from './Iniciosesioncliente.jsx';
 import Registratecliente from './Registratecliente.jsx';  
 import Actualizarcliente from './actualizarcliente.jsx';
 createRoot(document.getElementById('root')).render(
@@ -28,12 +27,11 @@ createRoot(document.getElementById('root')).render(
     <Router>
       <Routes>
         {}
-        <Route path="/" element={<Identificacion />} />
+        <Route path="/" element={<Iniciosesion />} />
         <Route path="/dashboardcliente" element={<Dashboardcliente />} /> {}
         <Route path="/dashboard" element={<Dashboard />} /> {}
         <Route path='/clienteempleado' element={<Clienteempleado />} /> {}
         <Route path='/empleado' element={<Empleado />} /> {}
-        <Route path="/Iniciosesion" element={<Iniciosesion />} /> {}
         <Route path='/formulariocita' element={<FormularioCita />} /> {}
         <Route path='/crearcita' element={<Crearcita />} /> {}
         <Route path='/crearcliente' element={<CrearCliente />} /> {}
@@ -46,7 +44,6 @@ createRoot(document.getElementById('root')).render(
         <Route path='/pagoform' element={<PagoForm />} /> {}
         <Route path='/cotizacion' element={<Cotizacion />} /> {}
         <Route path='/crearempleado' element={<Crearempleado />} /> {}
-        <Route path='/iniciosesioncliente' element={<Iniciosesioncliente />} /> {}
         <Route path='/registratecliente' element={<Registratecliente />} /> {}
         <Route path='/actualizarcliente/:id' element={<Actualizarcliente />} /> {}
 

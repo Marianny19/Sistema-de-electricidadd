@@ -46,7 +46,7 @@ const Pago = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de Pagos</h2>
+        <h2>Bienvenido a la sección de pagos</h2>
         <div className="main-content">
                       <Link to="/pagoform"><button className="Registro">+ Nuevo Pago</button></Link>
                      <div className="input-container-wrapper">
