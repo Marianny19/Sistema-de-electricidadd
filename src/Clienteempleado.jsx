@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
@@ -9,9 +9,26 @@ import { Link } from 'react-router-dom';
 
 const Clienteempleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [clientes, setClientes] = useState([]);
 
+  useEffect(() => {
+    async function cargarClientes() {
+      try {
+        const response = await fetch('http://localhost:8081/clientes'); 
+        const data = await response.json();
+        setClientes(data);
+      } catch (error) {
+        console.error('Error al cargar clientes:', error);
+      }
+    }
+  
+    cargarClientes();
+  }, []);
+  
+  
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
+
 
   return (
     <div className="dashboard">
@@ -53,23 +70,40 @@ const Clienteempleado = () => {
               <caption>Lista de clientes</caption>
               <thead>
                 <tr>
-                   <th>Codigo</th>
+                  <th> Id cliente</th>
                   <th>Nombre</th>
                   <th>Apellido</th>
-                  <th>Teléfono</th>
+                  <th>Telefono</th>
                   <th>Email</th>
+                  <th>Direccion</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-clientes">
-                {}
-              </tbody>
+              {clientes.map((cliente) => (
+              <tr key={cliente.id_cliente}>
+             <td data-label="Id cliente">{cliente.id_cliente}</td>
+            <td data-label="Nombre">{cliente.nombre}</td>
+            <td data-label="Apellido">{cliente.apellido}</td>
+            <td data-label="Teléfono">{cliente.telefono}</td>
+            <td data-label="Email">{cliente.email}</td>
+            <td data-label="Dirección">{cliente.direccion}</td>
+            <td data-label="Acciones">
+              <Link to="/actualizarcliente/:id">
+              <button className="Actualizar">Actualizar</button>
+              </Link>
+              <button className="Eliminar">Eliminar</button>
+              </td>
+              </tr>
+        ))}
+          </tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
+
+
   );
 };
-
 export default Clienteempleado;
