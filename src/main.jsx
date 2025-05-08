@@ -22,8 +22,8 @@ import Cotizacionregisto from './Cotizacionregistro.jsx';
 import Cotizacion from './Cotizacion.jsx';
 import Crearempleado from './Crearempleado.jsx';
 import Iniciosesioncliente from './Iniciosesioncliente.jsx';
-import Registratecliente from './Registratecliente.jsx';
-
+import Registratecliente from './Registratecliente.jsx';  
+import Actualizarcliente from './actualizarcliente.jsx';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Router>
@@ -50,11 +50,7 @@ createRoot(document.getElementById('root')).render(
         <Route path='/crearempleado' element={<Crearempleado />} /> {}
         <Route path='/iniciosesioncliente' element={<Iniciosesioncliente />} /> {}
         <Route path='/registratecliente' element={<Registratecliente />} /> {}
-
-
-
-
-
+        <Route path='/actualizarcliente/:id' element={<Actualizarcliente />} /> {}
 
 
       </Routes>
