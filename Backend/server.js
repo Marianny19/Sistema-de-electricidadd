@@ -4,6 +4,9 @@ const conexion = require('./database');
 const Cliente = require('./models/cliente');
 const Empleado = require('./models/empleado');
 const Pago = require('./models/pago');
+const Nota = require('./models/nota')
+const bcrypt = require('bcryptjs'); 
+const Usuario = require('./models/usuario'); 
 
 const app = express();
 const port = 8081;
@@ -11,7 +14,6 @@ const port = 8081;
 app.use(cors()); 
 app.use(express.json());
 
-// Ruta base de prueba
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente');
 });
@@ -80,6 +82,29 @@ app.post('/pagos', async (req, res) => {
   } catch (error) {
     console.error('Error al registrar pago:', error);
     res.status(500).json({ error: 'Error al registrar pago' });
+  }
+});
+
+
+// Ruta GET para obtener todas las notas
+app.get('/notas', async (req, res) => {
+  try {
+    const Notas = await Nota.findAll();
+    res.json(Notas);
+  } catch (error) {
+    console.error('Error al obtener notas:', error);
+    res.status(500).json({ error: 'Error al obtener notas' });
+  }
+});
+
+// Ruta POST para crear una nueva nota
+app.post('/notas', async (req, res) => {
+  try {
+    const nuevaNota = await Nota.create(req.body);
+    res.status(201).json(nuevaNota);
+  } catch (error) {
+    console.error('Error al registrar nota:', error);
+    res.status(500).json({ error: 'Error al registar nota' });  
   }
 });
 
