@@ -15,10 +15,9 @@ import Dashboardcliente from './Dashboardcliente.jsx';
 import Clienteregistro from './Clienteregistro.jsx';
 import Citaregistro from './Citaregistro.jsx';
 import Notasregistro from './Notasregistro.jsx';
-import Recomendacion from './recomendacion.jsx';
 import Pago from './Pago.jsx';
 import PagoForm from './PagoForm.jsx';
-import Cotizacionregisto from './Cotizacionregistro.jsx';
+import Recomendacion from './Recomendacion.jsx';
 import Cotizacion from './Cotizacion.jsx';
 import Crearempleado from './Crearempleado.jsx';
 import Iniciosesioncliente from './Iniciosesioncliente.jsx';
@@ -45,7 +44,6 @@ createRoot(document.getElementById('root')).render(
         <Route path='/recomendacion' element={<Recomendacion />} /> {}
         <Route path='/pago' element={<Pago />} /> {}
         <Route path='/pagoform' element={<PagoForm />} /> {}
-        <Route path='/cotizacionregistro' element={<Cotizacionregisto />} /> {}
         <Route path='/cotizacion' element={<Cotizacion />} /> {}
         <Route path='/crearempleado' element={<Crearempleado />} /> {}
         <Route path='/iniciosesioncliente' element={<Iniciosesioncliente />} /> {}
