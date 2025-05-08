@@ -46,21 +46,100 @@ const PagoForm = () => {
   );
 };
 
-
 function Crearcitas() {
+  const [formulario, setFormulario] = useState({
+    id_cotizacion: '',
+    monto: '',
+    fecha_pago: '',
+    metodo_pago: '',
+  });
+
+  const handleChange = (e) => {
+    setFormulario({
+      ...formulario,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validar que no haya campos vacíos
+    if (!formulario.id_cotizacion || !formulario.monto || !formulario.fecha_pago || !formulario.metodo_pago) {
+      alert('Todos los campos son requeridos');
+      return;
+    }
+
+    try {
+      console.log('Datos enviados:', formulario);  // Verificar qué valores estás enviando
+
+      const respuesta = await fetch('http://localhost:8081/pagos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formulario),
+      });
+
+      if (respuesta.ok) {
+        alert('Pago registrado correctamente');
+        setFormulario({
+          id_cotizacion: '',
+          monto: '',
+          fecha_pago: '',
+          metodo_pago: '',
+        });
+      } else {
+        const errorData = await respuesta.json();
+        console.error('Error al registrar pago:', errorData);
+        alert('Error al registrar el pago');
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+      alert('Error de red al registrar pago');
+    }
+  };
+
   return (
     <div className="contenedor-cita">
       <h1 className="titulo-cita">REGISTRAR PAGO</h1>
-      <form className="formulario-cita">
-        <input type="number" placeholder="Cotizacion" className="campo-cita" />
-        <input type="number" placeholder="Monto" className="campo-cita" />
-        <input type="date" placeholder= "Fecha" className="campo-cita" />
-        <select className="campo-cita">
-      <option value="">Metodo pago</option>
-      <option value="efectivo">efectivo</option>
-      <option value="tarjeta">tarjeta</option>
-      <option value="tranferencia">transferencia</option>
-    </select>
+      <form className="formulario-cita" onSubmit={handleSubmit}>
+        <input
+          type="number"
+          name="id_cotizacion"
+          placeholder="Cotizacion"
+          className="campo-cita"
+          value={formulario.id_cotizacion}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="number"
+          name="monto"
+          placeholder="Monto"
+          className="campo-cita"
+          value={formulario.monto}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="date"
+          name="fecha_pago"
+          className="campo-cita"
+          value={formulario.fecha_pago}
+          onChange={handleChange}
+          required
+        />
+        <select
+          name="metodo_pago"
+          className="campo-cita"
+          value={formulario.metodo_pago}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Metodo de pago</option>
+          <option value="efectivo">Efectivo</option>
+          <option value="tarjeta">Tarjeta</option>
+          <option value="transferencia">Transferencia</option>
+        </select>
         <button type="submit" className="boton-cita">Generar Factura</button>
       </form>
     </div>

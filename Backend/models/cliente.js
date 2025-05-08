@@ -30,7 +30,7 @@ const Cliente = conexion.define('Cliente', {
   },
 }, {
   tableName: 'cliente',
-  timestamps: false
+  timestamps: false,
 });
 
 module.exports = Cliente;
