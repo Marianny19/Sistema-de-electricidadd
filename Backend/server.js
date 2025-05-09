@@ -3,7 +3,6 @@ const cors = require('cors');
 const conexion = require('./database');
 const Cliente = require('./models/cliente');
 const Empleado = require('./models/empleado');
-const Pago = require('./models/pago');
 const Nota = require('./models/nota')
 
 const app = express();
@@ -149,27 +148,6 @@ app.delete('/empleados/:id', async (req, res) => {
   }
 });
 
-// Ruta GET para obtener todos los pagos
-app.get('/pagos', async (req, res) => {
-  try {
-    const Pagos = await Pago.findAll();
-    res.json(Pagos);
-  } catch (error) {
-    console.error('Error al obtener pagos:', error);
-    res.status(500).json({ error: 'Error al obtener pagos' });
-  }
-});
-
-// Ruta POST para crear un nuevo pago
-app.post('/pagos', async (req, res) => {
-  try {
-    const nuevoPago = await Pago.create(req.body);
-    res.status(201).json(nuevoPago);
-  } catch (error) {
-    console.error('Error al registrar pago:', error);
-    res.status(500).json({ error: 'Error al registrar pago' });
-  }
-});
 
 
 // Ruta GET para obtener todas las notas

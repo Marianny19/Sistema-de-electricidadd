@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import "../index.css";
 
-const CrearEmpleadoPage = () => {
+
+const Actualizarempleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -39,14 +41,15 @@ const CrearEmpleadoPage = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de crear usuario</h2>
-        <FormularioEmpleado />
+        <h2>Actualizar datos del empleado</h2>
+        <FormularioActualizarEmpleado />
       </div>
     </div>
   );
 };
 
-function FormularioEmpleado() {
+function FormularioActualizarEmpleado() {
+  const { id } = useParams(); 
   const [formulario, setFormulario] = useState({
     nombre: '',
     apellido: '',
@@ -60,6 +63,25 @@ function FormularioEmpleado() {
     estado: ''
   });
 
+  useEffect(() => {
+    const obtenerEmpleado = async () => {
+      try {
+        const respuesta = await fetch(`http://localhost:8081/empleados/${id}`);
+        if (respuesta.ok) {
+          const datos = await respuesta.json();
+          setFormulario(datos);
+        } else {
+          alert('No se pudo obtener los datos del empleado');
+        }
+      } catch (error) {
+        console.error('Error al obtener empleado:', error);
+        alert('Error de red');
+      }
+    };
+
+    obtenerEmpleado();
+  }, [id]);
+
   const handleChange = (e) => {
     setFormulario({
       ...formulario,
@@ -71,41 +93,30 @@ function FormularioEmpleado() {
     e.preventDefault();
 
     try {
-      const respuesta = await fetch('http://localhost:8081/empleados', {
-        method: 'POST',
+      const respuesta = await fetch(`http://localhost:8081/empleados/${id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formulario)
       });
 
       if (respuesta.ok) {
-        alert('Empleado registrado correctamente');
-        setFormulario({
-          nombre: '',
-          apellido: '',
-          telefono: '',
-          email: '',
-          cargo: '',
-          salario: '',
-          fecha_ingreso: '',
-          fecha_nacimiento: '',
-          direccion: '',
-          estado: ''
-        });
+        alert('Empleado actualizado correctamente');
       } else {
-        alert('Error al registrar el empleado');
+        alert('Error al actualizar el empleado');
       }
     } catch (error) {
-      console.error('Error en el registro:', error);
-      alert('Error de red al registrar empleado');
+      console.error('Error en la actualización:', error);
+      alert('Error de red al actualizar empleado');
     }
   };
 
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">CREAR NUEVO EMPLEADO</h1>
+      <h1 className="titulo-cita">ACTUALIZAR EMPLEADO</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
         <input type="text" name="nombre" placeholder="Nombre" className="campo-cita" value={formulario.nombre} onChange={handleChange} />
         <input type="text" name="apellido" placeholder="Apellido" className="campo-cita" value={formulario.apellido} onChange={handleChange} />
+        <input type="text" name="telefono" placeholder="Telefono" className="campo-cita" value={formulario.telefono} onChange={handleChange} />
         <input type="text" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} />
         <input type="text" name="cargo" placeholder="Cargo" className="campo-cita" value={formulario.cargo} onChange={handleChange} />
         <input type="number" name="salario" placeholder="Salario" className="campo-cita" value={formulario.salario} onChange={handleChange} />
@@ -117,10 +128,9 @@ function FormularioEmpleado() {
           <option value="activo">Activo</option>
           <option value="inactivo">Inactivo</option>
         </select>
-        <button type="submit" className="boton-cita">Registrar empleado</button>
+        <button type="submit" className="boton-cita">Actualizar empleado</button>
       </form>
     </div>
   );
 }
-
-export default CrearEmpleadoPage;
+export default Actualizarempleado;

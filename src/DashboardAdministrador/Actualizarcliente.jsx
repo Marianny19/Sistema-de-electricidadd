@@ -6,6 +6,8 @@ import {
   faSignOut, faUser, faUsers, faSearch
 } from '@fortawesome/free-solid-svg-icons';
 import { Link, useParams } from 'react-router-dom';
+import "../index.css";
+
 
 const Actualizarcliente = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
