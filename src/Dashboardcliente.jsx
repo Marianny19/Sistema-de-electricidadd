@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import logo from './imagenes/logo.jpg'
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
@@ -26,27 +27,31 @@ const Dashboardcliente = () => {
   };
 
   return (
+    
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido</h2>
         <ul>
-          <li><a href="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+          <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
           <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><a href="/cotizacionregistro"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></a></li>
           <li><Link to="/recomendacion"><FontAwesomeIcon icon={faReceipt} /> <span>Recomendación</span></Link></li>
-          <li><a href="/notasregistro"> <FontAwesomeIcon icon={faClipboard} /><span>Notas</span></a></li>
+          <li><Link to="/notasregistro"> <FontAwesomeIcon icon={faClipboard}/> <span>Notas</span></Link></li>
         </ul>
         <ul>
+          
           <li className="Cerrarsesion"><a href="#" onClick={cerrarSesion}><FontAwesomeIcon icon={faSignOut} /><span>Cerrar sesión</span></a></li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}><FontAwesomeIcon icon={faChevronLeft} /></button>
       </div>
-
       <div className="dashboard-content">
+      <div className="logo-dashboard">
+      <img src={logo} alt="Logo" />
+    </div>
         <h2>Bienvenido a Servicios Multiples Pérez</h2>
         <div className="widgets">
           <div className="widget cita">
+
             <h3>MISIÓN</h3>
             <div id="lista-citas">
               <p>Brindar soluciones integrales en electricidad residencial, comercial e industrial con altos estándares de c
