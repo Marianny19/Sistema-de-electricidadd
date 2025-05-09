@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faSignOut, faHome, faUsers, faCalendar, faFileInvoice, faReceipt, faClipboard } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faSignOut, faHome, faUsers, faUser, faCalendar, faFileInvoice,  faFileText, faTasks, faFileInvoiceDollar, faMoneyCheck } from '@fortawesome/free-solid-svg-icons';
 import { Link } from "react-router-dom";
+import "../index.css";
+
 
 const Cotizacion = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -15,12 +17,14 @@ const Cotizacion = () => {
         <h2>Bienvenido cliente</h2>
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-          <li><Link to="/empleado"><FontAwesomeIcon icon={faCalendar} /> <span>Empleados</span></Link></li>
-          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faFileInvoice} /> <span>Citas</span></Link></li>
-          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faReceipt} /> <span>Cotizacion</span></Link></li>
-          <li><Link to="/factura"><FontAwesomeIcon icon={faClipboard} /> <span>Factura</span></Link></li>
-          <li><Link to="/pago"><FontAwesomeIcon icon={faClipboard} /> <span>Pago</span></Link></li>
+                   <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+                   <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
+                   <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
+                   <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+                   <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
+                   <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+                   <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+                   <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
 
         </ul>
         <ul>

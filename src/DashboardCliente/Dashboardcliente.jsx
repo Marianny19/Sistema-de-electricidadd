@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import logo from './imagenes/logo.jpg'
+import logo from '../imagenes/logo.jpg'
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
-  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
+  faFileInvoice, faFileInvoiceDollar, faFileText, faHome, faMoneyCheck,
   faReceipt,
   faSignOut, faUser, faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import "../index.css";
+
 
 const MiComponente = () => (
   <div>
@@ -30,12 +32,12 @@ const Dashboardcliente = () => {
     
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido</h2>
+        <h2>Bienvenido usuario</h2>
         <ul>
           <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
+          <li><Link to="/solicitarservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/recomendacion"><FontAwesomeIcon icon={faReceipt} /> <span>Recomendación</span></Link></li>
           <li><Link to="/notasregistro"> <FontAwesomeIcon icon={faClipboard}/> <span>Notas</span></Link></li>
         </ul>
         <ul>

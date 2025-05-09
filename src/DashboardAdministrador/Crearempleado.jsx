@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers
+  faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import "../index.css";
 
-const Actualizarempleado = () => {
+
+const CrearEmpleadoPage = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -21,7 +23,9 @@ const Actualizarempleado = () => {
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
+          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
           <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
@@ -39,15 +43,14 @@ const Actualizarempleado = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Actualizar datos del empleado</h2>
-        <FormularioActualizarEmpleado />
+        <h2>Bienvenido a la sección de crear usuario</h2>
+        <FormularioEmpleado />
       </div>
     </div>
   );
 };
 
-function FormularioActualizarEmpleado() {
-  const { id } = useParams(); 
+function FormularioEmpleado() {
   const [formulario, setFormulario] = useState({
     nombre: '',
     apellido: '',
@@ -61,25 +64,6 @@ function FormularioActualizarEmpleado() {
     estado: ''
   });
 
-  useEffect(() => {
-    const obtenerEmpleado = async () => {
-      try {
-        const respuesta = await fetch(`http://localhost:8081/empleados/${id}`);
-        if (respuesta.ok) {
-          const datos = await respuesta.json();
-          setFormulario(datos);
-        } else {
-          alert('No se pudo obtener los datos del empleado');
-        }
-      } catch (error) {
-        console.error('Error al obtener empleado:', error);
-        alert('Error de red');
-      }
-    };
-
-    obtenerEmpleado();
-  }, [id]);
-
   const handleChange = (e) => {
     setFormulario({
       ...formulario,
@@ -91,29 +75,42 @@ function FormularioActualizarEmpleado() {
     e.preventDefault();
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/empleados/${id}`, {
-        method: 'PUT',
+      const respuesta = await fetch('http://localhost:8081/empleados', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formulario)
       });
 
       if (respuesta.ok) {
-        alert('Empleado actualizado correctamente');
+        alert('Empleado registrado correctamente');
+        setFormulario({
+          nombre: '',
+          apellido: '',
+          telefono: '',
+          email: '',
+          cargo: '',
+          salario: '',
+          fecha_ingreso: '',
+          fecha_nacimiento: '',
+          direccion: '',
+          estado: ''
+        });
       } else {
-        alert('Error al actualizar el empleado');
+        alert('Error al registrar el empleado');
       }
     } catch (error) {
-      console.error('Error en la actualización:', error);
-      alert('Error de red al actualizar empleado');
+      console.error('Error en el registro:', error);
+      alert('Error de red al registrar empleado');
     }
   };
 
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">ACTUALIZAR EMPLEADO</h1>
+      <h1 className="titulo-cita">CREAR NUEVO EMPLEADO</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
         <input type="text" name="nombre" placeholder="Nombre" className="campo-cita" value={formulario.nombre} onChange={handleChange} />
         <input type="text" name="apellido" placeholder="Apellido" className="campo-cita" value={formulario.apellido} onChange={handleChange} />
+        <input type="text" name="telefono" placeholder="Telefono" className="campo-cita" value={formulario.telefono} onChange={handleChange} />
         <input type="text" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} />
         <input type="text" name="cargo" placeholder="Cargo" className="campo-cita" value={formulario.cargo} onChange={handleChange} />
         <input type="number" name="salario" placeholder="Salario" className="campo-cita" value={formulario.salario} onChange={handleChange} />
@@ -125,9 +122,10 @@ function FormularioActualizarEmpleado() {
           <option value="activo">Activo</option>
           <option value="inactivo">Inactivo</option>
         </select>
-        <button type="submit" className="boton-cita">Actualizar empleado</button>
+        <button type="submit" className="boton-cita">Registrar empleado</button>
       </form>
     </div>
   );
 }
-export default Actualizarempleado;
+
+export default CrearEmpleadoPage;

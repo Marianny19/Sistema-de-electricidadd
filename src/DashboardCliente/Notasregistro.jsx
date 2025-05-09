@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCalendar, faChevronLeft, faClipboard,
-  faFileInvoice, faHome, faReceipt, faSignOut,
-  faUsers
+  faCalendar, faChevronLeft, faClipboard, faFileInvoice,
+  faFileText,
+  faHome, faReceipt, faSignOut, faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import "../index.css";
 
-const Clienteregistro = () => {
+
+const Notasregistro = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -20,8 +22,8 @@ const Clienteregistro = () => {
         <ul>
           <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
+          <li><Link to="/solicitarservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/recomendacion"><FontAwesomeIcon icon={faReceipt} /> <span>Recomendación</span></Link></li>
           <li><Link to="/notasregistro"><FontAwesomeIcon icon={faClipboard} /> <span>Notas</span></Link></li>
         </ul>
         <ul>
@@ -37,7 +39,7 @@ const Clienteregistro = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de nuevo cliente</h2>
+        <h2>Bienvenido a la sección de notas o sugerencias</h2>
         <FormularioCliente />
       </div>
     </div>
@@ -46,61 +48,83 @@ const Clienteregistro = () => {
 
 function FormularioCliente() {
   const [formulario, setFormulario] = useState({
-    nombre: '',
-    apellido: '',
-    telefono: '',
-    email: '',
-    direccion: ''
+    id_cita: '',
+    comentario: '',
+    fecha_creacion: '',
   });
 
   const handleChange = (e) => {
     setFormulario({
       ...formulario,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formulario.id_cita || !formulario.comentario || !formulario.fecha_creacion) {
+      alert('Todos los campos son requeridos');
+      return;
+    }
+
     try {
-      const respuesta = await fetch('http://localhost:8081/clientes', {
+      const respuesta = await fetch('http://localhost:8081/notas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formulario)
+        body: JSON.stringify(formulario),
       });
 
       if (respuesta.ok) {
-        alert('Cliente registrado correctamente');
+        alert('Nota registrada correctamente');
         setFormulario({
-          nombre: '',
-          apellido: '',
-          telefono: '',
-          email: '',
-          direccion: ''
+          id_cita: '',
+          comentario: '',
+          fecha_creacion: '',
         });
       } else {
-        alert('Error al registrar el cliente');
+        const errorData = await respuesta.json();
+        console.error('Error al registrar nota:', errorData);
+        alert('Error al registrar la nota');
       }
     } catch (error) {
-      console.error('Error en el registro:', error);
-      alert('Error de red al registrar cliente');
+      console.error('Error de red:', error);
+      alert('Error de red al registrar nota');
     }
   };
 
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
+      <h1 className="titulo-cita">DEJANOS UNA NOTA O SUGERENCIA</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        <input type="text" name="nombre" placeholder="Nombre" className="campo-cita" value={formulario.nombre} onChange={handleChange} />
-        <input type="text" name="apellido" placeholder="Apellido" className="campo-cita" value={formulario.apellido} onChange={handleChange} />
-        <input type="text" name="telefono" placeholder="Telefono" className="campo-cita" value={formulario.telefono} onChange={handleChange} />
-        <input type="text" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} />
-        <input type="text" name="direccion" placeholder="Direccion" className="campo-cita" value={formulario.direccion} onChange={handleChange} />
+        <input
+          type="number"
+          name="id_cita"
+          placeholder="Código de cita"
+          className="campo-cita"
+          value={formulario.id_cita}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="comentario"
+          placeholder="Comentario"
+          className="campo-cita"
+          value={formulario.comentario}
+          onChange={handleChange}
+        />
+        <input
+          type="datetime-local"
+          name="fecha_creacion"
+          placeholder="Fecha y hora"
+          className="campo-cita"
+          value={formulario.fecha_creacion}
+          onChange={handleChange}
+        />
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>
   );
 }
 
-export default Clienteregistro;
+export default Notasregistro;

@@ -3,9 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers
+  faSignOut, faUser, faUsers, faFileText,
+  faTasksAlt,
+  faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import "../index.css";
 
 const MiComponente = () => (
   <div>
@@ -13,7 +16,7 @@ const MiComponente = () => (
     Inicio
   </div>
 );
-const Dashboard = () => {
+const Dashboardempleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => {
@@ -32,7 +35,9 @@ const Dashboard = () => {
           <li><a href=""><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
+          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
           <li><a href="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></a></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><a href="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></a></li>
@@ -77,4 +82,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Dashboardempleado;

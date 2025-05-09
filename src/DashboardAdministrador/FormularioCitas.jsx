@@ -3,11 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers
+  faSignOut, faUser, faUsers, faSearch, faFileText,faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import "../index.css";
 
-const Crearcita = () => {
+
+const FormularioCitas = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -21,10 +23,13 @@ const Crearcita = () => {
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
+          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
           <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
+
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -40,38 +45,37 @@ const Crearcita = () => {
 
       <div className="dashboard-content">
         <h2>Bienvenido a la sección de citas</h2>
-        <Crearcitas />
+
+        <div className="main-content">
+        <Link to="/crearcita"><button className="Registro">+ Nueva cita</button></Link>
+              <div className="input-container-wrapper">
+                <div className="input-container">
+                  <input id="buscar-empleado" className="Buscar" type="search" placeholder="Buscar cita" />
+                  <FontAwesomeIcon icon={faSearch} />
+                </div>
+
+            <table className='tabla-empleados'>
+              <caption>Lista de citas</caption>
+              <thead>
+                <tr>
+                  <th>Codigo</th>
+                  <th>Cliente</th>
+                  <th>Servicio </th>
+                  <th>Fecha</th>
+                  <th>Dirección</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+
+                </tr>
+              </thead>
+              <tbody id="tabla-empleados">
+                {}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
-
-
-function Crearcitas() {
-  return (
-    <div className="contenedor-cita">
-      <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
-      <form className="formulario-cita">
-      <select className="campo-cita">
-      <option value="">Selecciona un servicio</option>
-      <option value="electricidad">Instalacion electrica</option>
-      <option value="reparacion">Reparacion electrica</option>
-      <option value="lampara">Instalacion de lampara u inversor</option>
-      <option value="mantenimiento">Mantenimiento electrico</option>
-      <option value="plomeria">Plomeria</option>
-      <option value="aire">Aire/ac</option>
-    </select>
-        <input type="datetime-local" placeholder="Fecha" className="campo-cita" />
-        <select className="campo-cita">
-      <option value="">Estado</option>
-      <option value="agendada">agendada</option>
-      <option value="programada">programada</option>
-      <option value="cancelada">cancelada</option>
-    </select>
-        <button type="submit" className="boton-cita">REGISTRAR</button>
-      </form>
-    </div>
-  );
-}
-
-export default Crearcita;
+export default FormularioCitas;
