@@ -805,44 +805,6 @@ table button {
 }
 
 
-.copilot-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 30px;
-}
-
-.copilot-chat {
-  width: 100%;
-  max-width: 1000px; 
-  height: 600px; 
-  background-color: #ffffff;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-}
-
-.chat-header {
-  background: linear-gradient(to right, #03027a, #03027a);
-  color: white;
-  padding: 20px;
-  font-weight: 600;
-  font-size: 18px;
-  text-align: center;
-}
-
-.chat-body {
-  flex: 1;
-  padding: 30px 40px;
-  background-color: #f9fafb;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
-}
 
 .message {
   padding: 14px 18px;
@@ -1266,3 +1228,4 @@ button.cancel {
   }
   
 }
+

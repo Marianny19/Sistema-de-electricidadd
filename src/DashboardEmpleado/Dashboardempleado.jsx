@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
-  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers, faFileText,
+  faFileInvoice, faHome, faMoneyCheck,
+  faSignOut, faUser, faUsers, faFileText, faFileInvoiceDollar,
   faTasksAlt,
   faTasks
 } from '@fortawesome/free-solid-svg-icons';
@@ -32,15 +32,17 @@ const Dashboardempleado = () => {
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido usuario</h2>
         <ul>
-          <li><a href=""><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
-          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-          <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
-          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><a href="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></a></li>
-          <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><a href="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></a></li>
+          <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+          <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+          <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
+          <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
+          <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
+          <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+          <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
+
+
+
+
         </ul>
         <ul>
           <li className="Cerrarsesion"><a href="#" onClick={cerrarSesion}><FontAwesomeIcon icon={faSignOut} /><span>Cerrar sesión</span></a></li>
