@@ -5,8 +5,6 @@ const Cliente = require('./models/cliente');
 const Empleado = require('./models/empleado');
 const Pago = require('./models/pago');
 const Nota = require('./models/nota')
-const bcrypt = require('bcryptjs'); 
-const Usuario = require('./models/usuario'); 
 
 const app = express();
 const port = 8081;
@@ -37,6 +35,52 @@ app.post('/clientes', async (req, res) => {
   } catch (error) {
     console.error('Error al registrar cliente:', error);
     res.status(500).json({ error: 'Error al registrar cliente' });
+  }
+});
+app.get('/clientes/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const cliente = await Cliente.findOne({ where: { id_cliente: id } });
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+    res.json(cliente);
+  } catch (error) {
+    console.error('Error al obtener cliente:', error);
+    res.status(500).json({ error: 'Error al obtener cliente' });
+  }
+});
+
+
+
+// Ruta: actualizar cliente
+app.put('/clientes/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const cliente = await Cliente.findOne({ where: { id_cliente: id } });
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+    await cliente.update(req.body);
+    res.json({ mensaje: 'Cliente actualizado correctamente', cliente });
+  } catch (error) {
+    console.error('Error al actualizar cliente:', error);
+    res.status(500).json({ error: 'Error al actualizar cliente' });
+  }
+});
+
+app.delete('/clientes/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const cliente = await Cliente.findOne({ where: { id_cliente: id } });
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+    await cliente.destroy();
+    res.json({ mensaje: 'Cliente eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar cliente:', error);
+    res.status(500).json({ error: 'Error al eliminar cliente' });
   }
 });
 

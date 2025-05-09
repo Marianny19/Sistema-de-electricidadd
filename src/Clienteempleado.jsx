@@ -24,7 +24,28 @@ const Clienteempleado = () => {
   
     cargarClientes();
   }, []);
+   
+  const eliminarCliente = async (id) => {
+    const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este cliente?");
+    if (!confirmar) return;
   
+    try {
+      const respuesta = await fetch(`http://localhost:8081/clientes/${id}`, {
+        method: 'DELETE'
+      });
+  
+      if (respuesta.ok) {
+        // Eliminar visualmente de la lista
+        setClientes(prevClientes => prevClientes.filter(c => c.id_cliente !== id));
+        alert("Cliente eliminado correctamente");
+      } else {
+        alert("Error al eliminar cliente");
+      }
+    } catch (error) {
+      console.error('Error al eliminar cliente:', error);
+      alert("Error de red al eliminar cliente");
+    }
+  };  
   
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
@@ -54,7 +75,6 @@ const Clienteempleado = () => {
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
       </div>
-
       <div className="dashboard-content">
         <h2>Bienvenido a la sección de Clientes</h2>
 
@@ -89,10 +109,12 @@ const Clienteempleado = () => {
             <td data-label="Email">{cliente.email}</td>
             <td data-label="Dirección">{cliente.direccion}</td>
             <td data-label="Acciones">
-              <Link to="/actualizarcliente/:id">
-              <button className="Actualizar">Actualizar</button>
-              </Link>
-              <button className="Eliminar">Eliminar</button>
+            <Link to={`/actualizarcliente/${cliente.id_cliente}`}>
+             <button className="Actualizar">Actualizar</button>
+            </Link>
+            <button
+             className="Eliminar"
+             onClick={() => eliminarCliente(cliente.id_cliente)}>Eliminar</button>
               </td>
               </tr>
         ))}
