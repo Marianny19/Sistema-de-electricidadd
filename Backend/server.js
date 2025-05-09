@@ -51,9 +51,6 @@ app.get('/clientes/:id', async (req, res) => {
   }
 });
 
-
-
-// Ruta: actualizar cliente
 app.put('/clientes/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -104,6 +101,51 @@ app.post('/empleados', async (req, res) => {
   } catch (error) {
     console.error('Error al registrar empleado:', error);
     res.status(500).json({ error: 'Error al registrar empleado' });
+  }
+});
+//Obtener un empleado por ID
+app.get('/empleados/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const empleado = await Empleado.findOne({ where: { id_empleado: id } });
+    if (!empleado) {
+      return res.status(404).json({ error: 'Empleado no encontrado' });
+    }
+    res.json(empleado);
+  } catch (error) {
+    console.error('Error al obtener empleado:', error);
+    res.status(500).json({ error: 'Error al obtener empleado' });
+  }
+});
+
+
+//Actualizar empleado
+app.put('/empleados/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const empleado = await Empleado.findOne({ where: { id_empleado: id } });
+    if (!empleado) {
+      return res.status(404).json({ error: 'Empleado no encontrado' });
+    }
+    await empleado.update(req.body);
+    res.json({ mensaje: 'Empleado actualizado correctamente', empleado });
+  } catch (error) {
+    console.error('Error al actualizar empleado:', error);
+    res.status(500).json({ error: 'Error al actualizar empleado' });
+  }
+});
+app.delete('/empleados/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const empleado = await Empleado.findOne({ where: { id_empleado: id } });
+    if (!empleado) {
+      return res.status(404).json({ error: 'Empleado no encontrado' });
+    }
+    await empleado.destroy();
+    res.json({ mensaje: 'Empleado eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar empleado:', error);
+    res.status(500).json({ error: 'Error al eliminar empleado' });
   }
 });
 
