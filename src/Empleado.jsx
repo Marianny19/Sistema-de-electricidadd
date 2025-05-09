@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
@@ -9,7 +9,41 @@ import { Link } from 'react-router-dom';
 
 const Empleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [empleados, setEmpleados] = useState([]);
 
+  useEffect(() => {
+    async function cargarEmpleados() {
+      try {
+        const response = await fetch('http://localhost:8081/empleados'); 
+        const data = await response.json();
+        setEmpleados(data);
+      } catch (error) {
+        console.error('Error al cargar empleados:', error);
+      }
+    }
+  
+    cargarEmpleados();
+  }, []);
+  const eliminarEmpleado = async (id) => {
+    const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este empleado?");
+    if (!confirmar) return;
+  
+    try {
+      const respuesta = await fetch(`http://localhost:8081/empleados/${id}`, {
+        method: 'DELETE'
+      });
+  
+      if (respuesta.ok) {
+        setEmpleados(prevEmpleados => prevEmpleados.filter(c => c.id_empleado !== id));
+        alert("Empleado eliminado correctamente");
+      } else {
+        alert("Error al eliminar empleado");
+      }
+    } catch (error) {
+      console.error('Error al eliminar empleado:', error);
+      alert("Error de red al eliminar empleado");
+    }
+  };  
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
 
@@ -68,7 +102,29 @@ const Empleado = () => {
                 </tr>
               </thead>
               <tbody id="tabla-empleados">
-                {}
+                              {empleados.map((empleado) => (
+                              <tr key={empleado.id_empleado}>
+                             <td data-label="Id empleado">{empleado.id_empleado}</td>
+                            <td data-label="Nombre">{empleado.nombre}</td>
+                            <td data-label="Apellido">{empleado.apellido}</td>
+                            <td data-label="Teléfono">{empleado.telefono}</td>
+                            <td data-label="Email">{empleado.email}</td>
+                            <td data-label="Cargo">{empleado.cargo}</td>
+                            <td data-label="Salario">{empleado.salario}</td>
+                            <td data-label="Fecha de ingreso">{empleado.fecha_ingreso}</td>
+                            <td data-label="Fecha de nacimiento">{empleado.fecha_nacimiento}</td>
+                            <td data-label="Dirección">{empleado.direccion}</td>
+                            <td data-label="Estado">{empleado.estado}</td>
+                            <td data-label="Acciones">
+                            <Link to={`/actualizarempleado/${empleado.id_empleado}`}>
+                             <button className="Actualizar">Actualizar</button>
+                            </Link>
+                            <button
+                             className="Eliminar"
+                             onClick={() => eliminarEmpleado(empleado.id_empleado)}>Eliminar</button>
+                              </td>
+                              </tr>
+                        ))}
               </tbody>
             </table>
           </div>

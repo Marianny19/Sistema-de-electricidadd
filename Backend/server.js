@@ -5,8 +5,6 @@ const Cliente = require('./models/cliente');
 const Empleado = require('./models/empleado');
 const Pago = require('./models/pago');
 const Nota = require('./models/nota')
-const bcrypt = require('bcryptjs'); 
-const Usuario = require('./models/usuario'); 
 
 const app = express();
 const port = 8081;
@@ -39,6 +37,49 @@ app.post('/clientes', async (req, res) => {
     res.status(500).json({ error: 'Error al registrar cliente' });
   }
 });
+app.get('/clientes/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const cliente = await Cliente.findOne({ where: { id_cliente: id } });
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+    res.json(cliente);
+  } catch (error) {
+    console.error('Error al obtener cliente:', error);
+    res.status(500).json({ error: 'Error al obtener cliente' });
+  }
+});
+
+app.put('/clientes/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const cliente = await Cliente.findOne({ where: { id_cliente: id } });
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+    await cliente.update(req.body);
+    res.json({ mensaje: 'Cliente actualizado correctamente', cliente });
+  } catch (error) {
+    console.error('Error al actualizar cliente:', error);
+    res.status(500).json({ error: 'Error al actualizar cliente' });
+  }
+});
+
+app.delete('/clientes/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const cliente = await Cliente.findOne({ where: { id_cliente: id } });
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+    await cliente.destroy();
+    res.json({ mensaje: 'Cliente eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar cliente:', error);
+    res.status(500).json({ error: 'Error al eliminar cliente' });
+  }
+});
 
 
 // Ruta GET para obtener todos los empleados
@@ -60,6 +101,51 @@ app.post('/empleados', async (req, res) => {
   } catch (error) {
     console.error('Error al registrar empleado:', error);
     res.status(500).json({ error: 'Error al registrar empleado' });
+  }
+});
+//Obtener un empleado por ID
+app.get('/empleados/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const empleado = await Empleado.findOne({ where: { id_empleado: id } });
+    if (!empleado) {
+      return res.status(404).json({ error: 'Empleado no encontrado' });
+    }
+    res.json(empleado);
+  } catch (error) {
+    console.error('Error al obtener empleado:', error);
+    res.status(500).json({ error: 'Error al obtener empleado' });
+  }
+});
+
+
+//Actualizar empleado
+app.put('/empleados/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const empleado = await Empleado.findOne({ where: { id_empleado: id } });
+    if (!empleado) {
+      return res.status(404).json({ error: 'Empleado no encontrado' });
+    }
+    await empleado.update(req.body);
+    res.json({ mensaje: 'Empleado actualizado correctamente', empleado });
+  } catch (error) {
+    console.error('Error al actualizar empleado:', error);
+    res.status(500).json({ error: 'Error al actualizar empleado' });
+  }
+});
+app.delete('/empleados/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const empleado = await Empleado.findOne({ where: { id_empleado: id } });
+    if (!empleado) {
+      return res.status(404).json({ error: 'Empleado no encontrado' });
+    }
+    await empleado.destroy();
+    res.json({ mensaje: 'Empleado eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar empleado:', error);
+    res.status(500).json({ error: 'Error al eliminar empleado' });
   }
 });
 
