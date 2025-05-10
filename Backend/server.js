@@ -4,6 +4,10 @@ const conexion = require('./database');
 const Cliente = require('./models/cliente');
 const Empleado = require('./models/empleado');
 const Nota = require('./models/nota')
+const Cita = require('./models/cita');
+const Solicitudservicio = require('./models/solicitudservicio');
+const Registrotrabajo = require('./models/registrotrabajo');
+const Pago = require('./models/pago');
 
 const app = express();
 const port = 8081;
@@ -169,6 +173,94 @@ app.post('/notas', async (req, res) => {
   } catch (error) {
     console.error('Error al registrar nota:', error);
     res.status(500).json({ error: 'Error al registar nota' });  
+  }
+});
+
+// Ruta GET para obtener todas las citas
+app.get('/citas', async (req, res) => {
+  try {
+    const Citas = await Cita.findAll();
+    res.json(Citas);
+  } catch (error) {
+    console.error('Error al obtener citas:', error);
+    res.status(500).json({ error: 'Error al obtener citas' });
+  }
+});
+
+// Ruta POST para crear una nueva cita
+app.post('/citas', async (req, res) => {
+  try {
+    const nuevaCita = await Cita.create(req.body);
+    res.status(201).json(nuevaCita);
+  } catch (error) {
+    console.error('Error al registrar cita:', error);
+    res.status(500).json({ error: 'Error al registar cita' });  
+  }
+});
+
+// Ruta GET para obtener todas las solicitudes de servicio
+app.get('/solicitudservicio', async (req, res) => {
+  try {
+    const Solicitud = await Solicitudservicio.findAll();
+    res.json(Solicitud);
+  } catch (error) {
+    console.error('Error al obtener solicitud:', error);
+    res.status(500).json({ error: 'Error al obtener solicitud' });
+  }
+});
+
+// Ruta POST para crear una nueva solicitud de servicio
+app.post('/solicitudservicio', async (req, res) => {
+  try {
+    const nuevaSolicitud = await Solicitudservicio.create(req.body);
+    res.status(201).json(nuevaSolicitud);
+  } catch (error) {
+    console.error('Error al registrar solicitud:', error);
+    res.status(500).json({ error: 'Error al registar solicitud' });  
+  }
+});
+
+// Ruta GET para obtener todos los registros de trabajo
+app.get('/registrotrabajo', async (req, res) => {
+  try {
+    const Registro = await Registrotrabajo.findAll();
+    res.json(Registro);
+  } catch (error) {
+    console.error('Error al obtener registro:', error);
+    res.status(500).json({ error: 'Error al obtener registro' });
+  }
+});
+
+// Ruta POST para crear unnuevo registro de trabajo
+app.post('/registrotrabajo', async (req, res) => {
+  try {
+    const nuevoRegistro = await Registrotrabajo.create(req.body);
+    res.status(201).json(nuevoRegistro);
+  } catch (error) {
+    console.error('Error al registrar registro:', error);
+    res.status(500).json({ error: 'Error al registar registro' });  
+  }
+});
+
+// Ruta GET para obtener todos los pagos
+app.get('/pagos', async (req, res) => {
+  try {
+    const Pagos = await Pago.findAll();
+    res.json(Pagos);
+  } catch (error) {
+    console.error('Error al obtener pago:', error);
+    res.status(500).json({ error: 'Error al obtener pago' });
+  }
+});
+
+// Ruta POST para crear un nuevo pago
+app.post('/pagos', async (req, res) => {
+  try {
+    const nuevoPago = await Pago.create(req.body);
+    res.status(201).json(nuevoPago);
+  } catch (error) {
+    console.error('Error al registrar pago:', error);
+    res.status(500).json({ error: 'Error al registar pago' });  
   }
 });
 

@@ -46,6 +46,9 @@ const Pago = () => {
       </div>
 
       <div className="dashboard-content">
+            <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
+                                  <FontAwesomeIcon icon={faChevronLeft} />
+                                </Link>
         <h2>Bienvenido a la sección de pagos</h2>
         <div className="main-content">
                       <Link to="/pagoform"><button className="Registro">+ Nuevo Pago</button></Link>
@@ -64,7 +67,8 @@ const Pago = () => {
                          <th>Fecha</th>
                          <th>Hora</th>
                          <th>Monto</th>
-                         <th>metodo pago</th>
+                         <th>Metodo pago</th>
+                         <th>Estado</th>
                          <th>Acciones</th>
                        </tr>
                      </thead>

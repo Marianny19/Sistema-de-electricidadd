@@ -46,6 +46,9 @@ const Solicitudservicio = () => {
       </div>
 
       <div className="dashboard-content">
+            <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
+                                  <FontAwesomeIcon icon={faChevronLeft} />
+                                </Link>
         <h2>Bienvenido a la sección de solicitud de servicio</h2>
 
         <div className="main-content">

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers, faSearch, faFileText, faTasks
+  faSignOut, faUser, faUsers, faSearch, faFileText, faTasks, 
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import "../index.css";
@@ -54,6 +54,7 @@ const Clienteempleado = () => {
 
 
   return (
+    
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido usuario</h2>
@@ -80,6 +81,9 @@ const Clienteempleado = () => {
         </button>
       </div>
       <div className="dashboard-content">
+           <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </Link>
         <h2>Bienvenido a la sección de Clientes</h2>
 
         <div className="main-content">
@@ -100,7 +104,9 @@ const Clienteempleado = () => {
                   <th>Telefono</th>
                   <th>Email</th>
                   <th>Direccion</th>
+                   <th>Estado</th>
                   <th>Acciones</th>
+                  
                 </tr>
               </thead>
               <tbody id="tabla-clientes">
@@ -112,6 +118,7 @@ const Clienteempleado = () => {
             <td data-label="Teléfono">{cliente.telefono}</td>
             <td data-label="Email">{cliente.email}</td>
             <td data-label="Dirección">{cliente.direccion}</td>
+              <td data-label="Estado">{cliente.estado}</td>
             <td data-label="Acciones">
             <Link to={`/actualizarcliente/${cliente.id_cliente}`}>
              <button className="Actualizar">Actualizar</button>

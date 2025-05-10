@@ -21,13 +21,13 @@ const CitaEmpleado = () => {
         <h2>Bienvenido usuario</h2>
         <ul>
            <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
-                   <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-                   <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
-                   <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
-                   <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
-                   <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-                   <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
-         
+                    <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+                    <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
+                    <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
+                    <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
+                    <li><Link to="/cotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+                    <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+                    <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -42,6 +42,9 @@ const CitaEmpleado = () => {
       </div>
 
       <div className="dashboard-content">
+           <Link to="/dashboardempleado" className="boton-retroceso" aria-label="Volver">
+                                          <FontAwesomeIcon icon={faChevronLeft} />
+                                        </Link>
         <h2>Bienvenido a la sección de citas</h2>
 
         <div className="main-content">
@@ -62,8 +65,6 @@ const CitaEmpleado = () => {
                   <th>Fecha</th>
                   <th>Dirección</th>
                   <th>Estado</th>
-                  <th>Acciones</th>
-
                 </tr>
               </thead>
               <tbody id="tabla-empleados">

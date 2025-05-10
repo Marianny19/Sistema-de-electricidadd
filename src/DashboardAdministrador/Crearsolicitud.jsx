@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
-  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers, faFileText, faTasks
+  faCalendar, faChevronLeft, faFileInvoice, faFileInvoiceDollar,
+  faHome, faMoneyCheck, faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import "../index.css";
-
 
 const Crearsolicitud = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -43,6 +41,9 @@ const Crearsolicitud = () => {
       </div>
 
       <div className="dashboard-content">
+        <Link to="/solicitudservicio" className="boton-retroceso" aria-label="Volver">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </Link>
         <h2>Bienvenido a la sección de solicitud</h2>
         <Crearcitas />
       </div>
@@ -50,23 +51,80 @@ const Crearsolicitud = () => {
   );
 };
 
-
 function Crearcitas() {
+  const [formulario, setFormulario] = useState({
+    id_cliente: '',
+    id_servicio: '',
+    direccion: '',
+    via_comunicacion: '',
+    fecha: '',
+    estado: ''
+  });
+
+  const handleChange = (e) => {
+    setFormulario({
+      ...formulario,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const estadosValidos = ['pendiente', 'realizado', 'atrasado', 'cancelado'];
+
+    if (!formulario.id_cliente || !formulario.id_servicio || !formulario.direccion || !formulario.via_comunicacion || !formulario.fecha || !formulario.estado) {
+      alert('Todos los campos son obligatorios.');
+      return;
+    }
+
+    if (!estadosValidos.includes(formulario.estado)) {
+      alert('Por favor selecciona un estado válido.');
+      return;
+    }
+
+    try {
+      const respuesta = await fetch('http://localhost:8081/solicitudservicio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formulario)
+      });
+
+      if (respuesta.ok) {
+        alert('Solicitud registrada correctamente');
+        setFormulario({
+          id_cliente: '',
+          id_servicio: '',
+          direccion: '',
+          via_comunicacion: '',
+          fecha: '',
+          estado: ''
+        });
+      } else {
+        alert('Error al registrar solicitud');
+      }
+    } catch (error) {
+      console.error('Error en el registro', error);
+      alert('Error de red al registrar solicitud');
+    }
+  };
+
   return (
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
-      <form className="formulario-cita">
-      <input type="number" placeholder="Cliente" className="campo-cita" />
-      <input type="number" placeholder="Servicio" className="campo-cita" />
-       <input type="text" placeholder="Direccion" className="campo-cita" />
-      <input type="text" placeholder="Via comunicacion" className="campo-cita" />
-      <input type="date" placeholder="Fecha" className="campo-cita" />
-      <select className="campo-cita">
-      <option value="">Estado</option>
-      <option value="pendiente">Pendiente</option>
-      <option value="realizada">Realizada</option>
-      <option value="cancelada">Cancelada</option>
-    </select>
+      <form className="formulario-cita" onSubmit={handleSubmit}>
+        <input type="number" name="id_cliente" placeholder="Cliente" className="campo-cita" value={formulario.id_cliente} onChange={handleChange} />
+        <input type="number" name="id_servicio" placeholder="Servicio" className="campo-cita" value={formulario.id_servicio} onChange={handleChange} />
+        <input type="text" name="direccion" placeholder="Dirección" className="campo-cita" value={formulario.direccion} onChange={handleChange} />
+        <input type="text" name="via_comunicacion" placeholder="Vía de comunicación" className="campo-cita" value={formulario.via_comunicacion} onChange={handleChange} />
+        <input type="date" name="fecha" className="campo-cita" value={formulario.fecha} onChange={handleChange} />
+        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange}>
+          <option value="">Estado</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="realizado">Realizado</option>
+          <option value="atrasado">Atrasado</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

@@ -45,6 +45,9 @@ const Registrotrabajo = () => {
       </div>
 
       <div className="dashboard-content">
+            <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
+                                  <FontAwesomeIcon icon={faChevronLeft} />
+                                </Link>
         <h2>Bienvenido a la sección de registro de trabajo</h2>
 
         <div className="main-content">

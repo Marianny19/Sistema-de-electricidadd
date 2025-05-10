@@ -8,7 +8,6 @@ import {
 import { Link } from 'react-router-dom';
 import "../index.css";
 
-
 const CrearCliente = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -29,7 +28,6 @@ const CrearCliente = () => {
           <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
-        
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -44,13 +42,16 @@ const CrearCliente = () => {
       </div>
 
       <div className="dashboard-content">
-        <h2>Bienvenido a la sección de citas</h2>
+        <Link to="/clienteempleado" className="boton-retroceso" aria-label="Volver">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </Link>
+
+        <h2>Bienvenido a la sección de clientes</h2>
         <FormularioCliente />
       </div>
     </div>
   );
 };
-
 
 function FormularioCliente() {
   const [formulario, setFormulario] = useState({
@@ -58,7 +59,8 @@ function FormularioCliente() {
     apellido: '',
     telefono: '',
     email: '',
-    direccion: ''
+    direccion: '',
+    estado: '',
   });
 
   const handleChange = (e) => {
@@ -85,7 +87,9 @@ function FormularioCliente() {
           apellido: '',
           telefono: '',
           email: '',
-          direccion: ''
+          direccion: '',
+          estado: ''
+
         });
       } else {
         alert('Error al registrar el cliente');
@@ -105,6 +109,11 @@ function FormularioCliente() {
         <input type="text" name="telefono" placeholder="Telefono" className="campo-cita" value={formulario.telefono} onChange={handleChange} />
         <input type="text" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} />
         <input type="text" name="direccion" placeholder="Direccion" className="campo-cita" value={formulario.direccion} onChange={handleChange} />
+          <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange}>
+          <option value="">Estado</option>
+          <option value="activo">activo</option>
+          <option value="inactivo">inactivo</option>
+        </select>
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

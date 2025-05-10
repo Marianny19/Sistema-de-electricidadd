@@ -43,6 +43,9 @@ const Crearcita = () => {
       </div>
 
       <div className="dashboard-content">
+           <Link to="/formulariocita" className="boton-retroceso" aria-label="Volver">
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </Link>
         <h2>Bienvenido a la sección de citas</h2>
         <Crearcitas />
       </div>
@@ -52,19 +55,71 @@ const Crearcita = () => {
 
 
 function Crearcitas() {
+  const [formulario, setFormulario] = useState({
+    id_cliente: '',
+    id_empleado: '',
+    id_servicio: '',
+    fecha: '',
+    hora: '',
+    estado: ''
+  });
+
+  const handleChange = (e) => {
+    setFormulario({
+      ...formulario,
+      [e.target.name]: e.target.value
+    });
+  };
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!formulario.estado || !['agendada', 'completada', 'cancelada'].includes(formulario.estado)) {
+    alert('Por favor selecciona un estado válido.');
+    return;
+  }
+
+  try {
+    const respuesta = await fetch('http://localhost:8081/citas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formulario)
+    });
+
+    if (respuesta.ok) {
+      alert('Cita registrada correctamente');
+      setFormulario({
+        id_cliente: '',
+        id_empleado: '',
+        id_servicio: '',
+        fecha: '',
+        hora: '',
+        estado: ''
+      });
+    } else {
+      alert('Error al registrar cita');
+    }
+  } catch (error) {
+    console.error('Error en el registro:', error);
+    alert('Error de red al registrar cita');
+  }
+};
+
   return (
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
-      <form className="formulario-cita">
-      <input type="number" placeholder="Solicitud" className="campo-cita" />
-       <input type="date" placeholder="fecha" className="campo-cita" />
-      <input type="time" placeholder="Hora" className="campo-cita" />
-      <select className="campo-cita">
-      <option value="">Estado</option>
-      <option value="pendiente">Pendiente</option>
-      <option value="realizada">Realizada</option>
-      <option value="cancelado">Cancelado</option>
-    </select>
+      <form className="formulario-cita" onSubmit={handleSubmit}>
+        <input type="number" name="id_cliente" placeholder="Cliente" className="campo-cita" value={formulario.id_cliente} onChange={handleChange} />
+        <input type="number" name="id_empleado" placeholder="Empleado" className="campo-cita" value={formulario.id_empleado} onChange={handleChange} />
+        <input type="number" name="id_servicio" placeholder="Solicitud" className="campo-cita" value={formulario.id_servicio} onChange={handleChange} />
+        <input type="date" name="fecha" className="campo-cita" value={formulario.fecha} onChange={handleChange} />
+        <input type="time" name="hora" className="campo-cita" value={formulario.hora} onChange={handleChange} />
+        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange}>
+          <option value="">Estado</option>
+          <option value="agendada">agendada</option>
+          <option value="completada">completada</option>
+          <option value="cancelada">cancelada</option>
+        </select>
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

@@ -39,6 +39,9 @@ const Notasregistro = () => {
       </div>
 
       <div className="dashboard-content">
+           <Link to="/dashboardcliente" className="boton-retroceso" aria-label="Volver">
+                                  <FontAwesomeIcon icon={faChevronLeft} />
+                                </Link>
         <h2>Bienvenido a la sección de notas o sugerencias</h2>
         <FormularioCliente />
       </div>
