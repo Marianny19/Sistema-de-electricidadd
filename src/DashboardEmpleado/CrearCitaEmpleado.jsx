@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
-  faFileInvoice, faFileInvoiceDollar, faFileText, faHome, faMoneyCheck,
-  faReceipt,
-  faSignOut, faUser, faUsers, 
+  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
+  faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import "../index.css";
 
 
-const Citaregistro = () => {
+const CrearCitaEmpleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -21,14 +20,14 @@ const Citaregistro = () => {
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido usuario</h2>
         <ul>
-          <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
-          <li><Link to="/solicitarservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-          <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/notasregistro"> <FontAwesomeIcon icon={faClipboard}/> <span>Notas</span></Link></li>
-
-          
-        
+          <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+                 <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+                 <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
+                 <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
+                 <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
+                 <li><Link to="/cotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+                 <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+                 <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -43,15 +42,16 @@ const Citaregistro = () => {
       </div>
 
       <div className="dashboard-content">
-            <Link to="/dashboardcliente" className="boton-retroceso" aria-label="Volver">
+         <Link to="/citaempleado" className="boton-retroceso" aria-label="Volver">
                           <FontAwesomeIcon icon={faChevronLeft} />
                         </Link>
-        <h2>Bienvenido a la sección de agendar citas</h2>
+        <h2>Bienvenido a la sección de citas</h2>
         <Crearcitas />
       </div>
     </div>
   );
 };
+
 
 function Crearcitas() {
  const [formulario, setFormulario] = useState({
@@ -125,4 +125,4 @@ const handleSubmit = async (e) => {
   );
 }
 
-export default Citaregistro;
+export default CrearCitaEmpleado;

@@ -43,6 +43,9 @@ const CrearEmpleadoPage = () => {
       </div>
 
       <div className="dashboard-content">
+           <Link to="/empleado" className="boton-retroceso" aria-label="Volver">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </Link>
         <h2>Bienvenido a la sección de crear usuario</h2>
         <FormularioEmpleado />
       </div>
@@ -73,6 +76,7 @@ function FormularioEmpleado() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
 
     try {
       const respuesta = await fetch('http://localhost:8081/empleados', {

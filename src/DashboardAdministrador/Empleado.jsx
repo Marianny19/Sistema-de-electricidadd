@@ -77,6 +77,9 @@ const Empleado = () => {
       </div>
 
       <div className="dashboard-content">
+           <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </Link>
         <h2>Bienvenido a la sección de empleados</h2>
 
         <div className="main-content">

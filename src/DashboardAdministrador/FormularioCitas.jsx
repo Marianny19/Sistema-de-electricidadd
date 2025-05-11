@@ -44,6 +44,9 @@ const FormularioCitas = () => {
       </div>
 
       <div className="dashboard-content">
+            <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
+                                  <FontAwesomeIcon icon={faChevronLeft} />
+                                </Link>
         <h2>Bienvenido a la sección de citas</h2>
 
         <div className="main-content">
@@ -65,7 +68,6 @@ const FormularioCitas = () => {
                   <th>Dirección</th>
                   <th>Estado</th>
                   <th>Acciones</th>
-
                 </tr>
               </thead>
               <tbody id="tabla-empleados">

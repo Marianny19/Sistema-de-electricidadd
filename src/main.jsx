@@ -28,12 +28,26 @@ import Registrotrabajo from './DashboardAdministrador/Registrotrabajo.jsx';
 import Crearregistrotrabajo from './DashboardAdministrador/Crearregistrotrabajo.jsx';
 import Dashboardempleado from './DashboardEmpleado/Dashboardempleado.jsx';
 import Solicitarservicio from './DashboardCliente/Solicitarservicio.jsx';
+import ClienteDempleado from './DashboardEmpleado/ClienteDempleado.jsx';
+import CrearClienteEmpleado from './DashboardEmpleado/CrearClienteEmpleado.jsx';
+import RegistrarServicioEmpleado from './DashboardEmpleado/RegistrarServicioEmpleado.jsx';
+import CrearServicioEmpleado from './DashboardEmpleado/CrearServicioEmpleado.jsx';
+import CitaEmpleado from './DashboardEmpleado/CitaEmpleado.jsx';
+import CrearCitaEmpleado from './DashboardEmpleado/CrearCitaEmpleado.jsx';
+import RegistroTrabajoEmpleado from './DashboardEmpleado/RegistroTrabajoEmpleado.jsx';
+import CrearRegistroEmpleado from './DashboardEmpleado/CrearRegistroEmpleado.jsx';
+import FacturaEmpleado from './DashboardEmpleado/FacturaEmpleado.jsx';
+import PagoEmpleado from './DashboardEmpleado/PagoEmpleado.jsx';
+import CrearPagoEmpleado from './DashboardEmpleado/CrearPagoEmpleado.jsx';
+import CotizacionEmpleado from './DashboardEmpleado/CotizacionEmpleado.jsx';
+import Identificate from './Identificate.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Router>
       <Routes>
-        <Route path="/" element={<Iniciosesion />} />
+        <Route path="/" element={<Identificate />} />
+        <Route path="/iniciarsesion" element={<Iniciosesion />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/clienteempleado" element={<Clienteempleado />} />
         <Route path="/empleado" element={<Empleado />} />
@@ -58,6 +72,27 @@ createRoot(document.getElementById('root')).render(
         <Route path="/creartrabajo" element={<Crearregistrotrabajo />} />
         <Route path="/dashboardempleado" element={<Dashboardempleado />} />
         <Route path="/solicitarservicio" element={<Solicitarservicio />} />
+        <Route path="/clienteDempleado" element={<ClienteDempleado />} />
+        <Route path="/crearclienteempleado" element={<CrearClienteEmpleado />} />
+        <Route path="/registrarservicioempleado" element={<RegistrarServicioEmpleado />} />
+        <Route path="/crearservicioempleado" element={<CrearServicioEmpleado />} />
+        <Route path="/citaempleado" element={<CitaEmpleado />} />
+        <Route path="/crearcitaempleado" element={<CrearCitaEmpleado />} />
+        <Route path="/registrotrabajoempleado" element={<RegistroTrabajoEmpleado />} />
+        <Route path="/crearregistroempleado" element={<CrearRegistroEmpleado />} />
+        <Route path="/facturaempleado" element={<FacturaEmpleado />} />
+        <Route path="/pagoempleado" element={<PagoEmpleado />} />
+        <Route path="/crearpagoempleado" element={<CrearPagoEmpleado />} />
+        <Route path="/cotizacionempleado" element={<CotizacionEmpleado />} />
+
+
+
+
+
+
+
+
+
 
       </Routes>
     </Router>

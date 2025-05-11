@@ -3,13 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers, faSearch, faFileText, faTasks, 
+  faSignOut, faUser, faUsers, faSearch, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import "../index.css";
 
 
-const Clienteempleado = () => {
+const ClienteEmpleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [clientes, setClientes] = useState([]);
 
@@ -27,47 +27,24 @@ const Clienteempleado = () => {
     cargarClientes();
   }, []);
    
-  const eliminarCliente = async (id) => {
-    const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este cliente?");
-    if (!confirmar) return;
-  
-    try {
-      const respuesta = await fetch(`http://localhost:8081/clientes/${id}`, {
-        method: 'DELETE'
-      });
-  
-      if (respuesta.ok) {
-        // Eliminar visualmente de la lista
-        setClientes(prevClientes => prevClientes.filter(c => c.id_cliente !== id));
-        alert("Cliente eliminado correctamente");
-      } else {
-        alert("Error al eliminar cliente");
-      }
-    } catch (error) {
-      console.error('Error al eliminar cliente:', error);
-      alert("Error de red al eliminar cliente");
-    }
-  };  
-  
+ 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
 
 
   return (
-    
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido usuario</h2>
         <ul>
-          <li><Link to="/Dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-          <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
-          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="#"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
-          <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
+                <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+                         <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+                         <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
+                         <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
+                         <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
+                         <li><Link to="/cotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+                         <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+                         <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -81,13 +58,13 @@ const Clienteempleado = () => {
         </button>
       </div>
       <div className="dashboard-content">
-           <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
-                  <FontAwesomeIcon icon={faChevronLeft} />
-                </Link>
+           <Link to="/dashboardempleado" className="boton-retroceso" aria-label="Volver">
+                                  <FontAwesomeIcon icon={faChevronLeft} />
+                                </Link>
         <h2>Bienvenido a la sección de Clientes</h2>
 
         <div className="main-content">
-               <Link to="/crearcliente"><button className="Registro">+ Nuevo cliente</button></Link>
+               <Link to="/crearclienteempleado"><button className="Registro">+ Nuevo cliente</button></Link>
               <div className="input-container-wrapper">
                 <div className="input-container">
                   <input id="buscar-cliente" className="Buscar" type="search" placeholder="Buscar cliente" />
@@ -104,9 +81,7 @@ const Clienteempleado = () => {
                   <th>Telefono</th>
                   <th>Email</th>
                   <th>Direccion</th>
-                   <th>Estado</th>
-                  <th>Acciones</th>
-                  
+                  <th>Estado</th>
                 </tr>
               </thead>
               <tbody id="tabla-clientes">
@@ -118,15 +93,6 @@ const Clienteempleado = () => {
             <td data-label="Teléfono">{cliente.telefono}</td>
             <td data-label="Email">{cliente.email}</td>
             <td data-label="Dirección">{cliente.direccion}</td>
-              <td data-label="Estado">{cliente.estado}</td>
-            <td data-label="Acciones">
-            <Link to={`/actualizarcliente/${cliente.id_cliente}`}>
-             <button className="Actualizar">Actualizar</button>
-            </Link>
-            <button
-             className="Eliminar"
-             onClick={() => eliminarCliente(cliente.id_cliente)}>Eliminar</button>
-              </td>
               </tr>
         ))}
           </tbody>
@@ -139,4 +105,4 @@ const Clienteempleado = () => {
 
   );
 };
-export default Clienteempleado;
+export default ClienteEmpleado;

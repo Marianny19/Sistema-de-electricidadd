@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCalendar, faChevronLeft, faClipboard,
-  faFileInvoice, faFileText, faHome, faReceipt, faSignOut,
-  faUsers
+  faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
+  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
+  faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import "../index.css";
 
-
-const Clienteregistro = () => {
+const CrearClienteEmpleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -20,11 +19,14 @@ const Clienteregistro = () => {
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido usuario</h2>
         <ul>
-          <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
-          <li><Link to="/solicitarservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-          <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/notasregistro"><FontAwesomeIcon icon={faClipboard} /> <span>Notas</span></Link></li>
+       <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+                        <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+                        <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
+                        <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
+                        <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
+                        <li><Link to="/cotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+                        <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+                        <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -39,10 +41,11 @@ const Clienteregistro = () => {
       </div>
 
       <div className="dashboard-content">
-           <Link to="/dashboardcliente" className="boton-retroceso" aria-label="Volver">
-                                  <FontAwesomeIcon icon={faChevronLeft} />
-                                </Link>
-        <h2>Bienvenido a la sección de nuevo cliente</h2>
+        <Link to="/clienteDempleado" className="boton-retroceso" aria-label="Volver">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </Link>
+
+        <h2>Bienvenido a la sección de clientes</h2>
         <FormularioCliente />
       </div>
     </div>
@@ -55,7 +58,8 @@ function FormularioCliente() {
     apellido: '',
     telefono: '',
     email: '',
-    direccion: ''
+    direccion: '',
+    estado: '',
   });
 
   const handleChange = (e) => {
@@ -82,7 +86,9 @@ function FormularioCliente() {
           apellido: '',
           telefono: '',
           email: '',
-          direccion: ''
+          direccion: '',
+          estado: ''
+
         });
       } else {
         alert('Error al registrar el cliente');
@@ -102,10 +108,15 @@ function FormularioCliente() {
         <input type="text" name="telefono" placeholder="Telefono" className="campo-cita" value={formulario.telefono} onChange={handleChange} />
         <input type="text" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} />
         <input type="text" name="direccion" placeholder="Direccion" className="campo-cita" value={formulario.direccion} onChange={handleChange} />
+          <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange}>
+          <option value="">Estado</option>
+          <option value="activo">activo</option>
+          <option value="inactivo">inactivo</option>
+        </select>
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>
   );
 }
 
-export default Clienteregistro;
+export default CrearClienteEmpleado;

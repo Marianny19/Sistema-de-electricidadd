@@ -47,6 +47,9 @@ const Factura = () => {
       </div>
 
       <div className="dashboard-content">
+            <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
+                                  <FontAwesomeIcon icon={faChevronLeft} />
+                                </Link>
         <h2>Bienvenido a la sección de Factura</h2>
         <div className="main-content">
         <button className="Registro" onClick={() => console.log("Generar reporte")}> Generar reporte </button>

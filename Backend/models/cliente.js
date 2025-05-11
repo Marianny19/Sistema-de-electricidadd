@@ -28,6 +28,10 @@ const Cliente = conexion.define('Cliente', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  estado: {
+    type: DataTypes.ENUM('activo','inactivo'),
+    allowNull: false,
+  },
 }, {
   tableName: 'cliente',
   timestamps: false,

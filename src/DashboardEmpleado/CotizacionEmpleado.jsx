@@ -8,7 +8,7 @@ import {
 import { Link } from "react-router-dom";
 import "../index.css";
 
-const Cotizacion = () => {
+const CotizacionEmpleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [cliente, setCliente] = useState("");
   const [fecha, setFecha] = useState("");
@@ -44,17 +44,16 @@ const Cotizacion = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido cliente</h2>
         <ul>
-          <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-          <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
-          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
-          <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
+          <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+                                 <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+                                 <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
+                                 <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
+                                 <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
+                                 <li><Link to="/cotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+                                 <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+                                 <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
@@ -69,10 +68,10 @@ const Cotizacion = () => {
       </div>
 
       <div className="dashboard-content">
-         <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
-                          <FontAwesomeIcon icon={faChevronLeft} />
-                        </Link>
-        <h2>Bienvenido a la seccion de cotizacion</h2>
+           <Link to="/dashboardempleado" className="boton-retroceso" aria-label="Volver">
+                                          <FontAwesomeIcon icon={faChevronLeft} />
+                                        </Link>
+        <h2>Bienvenido a la seccion de citas</h2>
         <div className="invoice-container">
           <div className="invoice-card">
             <div className="invoice-grid">
@@ -163,4 +162,4 @@ const Cotizacion = () => {
   );
 };
 
-export default Cotizacion;
+export default CotizacionEmpleado;
