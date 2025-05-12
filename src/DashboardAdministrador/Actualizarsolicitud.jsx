@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Select from 'react-select';
 
-function Crearcitas() {
+function Editarsolicitud() {
+  const { id } = useParams(); 
+
   const [formulario, setFormulario] = useState({
     id_cliente: '',
     servicios: [],
@@ -14,18 +17,45 @@ function Crearcitas() {
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
 
-  // Carga de clientes y servicios con useEffect como antes
   useEffect(() => {
-    fetch('http://localhost:8081/clientes')
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(err => console.error('Error cargando clientes:', err));
+    const obtenerDatos = async () => {
+      try {
+        const resSolicitud = await fetch(`http://localhost:8081/solicitudservicio/${id}`);
+        const data = await resSolicitud.json();
 
-    fetch('http://localhost:8081/servicios')
-      .then(res => res.json())
-      .then(data => setServiciosLista(data))
-      .catch(err => console.error('Error cargando servicios:', err));
-  }, []);
+        setFormulario({
+          id_cliente: data.id_cliente,
+          servicios: data.servicios.map(s => s.id_servicio),
+          direccion: data.direccion,
+          via_comunicacion: data.via_comunicacion,
+          fecha: data.fecha.split('T')[0],
+          estado: data.estado || ''
+        });
+      } catch (error) {
+        console.error('Error cargando solicitud:', error);
+      }
+    };
+
+    const obtenerClientesYServicios = async () => {
+      try {
+        const [resClientes, resServicios] = await Promise.all([
+          fetch('http://localhost:8081/clientes'),
+          fetch('http://localhost:8081/servicios')
+        ]);
+
+        const clientesData = await resClientes.json();
+        const serviciosData = await resServicios.json();
+
+        setClientes(clientesData);
+        setServiciosLista(serviciosData);
+      } catch (error) {
+        console.error('Error cargando clientes o servicios:', error);
+      }
+    };
+
+    obtenerDatos();
+    obtenerClientesYServicios();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,56 +68,45 @@ function Crearcitas() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const estadosValidos = ['pendiente', 'realizado', 'atrasado', 'cancelado'];
-  const { id_cliente, servicios, direccion, via_comunicacion, fecha, estado } = formulario;
+    const estadosValidos = ['pendiente', 'realizado', 'atrasado', 'cancelado'];
+    const { id_cliente, servicios, direccion, via_comunicacion, fecha, estado } = formulario;
+    const estadoFinal = estado && estadosValidos.includes(estado) ? estado : 'pendiente';
 
-  // Verificar si el estado está vacío y asignar "pendiente" por defecto
-  const estadoFinal = estado && estadosValidos.includes(estado) ? estado : 'pendiente';
-
-  if (!id_cliente || servicios.length === 0 || !direccion || !fecha) {
-    alert('Todos los campos son obligatorios.');
-    return;
-  }
-
-  try {
-    const respuesta = await fetch('http://localhost:8081/solicitudservicio', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...formulario, 
-        estado: estadoFinal // Enviar el estado final con el valor por defecto si no se llena
-      })
-    });
-
-    if (respuesta.ok) {
-      alert('Solicitud registrada correctamente');
-      setFormulario({
-        id_cliente: '',
-        servicios: [],
-        direccion: '',
-        via_comunicacion: '',
-        fecha: new Date().toISOString().split('T')[0],
-        estado: '' // Limpiar el estado en el formulario
-      });
-    } else {
-      const error = await respuesta.json();
-      console.error('Error del servidor:', error);
-      alert('Error al registrar solicitud');
+    if (!id_cliente || servicios.length === 0 || !direccion || !fecha) {
+      alert('Todos los campos son obligatorios.');
+      return;
     }
-  } catch (error) {
-    console.error('Error en el registro:', error);
-    alert('Error de red al registrar solicitud');
-  }
-};
 
+    try {
+      const respuesta = await fetch(`http://localhost:8081/solicitudservicio/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formulario,
+          estado: estadoFinal
+        })
+      });
+
+      if (respuesta.ok) {
+        alert('Solicitud actualizada correctamente');
+        
+      } else {
+        const error = await respuesta.json();
+        console.error('Error del servidor:', error);
+        alert('Error al actualizar solicitud');
+      }
+    } catch (error) {
+      console.error('Error en la actualización:', error);
+      alert('Error de red al actualizar solicitud');
+    }
+  };
 
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
+      <h1 className="titulo-cita">EDITAR SOLICITUD</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        {/* ComboBox de clientes */}
         <select
           name="id_cliente"
           className="campo-cita"
@@ -103,7 +122,6 @@ function Crearcitas() {
           ))}
         </select>
 
-        {/* MultiSelect de servicios */}
         <div className="campo-cita">
           <label>Servicios:</label>
           <Select
@@ -114,7 +132,10 @@ function Crearcitas() {
             }))}
             value={serviciosLista
               .filter(serv => formulario.servicios.includes(serv.id_servicio))
-              .map(serv => ({ value: serv.id_servicio, label: serv.nombre_servicio }))}
+              .map(serv => ({
+                value: serv.id_servicio,
+                label: serv.nombre_servicio
+              }))}
             onChange={handleServiciosChange}
             placeholder="Selecciona uno o más servicios"
           />
@@ -159,10 +180,10 @@ function Crearcitas() {
           <option value="cancelado">Cancelado</option>
         </select>
 
-        <button type="submit" className="boton-cita">REGISTRAR</button>
+        <button type="submit" className="boton-cita">ACTUALIZAR</button>
       </form>
     </div>
   );
 }
 
-export default Crearcitas;
+export default Editarsolicitud;
