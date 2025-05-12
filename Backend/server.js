@@ -8,6 +8,31 @@ const Cita = require('./models/cita');
 const Solicitudservicio = require('./models/solicitudservicio');
 const Registrotrabajo = require('./models/registrotrabajo');
 const Pago = require('./models/pago');
+const Servicio = require('./models/Servicio');
+const DetalleSolicitudServicio = require('./models/DetalleSolicitudServicio');
+
+Cliente.hasMany(Solicitudservicio, { foreignKey: 'id_cliente' });
+Solicitudservicio.belongsTo(Cliente, { foreignKey: 'id_cliente' });
+
+Solicitudservicio.belongsToMany(Servicio, {
+  through: {
+    model: DetalleSolicitudServicio,
+    unique: false
+  },
+  foreignKey: 'id_solicitud',
+  otherKey: 'id_servicio'
+});
+
+Servicio.belongsToMany(Solicitudservicio, {
+  through: {
+    model: DetalleSolicitudServicio,
+    unique: false
+  },
+  foreignKey: 'id_servicio',
+  otherKey: 'id_solicitud'
+});
+
+
 
 const app = express();
 const port = 8081;
@@ -197,17 +222,16 @@ app.post('/citas', async (req, res) => {
     res.status(500).json({ error: 'Error al registar cita' });  
   }
 });
-
-// Ruta GET para obtener todas las solicitudes de servicio
-app.get('/solicitudservicio', async (req, res) => {
+app.get('/servicios', async (req, res) => {
   try {
-    const Solicitud = await Solicitudservicio.findAll();
-    res.json(Solicitud);
+    const servicios = await Servicio.findAll();
+    res.json(servicios);
   } catch (error) {
-    console.error('Error al obtener solicitud:', error);
-    res.status(500).json({ error: 'Error al obtener solicitud' });
+    console.error('Error al obtener servicios:', error);
+    res.status(500).json({ error: 'Error al obtener servicios' });
   }
 });
+
 
 // Ruta POST para crear una nueva solicitud de servicio
 app.post('/solicitudservicio', async (req, res) => {
@@ -217,6 +241,145 @@ app.post('/solicitudservicio', async (req, res) => {
   } catch (error) {
     console.error('Error al registrar solicitud:', error);
     res.status(500).json({ error: 'Error al registar solicitud' });  
+  }
+});
+// Ruta GET para obtener todas las solicitudes de servicio
+app.get('/solicitudservicio', async (req, res) => {
+  try {
+    const solicitudes = await Solicitudservicio.findAll({
+      include: [
+        { model: Cliente, attributes: ['nombre'] },
+        {
+          model: Servicio,
+          attributes: ['nombre_servicio'],
+          through: { attributes: [] }
+        }
+      ]
+    });
+
+    const respuesta = solicitudes.map((s) => ({
+      id_solicitud: s.id_solicitud,
+      cliente: s.Cliente?.nombre,
+      servicios: s.Servicios.map(serv => serv.nombre_servicio).join(', '),
+      direccion: s.direccion,
+      via_comunicacion: s.via_comunicacion,
+      fecha: s.fecha,
+      estado: s.estado
+    }));
+
+    res.json(respuesta);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener solicitudes' });
+  }
+});
+app.get('/solicitudservicio/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const solicitud = await Solicitudservicio.findByPk(id, {
+      include: [
+        {
+          model: Servicio,
+          attributes: ['id_servicio', 'nombre_servicio'], // <--- AQUI
+          through: { attributes: [] }
+        }
+      ]
+    });
+
+    if (!solicitud) {
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+
+    res.json({
+      id_cliente: solicitud.id_cliente,
+      direccion: solicitud.direccion,
+      via_comunicacion: solicitud.via_comunicacion,
+      fecha: solicitud.fecha,
+      estado: solicitud.estado,
+      servicios: solicitud.Servicios.map(s => ({
+        id_servicio: s.id_servicio,
+        nombre_servicio: s.nombre_servicio
+      }))
+    });
+  } catch (error) {
+    console.error('Error al obtener solicitud por ID:', error);
+    res.status(500).json({ error: 'Error al obtener solicitud' });
+  }
+});
+
+
+app.post('/solicitudservicio', async (req, res) => {
+  try {
+    const { id_cliente, direccion, via_comunicacion, fecha, estado, servicios } = req.body;
+
+    if (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id))) {
+      return res.status(400).json({ error: 'La lista de servicios debe ser un arreglo de IDs numéricos válidos' });
+    }
+
+    const serviciosEncontrados = await Servicio.findAll({
+      where: { id_servicio: servicios }
+    });
+
+    if (serviciosEncontrados.length !== servicios.length) {
+      return res.status(400).json({ error: 'Uno o más servicios no existen en la base de datos' });
+    }
+
+    const nuevaSolicitud = await Solicitudservicio.create({
+      id_cliente,
+      direccion,
+      via_comunicacion,
+      fecha,
+      estado
+    });
+
+    await nuevaSolicitud.addServicios(servicios);
+
+    res.status(201).json({ mensaje: 'Solicitud creada exitosamente' });
+  } catch (error) {
+    console.error("Error al crear solicitud:", error);
+    res.status(500).json({ error: 'Error al crear solicitud' });
+  }
+});
+app.put('/solicitudservicio/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { id_cliente, direccion, via_comunicacion, fecha, estado, servicios } = req.body;
+
+    // Verificar que servicios sea un array válido
+    if (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id))) {
+      return res.status(400).json({ error: 'La lista de servicios debe ser un arreglo de IDs numéricos válidos' });
+    }
+
+    // Verificar que la solicitud existe
+    const solicitud = await Solicitudservicio.findByPk(id);
+    if (!solicitud) {
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+
+    // Verificar que todos los servicios existen
+    const serviciosEncontrados = await Servicio.findAll({
+      where: { id_servicio: servicios }
+    });
+
+    if (serviciosEncontrados.length !== servicios.length) {
+      return res.status(400).json({ error: 'Uno o más servicios no existen en la base de datos' });
+    }
+
+    // Actualizar campos básicos de la solicitud
+    await solicitud.update({
+      id_cliente,
+      direccion,
+      via_comunicacion,
+      fecha,
+      estado
+    });
+    await solicitud.setServicios(servicios);
+
+    res.json({ mensaje: 'Solicitud actualizada exitosamente' });
+  } catch (error) {
+    console.error("Error al actualizar solicitud:", error);
+    res.status(500).json({ error: 'Error al actualizar solicitud' });
   }
 });
 

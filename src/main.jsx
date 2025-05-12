@@ -41,6 +41,7 @@ import PagoEmpleado from './DashboardEmpleado/PagoEmpleado.jsx';
 import CrearPagoEmpleado from './DashboardEmpleado/CrearPagoEmpleado.jsx';
 import CotizacionEmpleado from './DashboardEmpleado/CotizacionEmpleado.jsx';
 import Identificate from './Identificate.jsx';
+import Actualizarsolicitud from './DashboardAdministrador/Actualizarsolicitud.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -83,7 +84,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/facturaempleado" element={<FacturaEmpleado />} />
         <Route path="/pagoempleado" element={<PagoEmpleado />} />
         <Route path="/crearpagoempleado" element={<CrearPagoEmpleado />} />
-        <Route path="/cotizacionempleado" element={<CotizacionEmpleado />} />
+        <Route path="/cotizacionempleado" element={<CotizacionEmpleado />} /> 
+        <Route path="/actualizarsolicitud/:id" element={<Actualizarsolicitud />} />
 
 
 

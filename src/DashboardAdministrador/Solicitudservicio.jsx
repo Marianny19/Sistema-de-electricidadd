@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
@@ -11,9 +11,25 @@ import { faServer } from '@fortawesome/free-solid-svg-icons/faServer';
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons/faCommentDots';
 import "../index.css";
 
-
 const Solicitudservicio = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [Solicitud, setSolicitud] = useState([]);
+  
+  useEffect(() => {
+    async function cargarSolicitud() {
+      try {
+        const response = await fetch('http://localhost:8081/solicitudservicio');
+        if (!response.ok) throw new Error('Error en la solicitud');
+        const data = await response.json();
+        console.log('Datos recibidos:', data);  
+        setSolicitud(data);
+      } catch (error) {
+        console.error('Error al cargar solicitud:', error);
+      }
+    }
+
+    cargarSolicitud();
+  }, []);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
@@ -29,7 +45,7 @@ const Solicitudservicio = () => {
           <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
@@ -46,35 +62,60 @@ const Solicitudservicio = () => {
       </div>
 
       <div className="dashboard-content">
-            <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
-                                  <FontAwesomeIcon icon={faChevronLeft} />
-                                </Link>
+        <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </Link>
         <h2>Bienvenido a la sección de solicitud de servicio</h2>
 
         <div className="main-content">
-        <Link to="/crearsolicitud"><button className="Registro">+ Nueva solicitud</button></Link>
-              <div className="input-container-wrapper">
-                <div className="input-container">
-                  <input id="buscar-empleado" className="Buscar" type="search" placeholder="Buscar cita" />
-                  <FontAwesomeIcon icon={faSearch} />
-                </div>
+          <Link to="/crearsolicitud"><button className="Registro">+ Nueva solicitud</button></Link>
+          <div className="input-container-wrapper">
+            <div className="input-container">
+              <input id="buscar-empleado" className="Buscar" type="search" placeholder="Buscar cita" />
+              <FontAwesomeIcon icon={faSearch} />
+            </div>
             <table className='tabla-empleados'>
               <caption>Lista de solicitud</caption>
               <thead>
                 <tr>
                   <th>Codigo</th>
                   <th>Cliente</th>
-                  <th>Servicio </th>
-                  <th>Direccion</th>
-                  <th>Via comunicacion</th>
+                  <th>Servicio</th>
+                  <th>Dirección</th>
+                  <th>Vía comunicación</th>
                   <th>Fecha</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
-              <tbody id="tabla-empleados">
-                {}
-              </tbody>
+             <tbody id="tabla-empleados">
+  {Solicitud.length === 0 ? (
+    <tr>
+      <td colSpan="8">No hay solicitudes disponibles.</td>
+    </tr>
+  ) : (
+    Solicitud.map((solicitud) => (
+      <tr key={solicitud.id_solicitud}>
+        <td data-label="ID Solicitud">{solicitud.id_solicitud}</td>
+        <td data-label="Cliente">{solicitud.cliente}</td>
+        <td data-label="Servicio">
+          {solicitud.servicios ? solicitud.servicios : 'No hay servicios'}
+        </td>
+        <td data-label="Dirección">{solicitud.direccion}</td>
+        <td data-label="Vía de Comunicación">{solicitud.via_comunicacion}</td>
+        <td data-label="Fecha">{solicitud.fecha}</td>
+        <td data-label="Estado">{solicitud.estado}</td>
+        <td data-label="Acciones">
+                     <Link to={`/actualizarsolicitud/${solicitud.id_solicitud}`}>
+                      <button className="Actualizar">Actualizar</button>
+                     </Link>
+          <button className='Eliminar'>Eliminar</button>
+                </td>
+      </tr>
+    ))
+  )}
+</tbody>
+
             </table>
           </div>
         </div>
@@ -82,4 +123,5 @@ const Solicitudservicio = () => {
     </div>
   );
 };
+
 export default Solicitudservicio;
