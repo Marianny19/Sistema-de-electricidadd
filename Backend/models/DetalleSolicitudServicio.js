@@ -26,7 +26,7 @@ const DetalleSolicitudServicio = conexion.define('DetalleSolicitudServicio', {
     }
   }
 }, {
-  tableName: 'detalle_solicitud_servicio',
+  tableName: 'detallesolicitud',
   timestamps: false,
 });
 module.exports = DetalleSolicitudServicio;

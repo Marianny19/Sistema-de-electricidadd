@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Select from 'react-select'
+import Select from 'react-select';
 import {
-  faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
-  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
+  faCalendar, faChevronLeft, faFileInvoice,
+  faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import "../index.css";
 
-const Crearcita = () => {
+const Actualizarcita = () => {
+  const { id } = useParams(); // Aquí obtenemos el id de la URL
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
 
@@ -20,13 +20,13 @@ const Crearcita = () => {
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido usuario</h2>
         <ul>
-          <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/Dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
           <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="#"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
@@ -46,28 +46,29 @@ const Crearcita = () => {
         <Link to="/formulariocita" className="boton-retroceso" aria-label="Volver">
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
-        <h2>Bienvenido a la sección de citas</h2>
-        <Crearcitas />
+        <h2>Bienvenido a la sección de actualizar cita</h2>
+        <FormularioActualizarCita /> 
       </div>
     </div>
   );
 };
 
-function Crearcitas() {
+function FormularioActualizarCita() {
+  const { id } = useParams();
   const [clientes, setClientes] = useState([]);
   const [empleados, setEmpleados] = useState([]);
-  const [serviciosLista, setServiciosLista] = useState([]); 
-
+  const [serviciosLista, setServiciosLista] = useState([]);
   const [formulario, setFormulario] = useState({
     id_cliente: '',
     id_empleado: '',
     servicios: [],
     fecha: '',
     hora: '',
-    estado: 'agendada'
+    estado: 'activo'
   });
 
   useEffect(() => {
+    // Cargar clientes, empleados y servicios
     fetch('http://localhost:8081/clientes')
       .then(res => res.json())
       .then(data => setClientes(data))
@@ -82,7 +83,29 @@ function Crearcitas() {
       .then(res => res.json())
       .then(data => setServiciosLista(data))
       .catch(err => console.error('Error cargando servicios:', err));
-  }, []);
+
+    // Cargar los datos de la cita actual
+    fetch(`http://localhost:8081/citas/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          setFormulario({
+            id_cliente: data.id_cliente,
+            id_empleado: data.id_empleado,
+            servicios: data.servicios,
+            fecha: data.fecha,
+            hora: data.hora,
+            estado: data.estado
+          });
+        } else {
+          alert("Cita no encontrada");
+        }
+      })
+      .catch(error => {
+        console.error('Error al cargar cita:', error);
+        alert('No se pudo cargar la información de la cita');
+      });
+  }, [id]);
 
   const handleChange = (e) => {
     setFormulario({
@@ -98,50 +121,28 @@ function Crearcitas() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const { id_cliente, id_empleado, servicios, fecha, hora, estado } = formulario;
-
-    if (!id_cliente || !id_empleado || servicios.length === 0 || !fecha || !hora || !estado) {
-      alert('Por favor completa todos los campos.');
-      return;
-    }
-
-    if (!['agendada', 'completada', 'cancelada'].includes(estado)) {
-      alert('Por favor selecciona un estado válido.');
-      return;
-    }
-
     try {
-      const respuesta = await fetch('http://localhost:8081/citas', {
-        method: 'POST',
+      const respuesta = await fetch(`http://localhost:8081/citas/${id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formulario)
       });
 
       if (respuesta.ok) {
-        alert('Cita registrada correctamente');
-        setFormulario({
-          id_cliente: '',
-          id_empleado: '',
-          servicios: [],
-          fecha: '',
-          hora: '',
-          estado: 'agendada'
-        });
+        alert('Cita actualizada correctamente');
       } else {
-        alert('Error al registrar cita');
+        alert('Error al actualizar la cita');
       }
     } catch (error) {
-      console.error('Error de red:', error);
-      alert('Error de red al registrar cita');
+      console.error('Error al actualizar:', error);
+      alert('Error de red al actualizar cita');
     }
   };
 
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
+      <h1 className="titulo-cita">MODIFICA LOS CAMPOS NECESARIOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-
         <select name="id_cliente" className="campo-cita" value={formulario.id_cliente} onChange={handleChange} required>
           <option value="">Selecciona un cliente</option>
           {clientes.map((cliente) => (
@@ -182,10 +183,10 @@ function Crearcitas() {
           <option value="cancelada">Cancelada</option>
         </select>
 
-        <button type="submit" className="boton-cita">REGISTRAR</button>
+        <button type="submit" className="boton-cita">ACTUALIZAR</button>
       </form>
     </div>
   );
 }
 
-export default Crearcita;
+export default Actualizarcita;

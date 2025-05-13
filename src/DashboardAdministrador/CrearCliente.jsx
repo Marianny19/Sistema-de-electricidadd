@@ -12,7 +12,10 @@ const CrearCliente = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+  const cerrarSesion = () => {
+    console.log("Cerrar sesión");
+    // Aquí podrías agregar lógica de cierre de sesión real
+  };
 
   return (
     <div className="dashboard">
@@ -25,15 +28,15 @@ const CrearCliente = () => {
           <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
         <ul>
-          <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
+          <li className="cerrar-sesion">
+            <button onClick={cerrarSesion} className="boton-cerrar-sesion">
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </a>
+            </button>
           </li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
@@ -45,7 +48,6 @@ const CrearCliente = () => {
         <Link to="/clienteempleado" className="boton-retroceso" aria-label="Volver">
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
-
         <h2>Bienvenido a la sección de clientes</h2>
         <FormularioCliente />
       </div>
@@ -57,10 +59,11 @@ function FormularioCliente() {
   const [formulario, setFormulario] = useState({
     nombre: '',
     apellido: '',
+    cedula: '',
     telefono: '',
     email: '',
     direccion: '',
-    estado: '',
+    estado: 'activo'
   });
 
   const handleChange = (e) => {
@@ -85,11 +88,11 @@ function FormularioCliente() {
         setFormulario({
           nombre: '',
           apellido: '',
+          cedula: '',
           telefono: '',
           email: '',
           direccion: '',
-          estado: ''
-
+          estado: 'activo'
         });
       } else {
         alert('Error al registrar el cliente');
@@ -104,15 +107,15 @@ function FormularioCliente() {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        <input type="text" name="nombre" placeholder="Nombre" className="campo-cita" value={formulario.nombre} onChange={handleChange} />
-        <input type="text" name="apellido" placeholder="Apellido" className="campo-cita" value={formulario.apellido} onChange={handleChange} />
-        <input type="text" name="telefono" placeholder="Telefono" className="campo-cita" value={formulario.telefono} onChange={handleChange} />
-        <input type="text" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} />
-        <input type="text" name="direccion" placeholder="Direccion" className="campo-cita" value={formulario.direccion} onChange={handleChange} />
-          <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange}>
-          <option value="">Estado</option>
-          <option value="activo">activo</option>
-          <option value="inactivo">inactivo</option>
+        <input type="text" name="nombre" placeholder="Nombre" className="campo-cita" value={formulario.nombre} onChange={handleChange} required />
+        <input type="text" name="apellido" placeholder="Apellido" className="campo-cita" value={formulario.apellido} onChange={handleChange} required />
+        <input type="text" name="cedula" placeholder="Cédula" className="campo-cita" value={formulario.cedula} onChange={handleChange} required />
+        <input type="text" name="telefono" placeholder="Teléfono" className="campo-cita" value={formulario.telefono} onChange={handleChange} required />
+        <input type="email" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} required />
+        <input type="text" name="direccion" placeholder="Dirección" className="campo-cita" value={formulario.direccion} onChange={handleChange} required />
+        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange} required>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
         </select>
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>

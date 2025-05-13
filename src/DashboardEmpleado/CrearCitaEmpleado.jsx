@@ -60,7 +60,7 @@ function Crearcitas() {
     id_servicio: '',
     fecha: '',
     hora: '',
-    estado: ''
+    estado: 'agendada'
   });
 
   const handleChange = (e) => {
@@ -93,7 +93,7 @@ const handleSubmit = async (e) => {
         id_servicio: '',
         fecha: '',
         hora: '',
-        estado: ''
+        estado: 'agendada'
       });
     } else {
       alert('Error al registrar cita');

@@ -16,6 +16,10 @@ const Cliente = conexion.define('Cliente', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  cedula: {
+    type: DataTypes.CHAR,
+    allowNull: false,
+  },
   telefono: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -29,7 +33,7 @@ const Cliente = conexion.define('Cliente', {
     allowNull: false,
   },
   estado: {
-    type: DataTypes.ENUM('activo','inactivo'),
+    type: DataTypes.ENUM('activo', 'inactivo'),
     allowNull: false,
   },
 }, {

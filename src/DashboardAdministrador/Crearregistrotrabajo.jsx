@@ -58,7 +58,7 @@ function FormRegistroTrabajo() {
     id_servicio: '',
     costo_extra: '',
     fecha: '',
-    estado: ''
+    estado: 'activo'
   });
 
   const handleChange = (e) => {
@@ -91,7 +91,7 @@ function FormRegistroTrabajo() {
           id_servicio: '',
           costo_extra: '',
           fecha: '',
-          estado: ''
+          estado: 'activo'
         });
       } else {
         alert('Error al registrar el trabajo');

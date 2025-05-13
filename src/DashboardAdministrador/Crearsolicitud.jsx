@@ -1,20 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCalendar, faChevronLeft, faFileInvoice, faFileInvoiceDollar,
+  faHome, faMoneyCheck, faSignOut, faUser, faUsers, faFileText, faTasks
+} from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
+import "../index.css";
 
-function Crearcitas() {
+const Crearsolicitud = () => {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+  const cerrarSesion = () => console.log("Cerrar sesión");
+
+  return (
+    <div className="dashboard">
+      <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
+        <h2>Bienvenido usuario</h2>
+        <ul>
+          <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+          <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
+          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
+          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
+          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
+          <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+          <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
+        </ul>
+        <ul>
+          <li className="Cerrarsesion">
+            <a href="#" onClick={cerrarSesion}>
+              <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
+            </a>
+          </li>
+        </ul>
+        <button className="toggle-btn" onClick={toggleSidebar}>
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </button>
+      </div>
+
+      <div className="dashboard-content">
+        <Link to="/solicitudservicio" className="boton-retroceso" aria-label="Volver">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </Link>
+        <h2>Bienvenido a la sección de Solicitud</h2>
+        <FormRegistroTrabajo />
+      </div>
+    </div>
+  );
+};
+
+const FormRegistroTrabajo = () => {
   const [formulario, setFormulario] = useState({
     id_cliente: '',
     servicios: [],
     direccion: '',
     via_comunicacion: '',
     fecha: new Date().toISOString().split('T')[0],
-    estado: ''
+    estado: 'pendiente'
   });
 
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
 
-  // Carga de clientes y servicios con useEffect como antes
   useEffect(() => {
     fetch('http://localhost:8081/clientes')
       .then(res => res.json())
@@ -37,77 +87,84 @@ function Crearcitas() {
     setFormulario({ ...formulario, servicios: idsSeleccionados });
   };
 
+  const handleClienteChange = (selectedOption) => {
+    setFormulario({ ...formulario, id_cliente: selectedOption ? selectedOption.value : '' });
+  };
+
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const estadosValidos = ['pendiente', 'realizado', 'atrasado', 'cancelado'];
-  const { id_cliente, servicios, direccion, via_comunicacion, fecha, estado } = formulario;
+    const estadosValidos = ['pendiente', 'realizado', 'atrasado', 'cancelado'];
+    const { id_cliente, servicios, direccion, via_comunicacion, fecha, estado } = formulario;
 
-  // Verificar si el estado está vacío y asignar "pendiente" por defecto
-  const estadoFinal = estado && estadosValidos.includes(estado) ? estado : 'pendiente';
+    const estadoFinal = estado && estadosValidos.includes(estado) ? estado : 'pendiente';
 
-  if (!id_cliente || servicios.length === 0 || !direccion || !fecha) {
-    alert('Todos los campos son obligatorios.');
-    return;
-  }
-
-  try {
-    const respuesta = await fetch('http://localhost:8081/solicitudservicio', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...formulario, 
-        estado: estadoFinal // Enviar el estado final con el valor por defecto si no se llena
-      })
-    });
-
-    if (respuesta.ok) {
-      alert('Solicitud registrada correctamente');
-      setFormulario({
-        id_cliente: '',
-        servicios: [],
-        direccion: '',
-        via_comunicacion: '',
-        fecha: new Date().toISOString().split('T')[0],
-        estado: '' // Limpiar el estado en el formulario
-      });
-    } else {
-      const error = await respuesta.json();
-      console.error('Error del servidor:', error);
-      alert('Error al registrar solicitud');
+    if (!id_cliente || servicios.length === 0 || !direccion || !fecha) {
+      alert('Todos los campos son obligatorios.');
+      return;
     }
-  } catch (error) {
-    console.error('Error en el registro:', error);
-    alert('Error de red al registrar solicitud');
-  }
-};
 
+    try {
+      const respuesta = await fetch('http://localhost:8081/solicitudservicio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formulario,
+          estado: estadoFinal
+        })
+      });
+
+      if (respuesta.ok) {
+        alert('Solicitud registrada correctamente');
+        setFormulario({
+          id_cliente: '',
+          servicios: [],
+          direccion: '',
+          via_comunicacion: '',
+          fecha: new Date().toISOString().split('T')[0],
+          estado: 'pendiente'
+        });
+      } else {
+        const error = await respuesta.json();
+        console.error('Error del servidor:', error);
+        alert('Error al registrar solicitud');
+      }
+    } catch (error) {
+      console.error('Error en el registro:', error);
+      alert('Error de red al registrar solicitud');
+    }
+  };
 
   return (
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        {/* ComboBox de clientes */}
-        <select
-          name="id_cliente"
-          className="campo-cita"
-          value={formulario.id_cliente}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Seleccione un cliente</option>
-          {clientes.map(c => (
-            <option key={c.id_cliente} value={c.id_cliente}>
-              {c.nombre}
-            </option>
-          ))}
-        </select>
+        <div className="campo-cita">
+          <label>Cliente:</label>
+          <Select
+            className="react-select-custom"
+            classNamePrefix="react-select"
+            options={clientes.map(cliente => ({
+              value: cliente.id_cliente,
+              label: cliente.nombre
+            }))}
+            value={
+              clientes
+                .filter(c => c.id_cliente === formulario.id_cliente)
+                .map(c => ({ value: c.id_cliente, label: c.nombre }))[0] || null
+            }
+            onChange={handleClienteChange}
+            placeholder="Buscar cliente por nombre"
+            isClearable
+          />
+        </div>
 
-        {/* MultiSelect de servicios */}
         <div className="campo-cita">
           <label>Servicios:</label>
           <Select
             isMulti
+            className="react-select-custom"
+            classNamePrefix="react-select"
             options={serviciosLista.map(servicio => ({
               value: servicio.id_servicio,
               label: servicio.nombre_servicio
@@ -116,7 +173,7 @@ function Crearcitas() {
               .filter(serv => formulario.servicios.includes(serv.id_servicio))
               .map(serv => ({ value: serv.id_servicio, label: serv.nombre_servicio }))}
             onChange={handleServiciosChange}
-            placeholder="Selecciona uno o más servicios"
+            placeholder="Buscar y seleccionar servicios"
           />
         </div>
 
@@ -163,6 +220,6 @@ function Crearcitas() {
       </form>
     </div>
   );
-}
+};
 
-export default Crearcitas;
+export default Crearsolicitud;

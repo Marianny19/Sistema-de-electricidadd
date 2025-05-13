@@ -10,6 +10,29 @@ const Registrotrabajo = require('./models/registrotrabajo');
 const Pago = require('./models/pago');
 const Servicio = require('./models/Servicio');
 const DetalleSolicitudServicio = require('./models/DetalleSolicitudServicio');
+const DetalleCita  = require('./models/detallecita'); 
+
+
+
+Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
+Cita.belongsTo(Cliente, { foreignKey: 'id_cliente' });
+
+Empleado.hasMany(Cita, { foreignKey: 'id_empleado' });
+Cita.belongsTo(Empleado, { foreignKey: 'id_empleado' });
+
+Cita.belongsToMany(Servicio, {
+  through: 'DetalleCita',
+  foreignKey: 'id_cita',
+  otherKey: 'id_servicio'
+});
+
+Servicio.belongsToMany(Cita, {
+  through: 'DetalleCita',
+  foreignKey: 'id_servicio',
+  otherKey: 'id_cita'
+});
+
+
 
 Cliente.hasMany(Solicitudservicio, { foreignKey: 'id_cliente' });
 Solicitudservicio.belongsTo(Cliente, { foreignKey: 'id_cliente' });
@@ -65,6 +88,7 @@ app.post('/clientes', async (req, res) => {
     res.status(500).json({ error: 'Error al registrar cliente' });
   }
 });
+
 app.get('/clientes/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -177,8 +201,6 @@ app.delete('/empleados/:id', async (req, res) => {
   }
 });
 
-
-
 // Ruta GET para obtener todas las notas
 app.get('/notas', async (req, res) => {
   try {
@@ -201,27 +223,145 @@ app.post('/notas', async (req, res) => {
   }
 });
 
-// Ruta GET para obtener todas las citas
+
+//GET CITA
 app.get('/citas', async (req, res) => {
   try {
-    const Citas = await Cita.findAll();
-    res.json(Citas);
+    const citas = await Cita.findAll({
+      include: [
+        {
+          model: Cliente,
+          attributes: ['nombre']
+        },
+        {
+          model: Empleado,
+          attributes: ['nombre']
+        },
+        {
+          model: Servicio, // Incluir los servicios a través de la tabla intermedia DetalleCita
+          through: { attributes: [] },
+          attributes: ['nombre_servicio'] // Asegúrate de que este atributo sea correcto
+        }
+      ]
+    });
+
+    const citasConServicios = citas.map(cita => {
+      const citaJson = cita.toJSON();
+      citaJson.nombre_cliente = cita.Cliente ? cita.Cliente.nombre : 'Sin cliente';
+      citaJson.nombre_empleado = cita.Empleado ? cita.Empleado.nombre : 'Sin empleado';
+      
+      // Si 'Servicios' está disponible, agregamos los nombres de los servicios
+      citaJson.servicios = citaJson.Servicios && citaJson.Servicios.length
+        ? citaJson.Servicios.map(s => s.nombre_servicio) 
+        : ['No hay servicios'];
+
+      return citaJson;
+    });
+
+    res.json(citasConServicios);
   } catch (error) {
     console.error('Error al obtener citas:', error);
-    res.status(500).json({ error: 'Error al obtener citas' });
+    res.status(500).json({ error: 'Error al obtener citas', detalles: error.message });
   }
 });
 
-// Ruta POST para crear una nueva cita
+
+// Crear Cita con Servicios
 app.post('/citas', async (req, res) => {
   try {
-    const nuevaCita = await Cita.create(req.body);
-    res.status(201).json(nuevaCita);
+    const { id_cliente, id_empleado, servicios, fecha, hora, estado } = req.body;
+
+    if (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id))) {
+      return res.status(400).json({ error: 'Servicios debe ser un arreglo de IDs numéricos válidos' });
+    }
+
+    const serviciosValidos = await Servicio.findAll({
+      where: { id_servicio: servicios }
+    });
+
+    if (serviciosValidos.length !== servicios.length) {
+      return res.status(400).json({ error: 'Uno o más servicios no existen' });
+    }
+
+    const nuevaCita = await Cita.create({
+      id_cliente,
+      id_empleado,
+      fecha,
+      hora,
+      estado
+    });
+
+    await nuevaCita.addServicios(servicios); // Sequelize no busca timestamps si el modelo intermedio los tiene desactivados
+
+    const citaFinal = await Cita.findOne({
+      where: { id_cita: nuevaCita.id_cita },
+      include: [
+        { model: Servicio, attributes: ['nombre_servicio'] },
+        { model: Cliente, attributes: ['nombre'] },
+        { model: Empleado, attributes: ['nombre'] }
+      ]
+    });
+
+    res.status(201).json(citaFinal);
   } catch (error) {
-    console.error('Error al registrar cita:', error);
-    res.status(500).json({ error: 'Error al registar cita' });  
+    console.error('Error al crear la cita:', error);
+    res.status(500).json({ error: 'Error interno al registrar la cita' });
   }
 });
+
+//Actualizar cita
+
+app.put('/citas/:id', async (req, res) => {
+  const { id } = req.params;
+  const { servicios, ...restoCita } = req.body;
+
+  try {
+    // Buscar la cita existente
+    const cita = await Cita.findOne({ where: { id_cita: id } });
+    if (!cita) {
+      return res.status(404).json({ error: 'Cita no encontrada' });
+    }
+
+    // Actualizar los datos principales de la cita
+    await cita.update(restoCita);
+
+    // Si hay nuevos servicios, actualizar la tabla intermedia 'detallecita'
+    if (Array.isArray(servicios)) {
+      // Eliminar servicios existentes de la tabla intermedia
+      await DetalleCita.destroy({ where: { id_cita: id } });
+
+      // Agregar los nuevos servicios
+      await Promise.all(servicios.map(async (id_servicio) => {
+        await DetalleCita.create({
+          id_cita: cita.id_cita,
+          id_servicio
+        });
+      }));
+    }
+
+    // Obtener la cita actualizada con los servicios asociados
+    const citaActualizada = await Cita.findByPk(id, {
+      include: [
+        { model: Cliente, attributes: ['nombre'] },
+        { model: Empleado, attributes: ['nombre'] },
+        {
+          model: Servicio,
+          attributes: ['nombre'], // Ajusta el atributo si es necesario
+          through: { attributes: [] } // Evita que devuelva columnas innecesarias de la tabla intermedia
+        }
+      ]
+    });
+
+    // Responder con la cita actualizada
+    res.json({ mensaje: 'Cita actualizada correctamente', cita: citaActualizada });
+  } catch (error) {
+    console.error('Error al actualizar cita:', error);
+    res.status(500).json({ error: 'Error al actualizar cita' });
+  }
+});
+
+
+//get de servicios
 app.get('/servicios', async (req, res) => {
   try {
     const servicios = await Servicio.findAll();
@@ -233,16 +373,6 @@ app.get('/servicios', async (req, res) => {
 });
 
 
-// Ruta POST para crear una nueva solicitud de servicio
-app.post('/solicitudservicio', async (req, res) => {
-  try {
-    const nuevaSolicitud = await Solicitudservicio.create(req.body);
-    res.status(201).json(nuevaSolicitud);
-  } catch (error) {
-    console.error('Error al registrar solicitud:', error);
-    res.status(500).json({ error: 'Error al registar solicitud' });  
-  }
-});
 // Ruta GET para obtener todas las solicitudes de servicio
 app.get('/solicitudservicio', async (req, res) => {
   try {
@@ -273,6 +403,7 @@ app.get('/solicitudservicio', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener solicitudes' });
   }
 });
+
 app.get('/solicitudservicio/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -424,6 +555,40 @@ app.post('/pagos', async (req, res) => {
   } catch (error) {
     console.error('Error al registrar pago:', error);
     res.status(500).json({ error: 'Error al registar pago' });  
+  }
+});
+
+
+// Obtener un pago por ID
+app.get('/pagos/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const pago = await Pago.findOne({ where: { id_pago: id } }); 
+    if (!pago) {
+      return res.status(404).json({ error: 'Pago no encontrado' });
+    }
+    res.json(pago);
+  } catch (error) {
+    console.error('Error al obtener pago:', error);
+    res.status(500).json({ error: 'Error al obtener pago' });
+  }
+});
+
+
+
+// Actualizar pago
+app.put('/pagos/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const pago = await Pago.findOne({ where: { id_pago: id } });  // Usa el modelo correcto
+    if (!pago) {
+      return res.status(404).json({ error: 'Pago no encontrado' });  // Corrige la variable
+    }
+    await pago.update(req.body);
+    res.json({ mensaje: 'Pago actualizado correctamente', pago });  // Devuelve el objeto correcto
+  } catch (error) {
+    console.error('Error al actualizar pago:', error);
+    res.status(500).json({ error: 'Error al actualizar pago' });
   }
 });
 
