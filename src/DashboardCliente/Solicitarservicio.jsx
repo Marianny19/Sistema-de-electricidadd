@@ -58,7 +58,7 @@ function Crearcitas() {
      direccion: '',
      via_comunicacion: '',
      fecha: '',
-     estado: ''
+     estado: 'pendiente'
    });
  
    const handleChange = (e) => {
@@ -98,7 +98,7 @@ function Crearcitas() {
            direccion: '',
            via_comunicacion: '',
            fecha: '',
-           estado: ''
+           estado: 'pendiente'
          });
        } else {
          alert('Error al registrar solicitud');

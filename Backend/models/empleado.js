@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const conexion = require('../database');
 
+
 const Empleado = conexion.define('Empleado', {
     id_empleado: {
         type: DataTypes.INTEGER,
@@ -51,6 +52,8 @@ const Empleado = conexion.define('Empleado', {
     tableName: 'empleado',
     timestamps: false
   });
+
+  
   
   module.exports = Empleado;
   

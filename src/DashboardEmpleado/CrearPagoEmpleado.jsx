@@ -59,7 +59,7 @@ function Crearcitas() {
     monto: '',
     hora_pago: '',
     metodo_pago: '',
-    estado: '',
+    estado: 'activo',
   });
 
   const handleChange = (e) => {
@@ -87,7 +87,7 @@ function Crearcitas() {
           monto: '',
           hora_pago: '',
           metodo_pago: '',
-          estado: '',
+          estado: 'activo',
         });
       } else {
         alert('Error al registrar el pago');

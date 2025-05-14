@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
-  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers, faFileText, faTasks
+  faCalendar, faChevronLeft, faFileInvoice,
+  faFileInvoiceDollar, faHome, faMoneyCheck,
+  faSignOut, faUser, faUsers, faSearch, faTasks, faFileText
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import "../index.css";
 
-
-const PagoForm = () => {
+const Actualizarpago = () => {
+  const { id } = useParams(); // Aquí obtenemos el id de la URL
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
 
@@ -20,13 +19,13 @@ const PagoForm = () => {
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido usuario</h2>
         <ul>
-          <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/Dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
           <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="#"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
@@ -43,17 +42,18 @@ const PagoForm = () => {
       </div>
 
       <div className="dashboard-content">
-           <Link to="/pago" className="boton-retroceso" aria-label="Volver">
-                  <FontAwesomeIcon icon={faChevronLeft} />
-                </Link>
-        <h2>Bienvenido a la sección de pagos</h2>
-        <Crearcitas />
-      </div>
-    </div>
+  <Link to="/pago" className="boton-retroceso" aria-label="Volver">
+    <FontAwesomeIcon icon={faChevronLeft} />
+  </Link>
+  <h2>Bienvenido a la sección de actualizar pago</h2>
+  <ActualizarPago /> 
+</div>
+</div>
   );
 };
 
-function Crearcitas() {
+const ActualizarPago = () => {
+  const { id } = useParams();  
   const [formulario, setFormulario] = useState({
     id_solicitud: '',
     fecha_pago: '',
@@ -63,45 +63,53 @@ function Crearcitas() {
     estado: 'activo',
   });
 
+  useEffect(() => {
+    fetch(`http://localhost:8081/pagos/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          setFormulario(data); 
+        } else {
+          alert('Pago no encontrado');
+        }
+      })
+      .catch(error => {
+        console.error('Error al cargar pago:', error);
+        alert('No se pudo cargar la información del pago');
+      });
+  }, [id]);
+
+
   const handleChange = (e) => {
     setFormulario({
       ...formulario,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const respuesta = await fetch('http://localhost:8081/pagos', {
-        method: 'POST',
+      const respuesta = await fetch(`http://localhost:8081/pagos/${id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formulario)
+        body: JSON.stringify(formulario),
       });
 
       if (respuesta.ok) {
-        alert('Pago registrado correctamente');
-        setFormulario({
-          id_solicitud: '',
-          fecha_pago: '',
-          monto: '',
-          hora_pago: '',
-          metodo_pago: '',
-          estado: 'activo',
-        });
+        alert('Pago actualizado correctamente');
       } else {
-        alert('Error al registrar el pago');
+        alert('Error al actualizar el pago');
       }
     } catch (error) {
-      console.error('Error en el pago: ', error);
-      alert('Error de red al registrar pago');
+      console.error('Error en la actualización:', error);
+      alert('Error de red al actualizar pago');
     }
   };
 
   return (
     <div className="contenedor-cita">
-      <h1 className="titulo-cita">REGISTRAR PAGO</h1>
+      <h1 className="titulo-cita">ACTUALIZAR PAGO</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
         <input
           type="number"
@@ -158,11 +166,12 @@ function Crearcitas() {
           <option value="inactivo">Inactivo</option>
         </select>
 
-        <button type="submit" className="boton-cita">Registrar Pago</button>
+        <button type="submit" className="boton-cita">Actualizar Pago</button>
       </form>
     </div>
   );
-}
+};
 
 
-export default PagoForm;
+export default Actualizarpago;  
+

@@ -60,7 +60,7 @@ function Crearcitas() {
        id_servicio: '',
        costo_extra: '',
        fecha: '',
-       estado: ''
+       estado: 'activo'
      });
    
      const handleChange = (e) => {
@@ -93,7 +93,7 @@ function Crearcitas() {
              id_servicio: '',
              costo_extra: '',
              fecha: '',
-             estado: ''
+             estado: 'activo'
            });
          } else {
            alert('Error al registrar el trabajo');

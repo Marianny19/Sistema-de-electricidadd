@@ -59,6 +59,7 @@ function FormularioCliente() {
   const [formulario, setFormulario] = useState({
     nombre: '',
     apellido: '',
+    cedula: '',
     telefono: '',
     email: '',
     direccion: ''
@@ -111,6 +112,7 @@ function FormularioCliente() {
       <form className="formulario-cita" onSubmit={handleSubmit}>
         <input type="text" name="nombre" placeholder="Nombre" className="campo-cita" value={formulario.nombre} onChange={handleChange} />
         <input type="text" name="apellido" placeholder="Apellido" className="campo-cita" value={formulario.apellido} onChange={handleChange} />
+        <input type="text" name="cedula" placeholder="Cedula" className="campo-cita" value={formulario.cedula} onChange={handleChange} />
         <input type="text" name="telefono" placeholder="Telefono" className="campo-cita" value={formulario.telefono} onChange={handleChange} />
         <input type="text" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} />
         <input type="text" name="direccion" placeholder="Direccion" className="campo-cita" value={formulario.direccion} onChange={handleChange} />
