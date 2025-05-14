@@ -17,6 +17,10 @@ const Empleado = conexion.define('Empleado', {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      cedula: {
+        type: DataTypes.CHAR,
+        allowNull: false,
+      },
       telefono: {
         type: DataTypes.STRING,
         allowNull: false,
