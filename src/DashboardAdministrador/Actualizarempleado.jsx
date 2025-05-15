@@ -5,7 +5,7 @@ import {
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers,faTasks, faFileText
 } from '@fortawesome/free-solid-svg-icons';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 
@@ -55,6 +55,7 @@ const Actualizarempleado = () => {
 
 function FormularioActualizarEmpleado() {
   const { id } = useParams(); 
+  const navigate = useNavigate();
   const [formulario, setFormulario] = useState({
     nombre: '',
     apellido: '',
@@ -106,7 +107,9 @@ function FormularioActualizarEmpleado() {
       });
 
       if (respuesta.ok) {
-        alert('Empleado actualizado correctamente');
+        alert('Empleado actualizado correctamente');{
+          navigate('/empleado');
+        }
       } else {
         alert('Error al actualizar el empleado');
       }

@@ -5,7 +5,7 @@ import {
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const CrearCliente = () => {
@@ -56,6 +56,7 @@ const CrearCliente = () => {
 };
 
 function FormularioCliente() {
+  const navigate = useNavigate();
   const [formulario, setFormulario] = useState({
     nombre: '',
     apellido: '',
@@ -85,6 +86,7 @@ function FormularioCliente() {
 
       if (respuesta.ok) {
         alert('Cliente registrado correctamente');
+        navigate('/clienteempleado'); 
         setFormulario({
           nombre: '',
           apellido: '',
