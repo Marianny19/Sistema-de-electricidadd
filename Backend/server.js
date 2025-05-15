@@ -13,6 +13,7 @@ const DetalleSolicitudServicio = require('./models/DetalleSolicitudServicio');
 const DetalleCita  = require('./models/detallecita'); 
 const Usuario = require('./models/usuario');
 const bcrypt = require('bcrypt');
+const { Op } = require('sequelize');
 
 
 Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
@@ -268,72 +269,66 @@ app.get('/citas', async (req, res) => {
 
 
 
-// Crear Cita con Servicios
+// POST /citas
 app.post('/citas', async (req, res) => {
   try {
-    const { id_cliente, id_empleado, servicios, fecha, hora, estado } = req.body;
+    const { id_cliente, id_empleado, fecha, hora, servicios } = req.body; 
 
-    if (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id))) {
-      return res.status(400).json({ error: 'Servicios debe ser un arreglo de IDs numéricos válidos' });
-    }
-
-    const serviciosValidos = await Servicio.findAll({
-      where: { id_servicio: servicios }
+    const citaExistente = await Cita.findOne({
+      where: { id_empleado, fecha, hora }
     });
 
-    if (serviciosValidos.length !== servicios.length) {
-      return res.status(400).json({ error: 'Uno o más servicios no existen' });
+    if (citaExistente) {
+      return res.status(400).json({
+        error: 'Ya existe una cita para ese empleado en esa fecha y hora.'
+      });
     }
 
-    const nuevaCita = await Cita.create({
+    const citaNueva = await Cita.create({
       id_cliente,
       id_empleado,
       fecha,
       hora,
-      estado
+      estado: 'agendada'
     });
 
-    await nuevaCita.addServicios(servicios); // Sequelize no busca timestamps si el modelo intermedio los tiene desactivados
+    if (Array.isArray(servicios) && servicios.length > 0) {
+      const detalles = servicios.map(id_servicio => ({
+        id_cita: citaNueva.id_cita,
+        id_servicio
+      }));
+      await DetalleCita.bulkCreate(detalles);
+    }
 
-    const citaFinal = await Cita.findOne({
-      where: { id_cita: nuevaCita.id_cita },
-      include: [
-        { model: Servicio, attributes: ['nombre_servicio'] },
-        { model: Cliente, attributes: ['nombre'] },
-        { model: Empleado, attributes: ['nombre'] }
-      ]
+    return res.json({
+      message: 'Cita creada correctamente',
+      cita: citaNueva
     });
 
-    res.status(201).json(citaFinal);
   } catch (error) {
-    console.error('Error al crear la cita:', error);
-    res.status(500).json({ error: 'Error interno al registrar la cita' });
+    console.error(error);
+    return res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
-//Actualizar cita
 
+//Actualizar cita
 app.put('/citas/:id', async (req, res) => {
   const { id } = req.params;
   const { servicios, ...restoCita } = req.body;
 
   try {
-    // Buscar la cita existente
     const cita = await Cita.findOne({ where: { id_cita: id } });
     if (!cita) {
       return res.status(404).json({ error: 'Cita no encontrada' });
     }
 
-    // Actualizar datos de la cita
     await cita.update(restoCita);
 
-    // Si se envió arreglo de servicios, actualizar detalles
     if (Array.isArray(servicios)) {
       try {
-        // Borrar detalles anteriores
         await DetalleCita.destroy({ where: { id_cita: id } });
 
-        // Crear nuevos detalles
         const creaciones = servicios.map((id_servicio) =>
           DetalleCita.create({
             id_cita: cita.id_cita,
@@ -347,7 +342,6 @@ app.put('/citas/:id', async (req, res) => {
       }
     }
 
-    // Intentar obtener la cita actualizada con relaciones
     let citaActualizada;
     try {
       citaActualizada = await Cita.findByPk(id, {
@@ -363,7 +357,6 @@ app.put('/citas/:id', async (req, res) => {
       });
     } catch (error) {
       console.error('Error al obtener cita actualizada con relaciones:', error);
-      // Retornar respuesta parcial porque la actualización sí se hizo
       return res.status(200).json({
         mensaje: 'Cita actualizada, pero no se pudo recuperar los datos completos',
         cita: null
@@ -371,14 +364,12 @@ app.put('/citas/:id', async (req, res) => {
     }
 
     if (!citaActualizada) {
-      // Por si acaso no se encuentra la cita después de actualizarla
       return res.status(200).json({
         mensaje: 'Cita actualizada, pero no se encontró en consulta posterior',
         cita: null
       });
     }
 
-    // Responder con la cita actualizada y sus datos relacionados
     return res.json({
       mensaje: 'Cita actualizada correctamente',
       cita: citaActualizada
@@ -443,6 +434,37 @@ app.delete('/citas/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar estado de la cita' });
   }
 });
+
+// GET /validar-fecha
+app.get('/validar-fecha', async (req, res) => {
+  try {
+    const { fecha, id_empleado } = req.query;
+
+    if (!fecha || !id_empleado) {
+      return res.status(400).json({ error: 'Faltan parámetros requeridos.' });
+    }
+
+    const citas = await Cita.findAll({
+      where: { fecha, id_empleado },
+      attributes: ['hora']
+    });
+
+    const todasLasHoras = [
+      '08:00:00', '10:00:00', '01:00:00', '03:00:00',
+      '06:00:00',
+    ];
+
+    const horasOcupadas = citas.map(cita => cita.hora);
+    const horasDisponibles = todasLasHoras.filter(hora => !horasOcupadas.includes(hora));
+
+    res.json({ horasDisponibles });
+
+  } catch (error) {
+    console.error('La hora seleccionada no esta disponible, intenta con otra hora', error);
+    res.status(500).json({ error: 'La hora seleccionada no esta disponible, intenta con otra hora' });
+  }
+});
+
 
 //get de servicios
 app.get('/servicios', async (req, res) => {
@@ -611,6 +633,35 @@ app.delete('/solicitudservicio/:id', async (req, res) => {
     console.error('Error al cancelar la solicitud:', error);
     res.status(500).json({ error: 'Error al cancelar la solicitud' });
   }
+});
+
+app.get('/servicios-mas-solicitados', async (req, res) => {
+  try {
+    const resultados = await DetalleSolicitudServicio.findAll({
+      attributes: [
+        'id_servicio',
+        [fn('COUNT', col('id_servicio')), 'cantidad_solicitudes']
+      ],
+      include: [{
+        model: Servicio,
+        attributes: ['nombre']
+      }],
+      group: ['id_servicio', 'Servicio.id_servicio'],
+      order: [[fn('COUNT', col('id_servicio')), 'DESC']],
+      limit: 5
+    });
+
+    res.json(resultados);
+  } catch (error) {
+    console.error('Error al obtener servicios más solicitados:', error);
+    res.status(500).json({ error: 'Error al obtener servicios más solicitados' });
+  }
+});
+
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
 
 // Ruta GET para obtener todos los registros de trabajo
@@ -817,6 +868,56 @@ app.get('/cliente', async (req, res) => {
   }
 });
 
+// RUTA: Próximas citas (5 más cercanas)
+app.get('/proximas-citas', async (req, res) => {
+  try {
+    const citas = await Cita.findAll({
+      where: {
+        fecha: {
+          [Op.gte]: new Date()  // mayor o igual a hoy
+        }
+      },
+      order: [['fecha', 'ASC']],
+      limit: 5
+    });
+    res.json(citas);
+  } catch (error) {
+    console.error('Error al obtener próximas citas:', error);
+    res.status(500).json({ mensaje: 'Error al obtener próximas citas' });
+  }
+});
+
+app.get('/servicios-pendientes', async (req, res) => {
+  try {
+    const servicios = await Solicitudservicio.findAll({
+      where: { estado: 'pendiente' },
+      include: [Cliente]
+    });
+    res.json(servicios);
+  } catch (error) {
+    console.error('Error al obtener servicios pendientes:', error);
+    res.status(500).json({ mensaje: 'Error al obtener servicios pendientes' });
+  }
+});
+
+app.get('/servicios-atrasados', async (req, res) => {
+  try {
+    const hoy = new Date();
+    const servicios = await Solicitudservicio.findAll({
+      where: {
+        estado: 'pendiente',
+        fecha: {
+          [Op.lt]: hoy
+        }
+      },
+      include: [Cliente]
+    });
+    res.json(servicios);
+  } catch (error) {
+    console.error('Error al obtener servicios atrasados:', error);
+    res.status(500).json({ mensaje: 'Error al obtener servicios atrasados' });
+  }
+});
 
 
 

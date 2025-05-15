@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Select from 'react-select'
+import Select from 'react-select';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
@@ -26,7 +26,7 @@ const Crearcita = () => {
           <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/cotizacion"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
@@ -56,7 +56,8 @@ const Crearcita = () => {
 function Crearcitas() {
   const [clientes, setClientes] = useState([]);
   const [empleados, setEmpleados] = useState([]);
-  const [serviciosLista, setServiciosLista] = useState([]); 
+  const [serviciosLista, setServiciosLista] = useState([]);
+  const [horasDisponibles, setHorasDisponibles] = useState([]);
 
   const [formulario, setFormulario] = useState({
     id_cliente: '',
@@ -84,6 +85,29 @@ function Crearcitas() {
       .catch(err => console.error('Error cargando servicios:', err));
   }, []);
 
+  useEffect(() => {
+    const { fecha, id_empleado } = formulario;
+    if (fecha && id_empleado) {
+      fetch(`http://localhost:8081/validar-fecha?fecha=${fecha}&id_empleado=${id_empleado}`)
+        .then(res => {
+          if (!res.ok) throw new Error('No hay horas disponibles');
+          return res.json();
+        })
+        .then(data => {
+          console.log('Horas disponibles backend:', data.horasDisponibles);
+          setHorasDisponibles(data.horasDisponibles);
+          setFormulario(f => ({ ...f, hora: '' }));
+        })
+        .catch(() => {
+          setHorasDisponibles([]);
+          setFormulario(f => ({ ...f, hora: '' }));
+        });
+    } else {
+      setHorasDisponibles([]);
+      setFormulario(f => ({ ...f, hora: '' }));
+    }
+  }, [formulario.fecha, formulario.id_empleado]);
+
   const handleChange = (e) => {
     setFormulario({
       ...formulario,
@@ -92,66 +116,79 @@ function Crearcitas() {
   };
 
   const handleServiciosChange = (selectedOptions) => {
-    const idsSeleccionados = selectedOptions.map(op => op.value);
+    const idsSeleccionados = selectedOptions ? selectedOptions.map(op => op.value) : [];
     setFormulario({ ...formulario, servicios: idsSeleccionados });
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  const { id_cliente, id_empleado, servicios, fecha, hora, estado } = formulario;
 
-    const { id_cliente, id_empleado, servicios, fecha, hora, estado } = formulario;
+  if (!id_cliente || !id_empleado || servicios.length === 0 || !fecha || !hora || !estado) {
+    alert('Por favor completa todos los campos.');
+    return;
+  }
 
-    if (!id_cliente || !id_empleado || servicios.length === 0 || !fecha || !hora || !estado) {
-      alert('Por favor completa todos los campos.');
-      return;
-    }
+  const horaFormateada = hora.length === 5 ? `${hora}:00` : hora;
 
-    if (!['agendada', 'completada', 'cancelada'].includes(estado)) {
-      alert('Por favor selecciona un estado válido.');
-      return;
-    }
+  try {
+    const res = await fetch('http://localhost:8081/citas', {  
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...formulario,
+        hora: horaFormateada
+      })
+    });
 
-    try {
-      const respuesta = await fetch('http://localhost:8081/citas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formulario)
+    if (res.ok) {
+      alert('Cita registrada correctamente');
+      setFormulario({
+        id_cliente: '',
+        id_empleado: '',
+        servicios: [],
+        fecha: '',
+        hora: '',
+        estado: 'agendada'
       });
-
-      if (respuesta.ok) {
-        alert('Cita registrada correctamente');
-        setFormulario({
-          id_cliente: '',
-          id_empleado: '',
-          servicios: [],
-          fecha: '',
-          hora: '',
-          estado: 'agendada'
-        });
-      } else {
-        alert('Error al registrar cita');
-      }
-    } catch (error) {
-      console.error('Error de red:', error);
-      alert('Error de red al registrar cita');
+      setHorasDisponibles([]);
+    } else {
+      const error = await res.json();
+      alert(`Error: ${error.error}`);
     }
-  };
+  } catch (error) {
+    console.error('Error de red:', error);
+    alert('Error de red al registrar cita');
+  }
+};
 
   return (
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
 
-        <select name="id_cliente" className="campo-cita" value={formulario.id_cliente} onChange={handleChange} required>
+        <select
+          name="id_cliente"
+          className="campo-cita"
+          value={formulario.id_cliente}
+          onChange={handleChange}
+          required
+        >
           <option value="">Selecciona un cliente</option>
-          {clientes.map((cliente) => (
+          {clientes.map(cliente => (
             <option key={cliente.id_cliente} value={cliente.id_cliente}>{cliente.nombre}</option>
           ))}
         </select>
 
-        <select name="id_empleado" className="campo-cita" value={formulario.id_empleado} onChange={handleChange} required>
+        <select
+          name="id_empleado"
+          className="campo-cita"
+          value={formulario.id_empleado}
+          onChange={handleChange}
+          required
+        >
           <option value="">Selecciona un empleado</option>
-          {empleados.map((empleado) => (
+          {empleados.map(empleado => (
             <option key={empleado.id_empleado} value={empleado.id_empleado}>{empleado.nombre}</option>
           ))}
         </select>
@@ -172,10 +209,37 @@ function Crearcitas() {
           />
         </div>
 
-        <input type="date" name="fecha" className="campo-cita" value={formulario.fecha} onChange={handleChange} required />
-        <input type="time" name="hora" className="campo-cita" value={formulario.hora} onChange={handleChange} required />
+        <input
+          type="date"
+          name="fecha"
+          className="campo-cita"
+          value={formulario.fecha}
+          onChange={handleChange}
+          required
+          min={new Date().toISOString().split('T')[0]}
+        />
 
-        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange} required>
+        <select
+          name="hora"
+          className="campo-cita"
+          value={formulario.hora}
+          onChange={handleChange}
+          required
+          disabled={horasDisponibles.length === 0}
+        >
+          <option value="">Selecciona una hora</option>
+          {horasDisponibles.map(hora => (
+            <option key={hora} value={hora}>{hora.slice(0, 5)}</option>
+          ))}
+        </select>
+
+        <select
+          name="estado"
+          className="campo-cita"
+          value={formulario.estado}
+          onChange={handleChange}
+          required
+        >
           <option value="">Estado</option>
           <option value="agendada">Agendada</option>
           <option value="completada">Completada</option>

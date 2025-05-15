@@ -203,7 +203,6 @@ const FormRegistroTrabajo = () => {
           value={formulario.fecha}
           onChange={handleChange}
         />
-
         <select
           name="estado"
           className="campo-cita"
@@ -216,7 +215,6 @@ const FormRegistroTrabajo = () => {
           <option value="atrasado">Atrasado</option>
           <option value="cancelado">Cancelado</option>
         </select>
-
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

@@ -8,10 +8,10 @@ import {
 import { Link } from 'react-router-dom';
 import "../index.css";
 
-
 const FormularioCitas = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [citas, setCitas] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
     async function cargarCitas() {
@@ -27,7 +27,7 @@ const FormularioCitas = () => {
     cargarCitas();
   }, []);
 
-    const eliminarCita = async (id) => {
+  const eliminarCita = async (id) => {
     const confirmar = window.confirm("¿Estás seguro de que deseas actualizar el estado de esta cita?");
     if (!confirmar) return;
 
@@ -52,7 +52,11 @@ const FormularioCitas = () => {
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
 
-  
+  const citasFiltradas = citas.filter(cita =>
+    cita.id_cita.toString().includes(busqueda.toLowerCase()) ||
+    cita.nombre_cliente.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
@@ -92,7 +96,14 @@ const FormularioCitas = () => {
           </Link>
           <div className="input-container-wrapper">
             <div className="input-container">
-              <input id="buscar-empleado" className="Buscar" type="search" placeholder="Buscar cita" />
+              <input
+                id="buscar-empleado"
+                className="Buscar"
+                type="search"
+                placeholder="Buscar por ID o cliente"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
               <FontAwesomeIcon icon={faSearch} />
             </div>
 
@@ -110,30 +121,32 @@ const FormularioCitas = () => {
                   <th>Acciones</th>
                 </tr>
               </thead>
-           <tbody id="tabla-empleados">
-  {citas.map((cita) => (
-    <tr key={cita.id_cita}>
-      <td data-label="Id cita">{cita.id_cita}</td>
-      <td data-label="Cliente">{cita.nombre_cliente}</td>
-      <td data-label="Empleado">{cita.nombre_empleado}</td>
-       <td data-label="Servicio">
-        {cita.servicios ? cita.servicios : 'No hay servicios'}
-        </td>
-      <td data-label="Fecha">{cita.fecha}</td>
-      <td data-label="Hora">{cita.hora}</td>
-      <td data-label="Estado">{cita.estado}</td>
-      <td data-label="Acciones">
-        <Link to={`/actualizarcitas/${cita.id_cita}`}>
-          <button className="Actualizar">Actualizar</button>
-        </Link>
-          <button
-          className="Eliminar"
-          onClick={() => eliminarCita(cita.id_cita)}>Eliminar</button>
-      </td>
-    </tr>
-  ))}
-</tbody>
-
+              <tbody id="tabla-empleados">
+                {citasFiltradas.map((cita) => (
+                  <tr key={cita.id_cita}>
+                    <td data-label="Id cita">{cita.id_cita}</td>
+                    <td data-label="Cliente">{cita.nombre_cliente}</td>
+                    <td data-label="Empleado">{cita.nombre_empleado}</td>
+                    <td data-label="Servicio">
+                      {cita.servicios ? cita.servicios : 'No hay servicios'}
+                    </td>
+                    <td data-label="Fecha">{cita.fecha}</td>
+                    <td data-label="Hora">{cita.hora}</td>
+                    <td data-label="Estado">{cita.estado}</td>
+                    <td data-label="Acciones">
+                      <Link to={`/actualizarcitas/${cita.id_cita}`}>
+                        <button className="Actualizar">Actualizar</button>
+                      </Link>
+                      <button
+                        className="Eliminar"
+                        onClick={() => eliminarCita(cita.id_cita)}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         </div>

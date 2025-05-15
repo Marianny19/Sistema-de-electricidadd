@@ -62,7 +62,7 @@ const CitaEmpelado = () => {
         <h2>Bienvenido a la sección de citas</h2>
 
         <div className="main-content">
-          <Link to="/crearcita">
+          <Link to="/crearcitaempleado">
             <button className="Registro">+ Nueva cita</button>
           </Link>
           <div className="input-container-wrapper">
