@@ -28,7 +28,7 @@ const Clienteempleado = () => {
   }, []);
 
   const eliminarCliente = async (id) => {
-    const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este cliente?");
+    const confirmar = window.confirm("¿Estás seguro de que deseas cambiar el estado de este cliente a inactivo?");
     if (!confirmar) return;
 
     try {
@@ -38,13 +38,14 @@ const Clienteempleado = () => {
 
       if (respuesta.ok) {
         setClientes(prevClientes => prevClientes.filter(c => c.id_cliente !== id));
-        alert("Cliente eliminado correctamente");
+        alert("Estado del cliente modificado correctamente");
+        window.location.reload(); 
       } else {
-        alert("Error al eliminar cliente");
+        alert("Error al modificar el estado cliente");
       }
     } catch (error) {
-      console.error('Error al eliminar cliente:', error);
-      alert("Error de red al eliminar cliente");
+      console.error('Error al modificar el estado del cliente:', error);
+      alert("Error de red al cambiar el estado del cliente");
     }
   };
 

@@ -5,7 +5,7 @@ import {
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers, faSearch, faTasks, faFileText
 } from '@fortawesome/free-solid-svg-icons';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 
@@ -56,6 +56,7 @@ const Actualizarcliente = () => {
 
 function FormularioCliente() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [formulario, setFormulario] = useState({
     nombre: '',
     apellido: '',
@@ -97,6 +98,7 @@ function FormularioCliente() {
 
       if (respuesta.ok) {
         alert('Cliente actualizado correctamente');
+        navigate('/clienteempleado');
       } else {
         alert('Error al actualizar el cliente');
       }
@@ -116,6 +118,11 @@ function FormularioCliente() {
         <input type="text" name="telefono" placeholder="Telefono" className="campo-cita" value={formulario.telefono} onChange={handleChange} />
         <input type="text" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} />
         <input type="text" name="direccion" placeholder="Direccion" className="campo-cita" value={formulario.direccion} onChange={handleChange} />
+        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange}>
+          <option value="">Estado</option>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
         <button type="submit" className="boton-cita">ACTUALIZAR</button>
       </form>
     </div>
