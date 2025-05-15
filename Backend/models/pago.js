@@ -25,7 +25,7 @@ const Pago = conexion.define('Pago', {
         allowNull: false,
     },
     metodo_pago: {
-        type: DataTypes.ENUM('efectivo','tarjeta','transferencia'),
+        type: DataTypes.ENUM('efectivo','transferencia'),
         allowNull: false,
     },
     estado: {
