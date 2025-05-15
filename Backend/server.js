@@ -21,19 +21,20 @@ Cita.belongsTo(Cliente, { foreignKey: 'id_cliente' });
 Empleado.hasMany(Cita, { foreignKey: 'id_empleado' });
 Cita.belongsTo(Empleado, { foreignKey: 'id_empleado' });
 
+DetalleCita.belongsTo(Cita, { foreignKey: 'id_cita' });
+DetalleCita.belongsTo(Servicio, { foreignKey: 'id_servicio' });
+
 Cita.belongsToMany(Servicio, {
-  through: 'DetalleCita',
+  through: DetalleCita,
   foreignKey: 'id_cita',
   otherKey: 'id_servicio'
 });
 
 Servicio.belongsToMany(Cita, {
-  through: 'DetalleCita',
+  through: DetalleCita,
   foreignKey: 'id_servicio',
   otherKey: 'id_cita'
 });
-
-
 
 Cliente.hasMany(Solicitudservicio, { foreignKey: 'id_cliente' });
 Solicitudservicio.belongsTo(Cliente, { foreignKey: 'id_cliente' });
@@ -205,7 +206,6 @@ app.delete('/empleados/:id', async (req, res) => {
   }
 });
 
-// Ruta GET para obtener todas las notas
 app.get('/notas', async (req, res) => {
   try {
     const Notas = await Nota.findAll();
@@ -216,7 +216,6 @@ app.get('/notas', async (req, res) => {
   }
 });
 
-// Ruta POST para crear una nueva nota
 app.post('/notas', async (req, res) => {
   try {
     const nuevaNota = await Nota.create(req.body);
@@ -228,7 +227,6 @@ app.post('/notas', async (req, res) => {
 });
 
 
-//GET CITA
 app.get('/citas', async (req, res) => {
   try {
     const citas = await Cita.findAll({
@@ -242,9 +240,9 @@ app.get('/citas', async (req, res) => {
           attributes: ['nombre']
         },
         {
-          model: Servicio, // Incluir los servicios a través de la tabla intermedia DetalleCita
+          model: Servicio, 
           through: { attributes: [] },
-          attributes: ['nombre_servicio'] // Asegúrate de que este atributo sea correcto
+          attributes: ['nombre_servicio']
         }
       ]
     });
@@ -253,11 +251,10 @@ app.get('/citas', async (req, res) => {
       const citaJson = cita.toJSON();
       citaJson.nombre_cliente = cita.Cliente ? cita.Cliente.nombre : 'Sin cliente';
       citaJson.nombre_empleado = cita.Empleado ? cita.Empleado.nombre : 'Sin empleado';
-      
-      // Si 'Servicios' está disponible, agregamos los nombres de los servicios
+
       citaJson.servicios = citaJson.Servicios && citaJson.Servicios.length
-        ? citaJson.Servicios.map(s => s.nombre_servicio) 
-        : ['No hay servicios'];
+        ? citaJson.Servicios.map(s => s.nombre_servicio).join(', ')
+        : 'No hay servicios';
 
       return citaJson;
     });
@@ -268,6 +265,7 @@ app.get('/citas', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener citas', detalles: error.message });
   }
 });
+
 
 
 // Crear Cita con Servicios
@@ -326,44 +324,125 @@ app.put('/citas/:id', async (req, res) => {
       return res.status(404).json({ error: 'Cita no encontrada' });
     }
 
-    // Actualizar los datos principales de la cita
+    // Actualizar datos de la cita
     await cita.update(restoCita);
 
-    // Si hay nuevos servicios, actualizar la tabla intermedia 'detallecita'
+    // Si se envió arreglo de servicios, actualizar detalles
     if (Array.isArray(servicios)) {
-      // Eliminar servicios existentes de la tabla intermedia
-      await DetalleCita.destroy({ where: { id_cita: id } });
+      try {
+        // Borrar detalles anteriores
+        await DetalleCita.destroy({ where: { id_cita: id } });
 
-      // Agregar los nuevos servicios
-      await Promise.all(servicios.map(async (id_servicio) => {
-        await DetalleCita.create({
-          id_cita: cita.id_cita,
-          id_servicio
-        });
-      }));
+        // Crear nuevos detalles
+        const creaciones = servicios.map((id_servicio) =>
+          DetalleCita.create({
+            id_cita: cita.id_cita,
+            id_servicio
+          })
+        );
+        await Promise.all(creaciones);
+      } catch (error) {
+        console.error('Error al actualizar servicios:', error);
+        return res.status(500).json({ error: 'Error al actualizar servicios de la cita' });
+      }
     }
 
-    // Obtener la cita actualizada con los servicios asociados
-    const citaActualizada = await Cita.findByPk(id, {
+    // Intentar obtener la cita actualizada con relaciones
+    let citaActualizada;
+    try {
+      citaActualizada = await Cita.findByPk(id, {
+        include: [
+          { model: Cliente, attributes: ['nombre'] },
+          { model: Empleado, attributes: ['nombre'] },
+          {
+            model: Servicio,
+            attributes: ['nombre'],
+            through: { attributes: [] }
+          }
+        ]
+      });
+    } catch (error) {
+      console.error('Error al obtener cita actualizada con relaciones:', error);
+      // Retornar respuesta parcial porque la actualización sí se hizo
+      return res.status(200).json({
+        mensaje: 'Cita actualizada, pero no se pudo recuperar los datos completos',
+        cita: null
+      });
+    }
+
+    if (!citaActualizada) {
+      // Por si acaso no se encuentra la cita después de actualizarla
+      return res.status(200).json({
+        mensaje: 'Cita actualizada, pero no se encontró en consulta posterior',
+        cita: null
+      });
+    }
+
+    // Responder con la cita actualizada y sus datos relacionados
+    return res.json({
+      mensaje: 'Cita actualizada correctamente',
+      cita: citaActualizada
+    });
+
+  } catch (error) {
+    console.error('Error general al actualizar cita:', error);
+    return res.status(500).json({ error: 'Error general al actualizar cita' });
+  }
+});
+
+
+
+app.get('/citas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const cita = await Cita.findByPk(id, {
       include: [
-        { model: Cliente, attributes: ['nombre'] },
-        { model: Empleado, attributes: ['nombre'] },
         {
           model: Servicio,
-          attributes: ['nombre'], // Ajusta el atributo si es necesario
-          through: { attributes: [] } // Evita que devuelva columnas innecesarias de la tabla intermedia
+          attributes: ['id_servicio', 'nombre_servicio'], 
+          through: { attributes: [] }
         }
       ]
     });
 
-    // Responder con la cita actualizada
-    res.json({ mensaje: 'Cita actualizada correctamente', cita: citaActualizada });
+    if (!cita) {
+      return res.status(404).json({ error: 'Cita no encontrada' });
+    }
+
+    res.json({
+      id_cita: cita.id_cita,
+      id_cliente: cita.id_cliente,
+      id_empleado: cita.id_empleado,
+      fecha: cita.fecha,
+      hora: cita.hora,
+      estado: cita.estado,
+      servicios: cita.Servicios.map(s => ({
+        id_servicio: s.id_servicio,
+        nombre_servicio: s.nombre_servicio
+      }))
+    });
   } catch (error) {
-    console.error('Error al actualizar cita:', error);
-    res.status(500).json({ error: 'Error al actualizar cita' });
+    console.error('Error al obtener citas por ID:', error);
+    res.status(500).json({ error: 'Error al obtener cita' });
   }
 });
 
+app.delete('/citas/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const cita = await Cita.findOne({ where: { id_cita: id } });
+    if (!cita) {
+      return res.status(404).json({ error: 'Cita no encontrada' });
+    }
+    await cita.update({ estado: 'Cancelada' });
+
+    res.json({ mensaje: 'Cita marcada como cancelada correctamente' });
+  } catch (error) {
+    console.error('Error al actualizar estado de la cita:', error);
+    res.status(500).json({ error: 'Error al actualizar estado de la cita' });
+  }
+});
 
 //get de servicios
 app.get('/servicios', async (req, res) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -17,6 +17,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 function Editarsolicitud() {
+  const navigate = useNavigate();
   const { id } = useParams();
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -61,6 +62,7 @@ function Editarsolicitud() {
 
         const clientesData = await resClientes.json();
         const serviciosData = await resServicios.json();
+        
 
         setClientes(clientesData);
         setServiciosLista(serviciosData);
@@ -107,6 +109,7 @@ function Editarsolicitud() {
 
       if (respuesta.ok) {
         alert('Solicitud actualizada correctamente');
+        navigate('/solicitudservicio');
       } else {
         const error = await respuesta.json();
         console.error('Error del servidor:', error);

@@ -28,7 +28,7 @@ const Empleado = () => {
   }, []);
 
   const eliminarEmpleado = async (id) => {
-    const confirmar = window.confirm("¿Estás seguro de que deseas actiualizar el estado de este empleado?");
+    const confirmar = window.confirm("¿Estás seguro de que deseas actualizar el estado de este empleado?");
     if (!confirmar) return;
 
     try {
