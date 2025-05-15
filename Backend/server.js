@@ -11,7 +11,8 @@ const Pago = require('./models/pago');
 const Servicio = require('./models/Servicio');
 const DetalleSolicitudServicio = require('./models/DetalleSolicitudServicio');
 const DetalleCita  = require('./models/detallecita'); 
-
+const Usuario = require('./models/usuario');
+const bcrypt = require('bcrypt');
 
 
 Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
@@ -599,12 +600,12 @@ app.get('/pagos/:id', async (req, res) => {
 app.put('/pagos/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const pago = await Pago.findOne({ where: { id_pago: id } });  // Usa el modelo correcto
+    const pago = await Pago.findOne({ where: { id_pago: id } });  
     if (!pago) {
-      return res.status(404).json({ error: 'Pago no encontrado' });  // Corrige la variable
+      return res.status(404).json({ error: 'Pago no encontrado' });  
     }
     await pago.update(req.body);
-    res.json({ mensaje: 'Pago actualizado correctamente', pago });  // Devuelve el objeto correcto
+    res.json({ mensaje: 'Pago actualizado correctamente', pago });  
   } catch (error) {
     console.error('Error al actualizar pago:', error);
     res.status(500).json({ error: 'Error al actualizar pago' });
@@ -631,6 +632,114 @@ app.get('/facturas', async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
+
+app.post('/cliente', async (req, res) => {
+  try {
+    const { email, contrasena, rol, estado } = req.body;
+
+    if (!email || !contrasena) {
+      return res.status(400).json({ error: 'El email y la contraseña son obligatorios' });
+    }
+
+    const existeUsuario = await Usuario.findOne({ where: { email } });
+    if (existeUsuario) {
+      return res.status(409).json({ error: 'El email ya está registrado' });
+    }
+
+    const hashedContrasena = await bcrypt.hash(contrasena, 10);
+
+    const nuevoUsuario = await Usuario.create({
+      email,
+      contrasena: hashedContrasena,
+      rol: rol || 'cliente',
+      estado: estado || 'activo',
+    });
+
+    res.status(201).json({
+      message: 'Usuario registrado exitosamente',
+      id_usuario: nuevoUsuario.id_usuario,
+    });
+  } catch (error) {
+    console.error('Error al registrar usuario:', error);
+    res.status(500).json({ error: 'Error al registrar usuario', details: error.message });
+  }
+});
+
+
+app.post('/login', async (req, res) => {
+  const { email, contrasena } = req.body;
+
+  if (!email || !contrasena) {
+    return res.status(400).json({ error: 'Email y contraseña son obligatorios' });
+  }
+
+  try {
+    const usuario = await Usuario.findOne({ where: { email } });
+    if (!usuario) {
+      return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+    }
+
+    // Aquí importante: comparar con bcrypt.compare
+    const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+    }
+
+    if (usuario.estado !== 'activo') {
+      return res.status(403).json({ error: 'Usuario no activo' });
+    }
+
+    res.json({ id_usuario: usuario.id_usuario, email: usuario.email, rol: usuario.rol });
+  } catch (error) {
+    console.error('Error en login:', error);
+    res.status(500).json({ error: 'Error interno en el servidor' });
+  }
+});
+
+
+
+app.get('/usuario', async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: 'El email es obligatorio' });
+  }
+
+  try {
+    const usuario = await Usuario.findOne({ where: { email } });
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.json({
+      id_usuario: usuario.id_usuario,
+      email: usuario.email,
+      rol: usuario.rol,
+      estado: usuario.estado
+    });
+
+  } catch (error) {
+    console.error('Error al obtener usuario:', error);
+    res.status(500).json({ error: 'Error interno en el servidor' });
+  }
+});
+
+
+app.get('/cliente', async (req, res) => {
+  try {
+    const clientes = await Usuario.findAll({ where: { rol: 'cliente' } });
+    res.json(clientes);
+  } catch (error) {
+    console.error('Error al obtener clientes:', error);
+    res.status(500).json({ error: 'Error al obtener clientes' });
+  }
+});
+
+
+
 
 
 

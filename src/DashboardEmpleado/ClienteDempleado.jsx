@@ -27,26 +27,7 @@ const Clienteempleado = () => {
     cargarClientes();
   }, []);
 
-  const eliminarCliente = async (id) => {
-    const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este cliente?");
-    if (!confirmar) return;
-
-    try {
-      const respuesta = await fetch(`http://localhost:8081/clientes/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (respuesta.ok) {
-        setClientes(prev => prev.filter(c => c.id_cliente !== id));
-        alert("Cliente eliminado correctamente");
-      } else {
-        alert("Error al eliminar cliente");
-      }
-    } catch (error) {
-      console.error('Error al eliminar cliente:', error);
-      alert("Error de red al eliminar cliente");
-    }
-  };
+  
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
@@ -122,7 +103,6 @@ const Clienteempleado = () => {
                   <th>Email</th>
                   <th>Direccion</th>
                   <th>Estado</th>
-                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,12 +117,6 @@ const Clienteempleado = () => {
                     <td>{cliente.direccion}</td>
                     <td>{cliente.estado}</td>
                     <td>
-                      <Link to={`/actualizarcliente/${cliente.id_cliente}`}>
-                        <button className="Actualizar">Actualizar</button>
-                      </Link>
-                      <button className="Eliminar" onClick={() => eliminarCliente(cliente.id_cliente)}>
-                        Eliminar
-                      </button>
                     </td>
                   </tr>
                 ))}
