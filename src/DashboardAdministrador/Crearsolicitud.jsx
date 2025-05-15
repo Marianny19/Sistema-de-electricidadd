@@ -5,7 +5,7 @@ import {
   faCalendar, faChevronLeft, faFileInvoice, faFileInvoiceDollar,
   faHome, faMoneyCheck, faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const Crearsolicitud = () => {
@@ -61,7 +61,7 @@ const FormRegistroTrabajo = () => {
     fecha: new Date().toISOString().split('T')[0],
     estado: 'pendiente'
   });
-
+  const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
 
@@ -115,7 +115,8 @@ const FormRegistroTrabajo = () => {
       });
 
       if (respuesta.ok) {
-        alert('Solicitud registrada correctamente');
+        alert('Solicitud registrada correctamente');   
+        navigate('/solicitudservicio');
         setFormulario({
           id_cliente: '',
           servicios: [],

@@ -29,6 +29,27 @@ const Solicitudservicio = () => {
     cargarSolicitud();
   }, []);
 
+    const Cancelarsolicitud = async (id) => {
+    const confirmar = window.confirm("¿Estás seguro de que deseas actiualizar el estado de este empleado?");
+    if (!confirmar) return;
+
+    try {
+      const respuesta = await fetch(`http://localhost:8081/solicitudservicio/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (respuesta.ok) {
+        setSolicitud(prev => prev.filter(s => s.id_solicitud !== id));
+        alert("Solicitud del servicio cancelada correctamente");
+        window.location.reload();
+      } else {
+        alert("Error al cancelar la solicitud del servicio");
+      }
+    } catch (error) {
+      console.error('Error al cancelar la solicitud del servicio:', error);
+      alert("Error de red al cancelar la solicitud del servicio");
+    }
+  };
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
 
@@ -133,7 +154,9 @@ const Solicitudservicio = () => {
                         <Link to={`/actualizarsolicitud/${solicitud.id_solicitud}`}>
                           <button className="Actualizar">Actualizar</button>
                         </Link>
-                        <button className='Eliminar'>Eliminar</button>
+                       <button
+                        className="Eliminar"
+                        onClick={() => Cancelarsolicitud(solicitud.id_solicitud)}>Eliminar</button>
                       </td>
                     </tr>
                   ))

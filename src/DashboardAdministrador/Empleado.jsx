@@ -28,7 +28,7 @@ const Empleado = () => {
   }, []);
 
   const eliminarEmpleado = async (id) => {
-    const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este empleado?");
+    const confirmar = window.confirm("¿Estás seguro de que deseas actiualizar el estado de este empleado?");
     if (!confirmar) return;
 
     try {
@@ -38,13 +38,14 @@ const Empleado = () => {
 
       if (respuesta.ok) {
         setEmpleados(prev => prev.filter(e => e.id_empleado !== id));
-        alert("Empleado eliminado correctamente");
+        alert("Estado del empleado actualizado correctamente");
+        window.location.reload();
       } else {
-        alert("Error al eliminar empleado");
+        alert("Error al actualizar el estado del empleado");
       }
     } catch (error) {
-      console.error('Error al eliminar empleado:', error);
-      alert("Error de red al eliminar empleado");
+      console.error('Error al actualizar el estado del empleado:', error);
+      alert("Error de red al actualizar el estado del empleado");
     }
   };
 
