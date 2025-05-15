@@ -56,9 +56,9 @@ const PagoForm = () => {
 function Crearcitas() {
   const [formulario, setFormulario] = useState({
     id_solicitud: '',
-    fecha_pago: '',
+    fecha_pago: new Date().toISOString().split('T')[0],
     monto: '',
-    hora_pago: '',
+    hora_pago: new Date().toTimeString().split(' ')[0],
     metodo_pago: '',
     estado: 'activo',
   });
@@ -84,9 +84,9 @@ function Crearcitas() {
         alert('Pago registrado correctamente');
         setFormulario({
           id_solicitud: '',
-          fecha_pago: '',
+          fecha_pago: new Date().toISOString().split('T')[0],
           monto: '',
-          hora_pago: '',
+          hora_pago:  new Date().toTimeString().split(' ')[0],
           metodo_pago: '',
           estado: 'activo',
         });
@@ -144,7 +144,6 @@ function Crearcitas() {
         >
           <option value="">Método de pago</option>
           <option value="efectivo">Efectivo</option>
-          <option value="tarjeta">Tarjeta</option>
           <option value="transferencia">Transferencia</option>
         </select>
         <select
