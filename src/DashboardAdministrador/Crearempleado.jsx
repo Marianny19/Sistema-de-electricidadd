@@ -5,7 +5,7 @@ import {
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 
@@ -54,6 +54,7 @@ const CrearEmpleadoPage = () => {
 };
 
 function FormularioEmpleado() {
+  const navigate = useNavigate();
   const [formulario, setFormulario] = useState({
     nombre: '',
     apellido: '',
@@ -88,6 +89,8 @@ function FormularioEmpleado() {
 
       if (respuesta.ok) {
         alert('Empleado registrado correctamente');
+        navigate('/empleado'); 
+        
         setFormulario({
           nombre: '',
           apellido: '',

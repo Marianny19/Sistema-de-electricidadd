@@ -195,11 +195,12 @@ app.delete('/empleados/:id', async (req, res) => {
     if (!empleado) {
       return res.status(404).json({ error: 'Empleado no encontrado' });
     }
-    await empleado.destroy();
-    res.json({ mensaje: 'Empleado eliminado correctamente' });
+    await empleado.update({ estado: 'inactivo' });
+
+    res.json({ mensaje: 'Empleado marcado como inactivo correctamente' });
   } catch (error) {
-    console.error('Error al eliminar empleado:', error);
-    res.status(500).json({ error: 'Error al eliminar empleado' });
+    console.error('Error al actualizar estado del empleado:', error);
+    res.status(500).json({ error: 'Error al actualizar estado del empleado' });
   }
 });
 
@@ -513,6 +514,22 @@ app.put('/solicitudservicio/:id', async (req, res) => {
   } catch (error) {
     console.error("Error al actualizar solicitud:", error);
     res.status(500).json({ error: 'Error al actualizar solicitud' });
+  }
+});
+  
+app.delete('/solicitudservicio/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const solicitudservicio = await Solicitudservicio.findOne({ where: { id_solicitud: id } });
+    if (!solicitudservicio) {
+      return res.status(404).json({ error: 'Solicitud de servicio no encontrada' });
+    }
+    await solicitudservicio.update({ estado: 'Cancelada' });
+
+    res.json({ mensaje: 'Solicitud de servicio cancelada correctamente' });
+  } catch (error) {
+    console.error('Error al cancelar la solicitud:', error);
+    res.status(500).json({ error: 'Error al cancelar la solicitud' });
   }
 });
 
