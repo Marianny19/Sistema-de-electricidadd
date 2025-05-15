@@ -594,6 +594,29 @@ app.put('/pagos/:id', async (req, res) => {
   }
 });
 
+app.get('/facturas', async (req, res) => {
+  try {
+    const [rows] = await conexion.query(`
+      SELECT 
+        f.id,
+        f.solicitud_id,
+        f.pago_id,
+        f.fecha_emision,
+        f.total,
+        f.estado,
+        df.descripcion
+      FROM factura f
+      LEFT JOIN detalle_factura df ON f.id = df.factura_id
+    `);
+    res.json(rows);
+  } catch (error) {
+    console.error("Error al obtener facturas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+
+
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);

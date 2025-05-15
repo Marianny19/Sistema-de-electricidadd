@@ -93,7 +93,7 @@ const Pago = () => {
         <h2>Bienvenido a la sección de Pagos</h2>
 
         <div className="main-content">
-          <Link to="/crearpago"><button className="Registro">+ Nuevo pago</button></Link>
+          <Link to="/pagoform"><button className="Registro">+ Nuevo pago</button></Link>
           <div className="input-container-wrapper">
             <div className="input-container">
               <input
