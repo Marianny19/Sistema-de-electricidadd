@@ -44,7 +44,12 @@ const Dashboard = () => {
           <li><a href="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></a></li>
         </ul>
         <ul>
-          <li className="Cerrarsesion"><a href="#" onClick={cerrarSesion}><FontAwesomeIcon icon={faSignOut} /><span>Cerrar sesión</span></a></li>
+        <li className="Cerrarsesion">
+       <Link to="/iniciarsesion" onClick={cerrarSesion}>
+       <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
+        </Link>
+         </li>
+
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}><FontAwesomeIcon icon={faChevronLeft} /></button>
       </div>
