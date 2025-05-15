@@ -78,7 +78,9 @@ const Empleado = () => {
         <ul>
           <li className="Cerrarsesion">
             <a href="#" onClick={cerrarSesion}>
+              <Link to = "/iniciarsesion">
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
+              </Link>
             </a>
           </li>
         </ul>
@@ -115,6 +117,7 @@ const Empleado = () => {
                   <th>Codigo</th>
                   <th>Nombre</th>
                   <th>Apellido</th>
+                  <th>Cedula</th>
                   <th>Teléfono</th>
                   <th>Email</th>
                   <th>Cargo</th>
@@ -132,6 +135,7 @@ const Empleado = () => {
                     <td data-label="Id empleado">{empleado.id_empleado}</td>
                     <td data-label="Nombre">{empleado.nombre}</td>
                     <td data-label="Apellido">{empleado.apellido}</td>
+                    <td data-label="Cedula">{empleado.cedula}</td>
                     <td data-label="Teléfono">{empleado.telefono}</td>
                     <td data-label="Email">{empleado.email}</td>
                     <td data-label="Cargo">{empleado.cargo}</td>
