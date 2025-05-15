@@ -8,6 +8,7 @@ import {
 import { Link } from 'react-router-dom';
 import "../index.css";
 
+
 const FormularioCitas = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [citas, setCitas] = useState([]);
@@ -26,9 +27,32 @@ const FormularioCitas = () => {
     cargarCitas();
   }, []);
 
+    const eliminarCita = async (id) => {
+    const confirmar = window.confirm("¿Estás seguro de que deseas actualizar el estado de esta cita?");
+    if (!confirmar) return;
+
+    try {
+      const respuesta = await fetch(`http://localhost:8081/citas/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (respuesta.ok) {
+        setCitas(prev => prev.filter(c => c.id_cita !== id));
+        alert("Estado de la cita actualizado correctamente");
+        window.location.reload();
+      } else {
+        alert("Error al actualizar el estado de la cita");
+      }
+    } catch (error) {
+      console.error('Error al actualizar el estado de la cita:', error);
+      alert("Error de red al actualizar el estado de la cita");
+    }
+  };
+
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => console.log("Cerrar sesión");
 
+  
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
@@ -102,6 +126,9 @@ const FormularioCitas = () => {
         <Link to={`/actualizarcitas/${cita.id_cita}`}>
           <button className="Actualizar">Actualizar</button>
         </Link>
+          <button
+          className="Eliminar"
+          onClick={() => eliminarCita(cita.id_cita)}>Eliminar</button>
       </td>
     </tr>
   ))}

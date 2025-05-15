@@ -84,19 +84,20 @@ function FormularioActualizarCita() {
       .then(data => setServiciosLista(data))
       .catch(err => console.error('Error cargando servicios:', err));
 
-    // Cargar los datos de la cita actual
+ +
     fetch(`http://localhost:8081/citas/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data) {
-          setFormulario({
-            id_cliente: data.id_cliente,
-            id_empleado: data.id_empleado,
-            servicios: data.servicios,
-            fecha: data.fecha,
-            hora: data.hora,
-            estado: data.estado
-          });
+        setFormulario({
+        id_cliente: data.id_cliente,
+        id_empleado: data.id_empleado,
+        servicios: data.servicios.map(s => s.id_servicio), 
+        fecha: data.fecha,
+        hora: data.hora,
+        estado: data.estado
+      });
+
         } else {
           alert("Cita no encontrada");
         }

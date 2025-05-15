@@ -1,6 +1,8 @@
-// models/DetalleCita.js
-module.exports = (sequelize, DataTypes) => {
-  const DetalleCita = sequelize.define('DetalleCita', {
+const { DataTypes } = require('sequelize');
+const conexion = require('../database');
+
+
+const DetalleCita = conexion.define('DetalleCita', {
     id_detallecita: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -24,8 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     tableName: 'detallecita',
-    timestamps: true // Ahora Sequelize manejará automáticamente createdAt y updatedAt
+    timestamps: true 
   });
 
-  return DetalleCita;
-};
+module.exports = DetalleCita;
