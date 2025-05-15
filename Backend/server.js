@@ -125,13 +125,15 @@ app.delete('/clientes/:id', async (req, res) => {
     if (!cliente) {
       return res.status(404).json({ error: 'Cliente no encontrado' });
     }
-    await cliente.destroy();
-    res.json({ mensaje: 'Cliente eliminado correctamente' });
+    await cliente.update({ estado: 'inactivo' });
+
+    res.json({ mensaje: 'Cliente marcado como inactivo correctamente' });
   } catch (error) {
-    console.error('Error al eliminar cliente:', error);
-    res.status(500).json({ error: 'Error al eliminar cliente' });
+    console.error('Error al actualizar estado del cliente:', error);
+    res.status(500).json({ error: 'Error al actualizar estado del cliente' });
   }
 });
+
 
 
 // Ruta GET para obtener todos los empleados
