@@ -1,59 +1,52 @@
+// src/components/Iniciosesion.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import iniciosesion from './imagenes/Inicio_sesion.png';
-import { FaArrowLeft } from "react-icons/fa"; 
+import { FaArrowLeft } from "react-icons/fa";
 
 const Iniciosesion = () => {
-  const [credenciales, setCredenciales] = useState({
-    email: '',
-    contrasena: ''
-  });
+  const [credenciales, setCredenciales] = useState({ email: '', contrasena: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCredenciales(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setCredenciales(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
+    e.preventDefault();
+    setError('');
 
-  if (!credenciales.email.trim() || !credenciales.contrasena.trim()) {
-    setError('Email y contraseña son obligatorios');
-    return;
-  }
-
-  try {
-    const response = await fetch('http://localhost:8081/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credenciales)
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al iniciar sesión');
+    if (!credenciales.email.trim() || !credenciales.contrasena.trim()) {
+      setError('Email y contraseña son obligatorios');
+      return;
     }
 
-    const data = await response.json();
-    if (data.rol === 'administrador') {
-      navigate('/dashboard');
-    } else if (data.rol === 'empleado'){
-      navigate('/dashboardempleado');
-    } else if (data.rol === 'cliente') {
-      navigate('/dashboardcliente');
-    } else {
-      setError('Rol no reconocido');
+    try {
+      const response = await fetch('http://localhost:8081/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credenciales)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al iniciar sesión');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+
+      if (data.rol === 'administrador') {
+        navigate('/dashboard', { replace: true });
+      } else {
+        setError('Rol no autorizado');
+      }
+    } catch (error) {
+      setError('Error al iniciar sesión: ' + error.message);
     }
-  } catch (error) {
-    setError('Error al iniciar sesión: ' + error.message);
-  }
-};
+  };
 
   return (
     <div className="foto_inicial">
@@ -62,7 +55,6 @@ const Iniciosesion = () => {
           <Link to="/" className="boton-volver-icono" aria-label="Volver">
             <FaArrowLeft />
           </Link>
-
           <h1>Iniciar sesión</h1>
         </div>
 

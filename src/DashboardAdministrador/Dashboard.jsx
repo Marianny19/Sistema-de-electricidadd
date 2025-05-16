@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faChevronLeft, faClipboard, faFileInvoice,
   faFileInvoiceDollar, faHome, faMoneyCheck, faSignOut,
   faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
 import "../index.css";
 import { Chart } from "chart.js/auto";
-
 
 const Dashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -17,13 +16,19 @@ const Dashboard = () => {
   const [pendientes, setPendientes] = useState([]);
   const [atrasados, setAtrasados] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
   const cerrarSesion = () => {
-    console.log("Cerrar sesión");
+    localStorage.removeItem('token');
+    sessionStorage.clear();
+
+    navigate('/iniciarsesion', { replace: true });
+
+    window.location.reload();
   };
 
   const formatearFecha = (fechaISO) => {
@@ -58,47 +63,46 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-  const graficoExistente = Chart.getChart("graficoTareas");
-  if (graficoExistente) {
-    graficoExistente.destroy(); // Evita duplicados al actualizar
-  }
+    const graficoExistente = Chart.getChart("graficoTareas");
+    if (graficoExistente) {
+      graficoExistente.destroy();
+    }
 
-  const ctx = document.getElementById("graficoTareas")?.getContext("2d");
-  if (!ctx) return;
+    const ctx = document.getElementById("graficoTareas")?.getContext("2d");
+    if (!ctx) return;
 
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Completados", "Pendientes", "Atrasados"],
-      datasets: [
-        {
-          label: "Cantidad",
-          data: [
-            15, 
-            pendientes.length,
-            atrasados.length
-          ],
-          borderWidth: 1
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false }
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Completados", "Pendientes", "Atrasados"],
+        datasets: [
+          {
+            label: "Cantidad",
+            data: [
+              15,
+              pendientes.length,
+              atrasados.length
+            ],
+            borderWidth: 1
+          }
+        ]
       },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 1
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
           }
         }
       }
-    }
-  });
-}, [pendientes, atrasados]);
-
+    });
+  }, [pendientes, atrasados]);
 
   return (
     <div className="dashboard">
@@ -117,9 +121,12 @@ const Dashboard = () => {
         </ul>
         <ul>
           <li className="Cerrarsesion">
-            <Link to="/iniciarsesion" onClick={cerrarSesion}>
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </Link>
+            </button>
           </li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
@@ -130,7 +137,6 @@ const Dashboard = () => {
       <div className="dashboard-content">
         <h2>Bienvenido al sistema de gestión de electricidad</h2>
         <div className="widgets">
-          {/* Próximas citas */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faCalendar} /> Próximas citas</h3>
             <ul className="lista-personalizada">
@@ -148,7 +154,6 @@ const Dashboard = () => {
             </ul>
           </div>
 
-          {/* Servicios pendientes */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faClipboard} /> Servicios pendientes</h3>
             <ul className="lista-personalizada">
@@ -166,7 +171,6 @@ const Dashboard = () => {
             </ul>
           </div>
 
-          {/* Servicios atrasados */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faClipboard} /> Servicios atrasados</h3>
             <ul className="lista-personalizada">
@@ -183,11 +187,11 @@ const Dashboard = () => {
               )}
             </ul>
           </div>
-         <div className="widget tarjeta grafico-tarjeta">
-  <h3>Estadísticas de servicios</h3>
-  <canvas id="graficoTareas" className="grafico-canvas"></canvas>
-</div>
 
+          <div className="widget tarjeta grafico-tarjeta">
+            <h3>Estadísticas de servicios</h3>
+            <canvas id="graficoTareas" className="grafico-canvas"></canvas>
+          </div>
         </div>
       </div>
     </div>

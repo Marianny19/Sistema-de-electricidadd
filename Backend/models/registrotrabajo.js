@@ -4,7 +4,7 @@ const { data } = require('react-router-dom');
 
 const Registrotrabajo = conexion.define('Registrotrabajo', {
     id_registro_trabajo: {
-        type:DataTypes.INTEGER,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
@@ -14,10 +14,6 @@ const Registrotrabajo = conexion.define('Registrotrabajo', {
         allowNull: false,
     },
     id_empleado: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
-    id_servicio: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
