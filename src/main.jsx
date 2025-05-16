@@ -46,6 +46,7 @@ import Actualizarcita  from './DashboardAdministrador/Actualizarcita.jsx';
 import Actualizarpago from './DashboardAdministrador/Actualizarpago.jsx';
 import Vercotizaciones from './DashboardAdministrador/Vercotizaciones.jsx';
 import Actualizarcotizacion from './DashboardAdministrador/Actualizarcotizacion.jsx';
+import Actualizarregistrotrabajo from './DashboardAdministrador/Actualizarregistrotrabajo.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -96,6 +97,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/actualizarcotizacion/:id" element={<Actualizarcotizacion />} />
         
 
+        <Route path="/actualizarpago/:id" element={<Actualizarpago />} />
+        <Route path="/actualizarregistrotrabajo/:id" element={<Actualizarregistrotrabajo />} />
       </Routes>
     </Router>
   </StrictMode>

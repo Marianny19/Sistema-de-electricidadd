@@ -17,6 +17,7 @@ const { Op } = require('sequelize');
 const Cotizacion = require('./models/Cotizacion');
 const DetalleCotizacion = require('./models/DetalleCotizacion');
 const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
+const { Op } = require('sequelize');
 
 
 Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
@@ -70,6 +71,18 @@ DetalleCotizacion.belongsTo(Cotizacion, { foreignKey: 'id_cotizacion' });
 Cotizacion.hasMany(DetalleCotizacion, { foreignKey: 'id_cotizacion', as: 'detalles' });
 Cotizacion.belongsTo(Cliente, { foreignKey: 'id_cliente', as: 'cliente' });
 
+Registrotrabajo.belongsToMany(Servicio, {
+  through: 'detalleregistro',
+  foreignKey: 'id_registro_trabajo',
+  otherKey: 'id_servicio',
+  as: 'Servicios'   
+});
+Servicio.belongsToMany(Registrotrabajo, {
+  through: 'detalleregistro',
+  foreignKey: 'id_servicio',
+  otherKey: 'id_registro_trabajo',
+  as: 'RegistrosTrabajo'  
+});
 
 
 const app = express();
@@ -529,7 +542,7 @@ app.get('/solicitudservicio/:id', async (req, res) => {
       include: [
         {
           model: Servicio,
-          attributes: ['id_servicio', 'nombre_servicio'], // <--- AQUI
+          attributes: ['id_servicio', 'nombre_servicio'], 
           through: { attributes: [] }
         }
       ]
@@ -589,6 +602,7 @@ app.post('/solicitudservicio', async (req, res) => {
     res.status(500).json({ error: 'Error al crear solicitud' });
   }
 });
+
 app.put('/solicitudservicio/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -668,44 +682,176 @@ app.get('/servicios-mas-solicitados', async (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
-});
 
-// Ruta GET para obtener todos los registros de trabajo
 app.get('/registrotrabajo', async (req, res) => {
   try {
-    const Registro = await Registrotrabajo.findAll();
-    res.json(Registro);
+    const registros = await Registrotrabajo.findAll({
+      include: [
+        {
+          model: Servicio,
+          as: 'Servicios',  
+          attributes: ['id_servicio', 'nombre_servicio'],
+          through: { attributes: [] }
+        }
+      ]
+    });
+
+    const resultado = registros.map(r => ({
+      id_registro_trabajo: r.id_registro_trabajo,
+      id_solicitud_servicio: r.id_solicitud_servicio,
+      id_empleado: r.id_empleado,
+      costo_extra: r.costo_extra,
+      fecha: r.fecha,
+      estado: r.estado,
+      servicios: r.Servicios?.map(s => ({
+        id_servicio: s.id_servicio,
+        nombre_servicio: s.nombre_servicio
+      })) || []
+    }));
+
+    res.json(resultado);
   } catch (error) {
     console.error('Error al obtener registro:', error);
     res.status(500).json({ error: 'Error al obtener registro' });
   }
 });
 
-// Ruta POST para crear unnuevo registro de trabajo
+
 app.post('/registrotrabajo', async (req, res) => {
   try {
-    const nuevoRegistro = await Registrotrabajo.create(req.body);
-    res.status(201).json(nuevoRegistro);
+    const {
+      id_solicitud_servicio,
+      id_empleado,
+      servicios,
+      costo_extra,
+      fecha,
+      estado,
+    } = req.body;
+
+    if (!id_solicitud_servicio || !id_empleado || !fecha || !estado) {
+      return res.status(400).json({ error: 'Faltan datos obligatorios' });
+    }
+
+    if (servicios && (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id)))) {
+      return res.status(400).json({ error: 'La lista de servicios debe ser un arreglo de IDs numéricos válidos' });
+    }
+
+    if (servicios && servicios.length > 0) {
+      const serviciosEncontrados = await Servicio.findAll({
+        where: { id_servicio: servicios }
+      });
+
+      if (serviciosEncontrados.length !== servicios.length) {
+        return res.status(400).json({ error: 'Uno o más servicios no existen en la base de datos' });
+      }
+    }
+
+    const nuevoRegistro = await Registrotrabajo.create({
+      id_solicitud_servicio,
+      id_empleado,
+      costo_extra,
+      fecha,
+      estado
+    });
+
+    await nuevoRegistro.addServicios(servicios);
+
+    res.status(201).json({ mensaje: 'Registro de trabajo creado exitosamente' });
   } catch (error) {
-    console.error('Error al registrar registro:', error);
-    res.status(500).json({ error: 'Error al registar registro' });  
+    console.error("Error al crear registro:", error);
+    res.status(500).json({ error: 'Error al crear registro' });
   }
 });
 
-// Ruta GET para obtener todos los pagos
-app.get('/pagos', async (req, res) => {
+app.get('/registrotrabajo/:id', async (req, res) => {
   try {
-    const Pagos = await Pago.findAll();
-    res.json(Pagos);
+    const { id } = req.params;
+
+    const registro = await Registrotrabajo.findByPk(id, {
+      include: [
+        {
+          model: Servicio,
+          as: 'Servicios', 
+          attributes: ['id_servicio', 'nombre_servicio'],
+          through: { attributes: [] }
+        }
+      ]
+    });
+
+    if (!registro) {
+      return res.status(404).json({ error: 'Registro de trabajo no encontrado' });
+    }
+
+    res.json({
+      id_solicitud_servicio: registro.id_solicitud_servicio,
+      id_empleado: registro.id_empleado,
+      costo_extra: registro.costo_extra,
+      fecha: registro.fecha,
+      estado: registro.estado,
+      servicios: registro.Servicios.map(s => ({
+        id_servicio: s.id_servicio,
+        nombre_servicio: s.nombre_servicio
+      }))
+    });
   } catch (error) {
-    console.error('Error al obtener pago:', error);
-    res.status(500).json({ error: 'Error al obtener pago' });
+    console.error('Error al obtener registro de trabajo por ID:', error);
+    res.status(500).json({ error: 'Error al obtener registro de trabajo' });
   }
 });
 
+
+
+app.put('/registrotrabajo/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { id_solicitud_servicio, id_empleado, servicios, costo_extra, fecha, estado } = req.body;
+
+    if (!Array.isArray(servicios) || servicios.some(s => !Number.isInteger(s))) {
+      return res.status(400).json({ error: 'La lista de servicios debe ser un arreglo de IDs numéricos válidos' });
+    }
+
+    const registro = await Registrotrabajo.findByPk(id);
+    if (!registro) {
+      return res.status(404).json({ error: 'Registro de trabajo no encontrado' });
+    }
+
+    const solicitud = await Solicitudservicio.findByPk(id_solicitud_servicio);
+    if (!solicitud) {
+      return res.status(400).json({ error: 'La solicitud de servicio indicada no existe' });
+    }
+
+    const empleado = await Empleado.findByPk(id_empleado);
+    if (!empleado) {
+      return res.status(400).json({ error: 'El empleado indicado no existe' });
+    }
+
+    const serviciosEncontrados = await Servicio.findAll({
+      where: { id_servicio: servicios }
+    });
+
+    if (serviciosEncontrados.length !== servicios.length) {
+      return res.status(400).json({ error: 'Uno o más servicios no existen en la base de datos' });
+    }
+
+    await registro.update({
+      id_solicitud_servicio,
+      id_empleado,
+      costo_extra,
+      fecha,
+      estado
+    });
+
+    await registro.setServicios(servicios);
+
+    res.json({ mensaje: 'Registro de trabajo actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error al actualizar registro de trabajo:', error);
+    res.status(500).json({ error: 'Error al actualizar registro de trabajo' });
+  }
+});
+
+
+ 
 // Ruta POST para crear un nuevo pago
 app.post('/pagos', async (req, res) => {
   try {
@@ -819,7 +965,6 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
     }
 
-    // Aquí importante: comparar con bcrypt.compare
     const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
 
     if (!passwordMatch) {
@@ -882,7 +1027,7 @@ app.get('/proximas-citas', async (req, res) => {
     const citas = await Cita.findAll({
       where: {
         fecha: {
-          [Op.gte]: new Date()  
+          [Op.gte]: new Date() 
         }
       },
       order: [['fecha', 'ASC']],
