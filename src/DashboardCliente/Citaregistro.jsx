@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Select from 'react-select';
 import {
   faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
-  faFileInvoice, faFileInvoiceDollar, faFileText, faHome, faMoneyCheck,
-  faReceipt,
-  faSignOut, faUser, faUsers, 
+  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
+  faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import "../index.css";
-
 
 const Citaregistro = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -19,18 +18,15 @@ const Citaregistro = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido cliente</h2>
         <ul>
-          <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
-          <li><Link to="/solicitarservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-          <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/notasregistro"> <FontAwesomeIcon icon={faClipboard}/> <span>Notas</span></Link></li>
-
-          
-        
-        </ul>
-        <ul>
+                 <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+                 <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
+                 <li><Link to="/solicitarservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
+                 <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+                 <li><Link to="/notasregistro"><FontAwesomeIcon icon={faClipboard} /> <span>Notas</span></Link></li>
+               </ul>
+               <ul>
           <li className="Cerrarsesion">
             <a href="#" onClick={cerrarSesion}>
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
@@ -43,10 +39,10 @@ const Citaregistro = () => {
       </div>
 
       <div className="dashboard-content">
-            <Link to="/dashboardcliente" className="boton-retroceso" aria-label="Volver">
-                          <FontAwesomeIcon icon={faChevronLeft} />
-                        </Link>
-        <h2>Bienvenido a la sección de agendar citas</h2>
+        <Link to="/dashboardcliente" className="boton-retroceso" aria-label="Volver">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </Link>
+        <h2>Bienvenido a la sección de citas</h2>
         <Crearcitas />
       </div>
     </div>
@@ -54,14 +50,59 @@ const Citaregistro = () => {
 };
 
 function Crearcitas() {
- const [formulario, setFormulario] = useState({
+  const [clientes, setClientes] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
+  const [serviciosLista, setServiciosLista] = useState([]);
+  const [horasDisponibles, setHorasDisponibles] = useState([]);
+
+  const [formulario, setFormulario] = useState({
     id_cliente: '',
     id_empleado: '',
-    id_servicio: '',
+    servicios: [],
     fecha: '',
     hora: '',
     estado: 'agendada'
   });
+
+  useEffect(() => {
+    fetch('http://localhost:8081/clientes')
+      .then(res => res.json())
+      .then(data => setClientes(data))
+      .catch(err => console.error('Error al cargar clientes:', err));
+
+    fetch('http://localhost:8081/empleados')
+      .then(res => res.json())
+      .then(data => setEmpleados(data))
+      .catch(err => console.error('Error al cargar empleados:', err));
+
+    fetch('http://localhost:8081/servicios')
+      .then(res => res.json())
+      .then(data => setServiciosLista(data))
+      .catch(err => console.error('Error cargando servicios:', err));
+  }, []);
+
+  useEffect(() => {
+    const { fecha, id_empleado } = formulario;
+    if (fecha && id_empleado) {
+      fetch(`http://localhost:8081/validar-fecha?fecha=${fecha}&id_empleado=${id_empleado}`)
+        .then(res => {
+          if (!res.ok) throw new Error('No hay horas disponibles');
+          return res.json();
+        })
+        .then(data => {
+          console.log('Horas disponibles backend:', data.horasDisponibles);
+          setHorasDisponibles(data.horasDisponibles);
+          setFormulario(f => ({ ...f, hora: '' }));
+        })
+        .catch(() => {
+          setHorasDisponibles([]);
+          setFormulario(f => ({ ...f, hora: '' }));
+        });
+    } else {
+      setHorasDisponibles([]);
+      setFormulario(f => ({ ...f, hora: '' }));
+    }
+  }, [formulario.fecha, formulario.id_empleado]);
 
   const handleChange = (e) => {
     setFormulario({
@@ -70,36 +111,49 @@ function Crearcitas() {
     });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleServiciosChange = (selectedOptions) => {
+    const idsSeleccionados = selectedOptions ? selectedOptions.map(op => op.value) : [];
+    setFormulario({ ...formulario, servicios: idsSeleccionados });
+  };
 
-  if (!formulario.estado || !['agendada', 'completada', 'cancelada'].includes(formulario.estado)) {
-    alert('Por favor selecciona un estado válido.');
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { id_cliente, id_empleado, servicios, fecha, hora, estado } = formulario;
+
+  if (!id_cliente || !id_empleado || servicios.length === 0 || !fecha || !hora || !estado) {
+    alert('Por favor completa todos los campos.');
     return;
   }
 
+  const horaFormateada = hora.length === 5 ? `${hora}:00` : hora;
+
   try {
-    const respuesta = await fetch('http://localhost:8081/citas', {
+    const res = await fetch('http://localhost:8081/citas', {  
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formulario)
+      body: JSON.stringify({
+        ...formulario,
+        hora: horaFormateada
+      })
     });
 
-    if (respuesta.ok) {
+    if (res.ok) {
       alert('Cita registrada correctamente');
       setFormulario({
         id_cliente: '',
         id_empleado: '',
-        id_servicio: '',
+        servicios: [],
         fecha: '',
         hora: '',
         estado: 'agendada'
       });
+      setHorasDisponibles([]);
     } else {
-      alert('Error al registrar cita');
+      const error = await res.json();
+      alert(`Error: ${error.error}`);
     }
   } catch (error) {
-    console.error('Error en el registro:', error);
+    console.error('Error de red:', error);
     alert('Error de red al registrar cita');
   }
 };
@@ -108,17 +162,86 @@ const handleSubmit = async (e) => {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        <input type="number" name="id_cliente" placeholder="Cliente" className="campo-cita" value={formulario.id_cliente} onChange={handleChange} />
-        <input type="number" name="id_empleado" placeholder="Empleado" className="campo-cita" value={formulario.id_empleado} onChange={handleChange} />
-        <input type="number" name="id_servicio" placeholder="Solicitud" className="campo-cita" value={formulario.id_servicio} onChange={handleChange} />
-        <input type="date" name="fecha" className="campo-cita" value={formulario.fecha} onChange={handleChange} />
-        <input type="time" name="hora" className="campo-cita" value={formulario.hora} onChange={handleChange} />
-        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange}>
-          <option value="">Estado</option>
-          <option value="agendada">agendada</option>
-          <option value="completada">completada</option>
-          <option value="cancelada">cancelada</option>
+
+        <select
+          name="id_cliente"
+          className="campo-cita"
+          value={formulario.id_cliente}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Selecciona un cliente</option>
+          {clientes.map(cliente => (
+            <option key={cliente.id_cliente} value={cliente.id_cliente}>{cliente.nombre}</option>
+          ))}
         </select>
+
+        <select
+          name="id_empleado"
+          className="campo-cita"
+          value={formulario.id_empleado}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Selecciona un empleado</option>
+          {empleados.map(empleado => (
+            <option key={empleado.id_empleado} value={empleado.id_empleado}>{empleado.nombre}</option>
+          ))}
+        </select>
+
+        <div className="campo-cita">
+          <label>Servicios:</label>
+          <Select
+            isMulti
+            options={serviciosLista.map(servicio => ({
+              value: servicio.id_servicio,
+              label: servicio.nombre_servicio
+            }))}
+            value={serviciosLista
+              .filter(serv => formulario.servicios.includes(serv.id_servicio))
+              .map(serv => ({ value: serv.id_servicio, label: serv.nombre_servicio }))}
+            onChange={handleServiciosChange}
+            placeholder="Selecciona uno o más servicios"
+          />
+        </div>
+
+        <input
+          type="date"
+          name="fecha"
+          className="campo-cita"
+          value={formulario.fecha}
+          onChange={handleChange}
+          required
+          min={new Date().toISOString().split('T')[0]}
+        />
+
+        <select
+          name="hora"
+          className="campo-cita"
+          value={formulario.hora}
+          onChange={handleChange}
+          required
+          disabled={horasDisponibles.length === 0}
+        >
+          <option value="">Selecciona una hora</option>
+          {horasDisponibles.map(hora => (
+            <option key={hora} value={hora}>{hora.slice(0, 5)}</option>
+          ))}
+        </select>
+
+        <select
+          name="estado"
+          className="campo-cita"
+          value={formulario.estado}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Estado</option>
+          <option value="agendada">Agendada</option>
+          <option value="completada">Completada</option>
+          <option value="cancelada">Cancelada</option>
+        </select>
+
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>
