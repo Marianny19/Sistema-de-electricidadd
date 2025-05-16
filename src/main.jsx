@@ -44,6 +44,8 @@ import Identificate from './Identificate.jsx';
 import Actualizarsolicitud from './DashboardAdministrador/Actualizarsolicitud.jsx';
 import Actualizarcita  from './DashboardAdministrador/Actualizarcita.jsx';
 import Actualizarpago from './DashboardAdministrador/Actualizarpago.jsx';
+import Vercotizaciones from './DashboardAdministrador/Vercotizaciones.jsx';
+import Actualizarcotizacion from './DashboardAdministrador/Actualizarcotizacion.jsx';
 import Actualizarregistrotrabajo from './DashboardAdministrador/Actualizarregistrotrabajo.jsx';
 
 createRoot(document.getElementById('root')).render(
@@ -90,6 +92,11 @@ createRoot(document.getElementById('root')).render(
         <Route path="/cotizacionempleado" element={<CotizacionEmpleado />} /> 
         <Route path="/actualizarsolicitud/:id" element={<Actualizarsolicitud />} />
         <Route path="/actualizarcitas/:id" element={<Actualizarcita />} />
+        <Route path="/actualizarpago/:id" element={<Actualizarpago />} />  
+        <Route path="/vercotizaciones" element={<Vercotizaciones />} />
+        <Route path="/actualizarcotizacion/:id" element={<Actualizarcotizacion />} />
+        
+
         <Route path="/actualizarpago/:id" element={<Actualizarpago />} />
         <Route path="/actualizarregistrotrabajo/:id" element={<Actualizarregistrotrabajo />} />
       </Routes>
