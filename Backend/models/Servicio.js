@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const conexion = require('../database');
+const DetalleCotizacion = require('./DetalleCotizacion');
 
 const Servicio = conexion.define('Servicio', {
     id_servicio: {

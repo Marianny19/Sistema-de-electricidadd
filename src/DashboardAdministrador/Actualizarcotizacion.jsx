@@ -2,44 +2,70 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft, faSignOut, faHome, faUsers, faUser, faCalendar,
-  faFileInvoice, faFileText, faTasks, faFileInvoiceDollar,
-  faMoneyCheck
+  faFileInvoice, faFileText, faTasks, faFileInvoiceDollar, faMoneyCheck
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, useNavigate } from "react-router-dom";
-import "../index.css";  
+import { Link, useParams, useNavigate } from "react-router-dom";
+import "../index.css";
 
-const Cotizacion = () => {
+const ActualizarCotizacion = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [cliente, setCliente] = useState("");
   const [fecha, setFecha] = useState("");
   const [estado, setEstado] = useState("");
+  const [clientes, setClientes] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [serviciosSeleccionados, setServiciosSeleccionados] = useState({});
-  const [clientes, setClientes] = useState([]);
 
   useEffect(() => {
-    async function cargarServicios() {
-      try {
-        const response = await fetch('http://localhost:8081/servicios');
-        const data = await response.json();
-        setServicios(data);
-      } catch (error) {
-        console.error('Error al cargar servicios:', error);
+  if (!id) return;
+
+  async function cargarCotizacion() {
+    try {
+      const response = await fetch(`http://localhost:8081/cotizaciones/${id}`);
+      const data = await response.json();
+
+      if (response.ok || response.status === 200) {
+        setCliente(String(data.id_cliente));
+        setFecha(data.fecha ? data.fecha.split("T")[0] : "");
+        setEstado(data.estado);
+
+
+        const serviciosIds = {};
+        (data.servicios || []).forEach(servicio => {
+          serviciosIds[servicio.id_servicio] = true;
+        });
+        setServiciosSeleccionados(serviciosIds);
+      } else {
+        alert(data.message || "Error al cargar cotización");
       }
+    } catch (error) {
+      console.error("Error al cargar cotización:", error);
     }
+  }
 
-    cargarServicios();
-  }, []);
+  cargarCotizacion();
+}, [id]);
+
 
   useEffect(() => {
-    fetch('http://localhost:8081/clientes')
+    fetch("http://localhost:8081/clientes")
       .then(res => res.json())
       .then(data => setClientes(data))
-      .catch(err => console.error('Error cargando clientes:', err));
+      .catch(err => console.error("Error cargando clientes:", err));
+  }, []);
+
+
+  useEffect(() => {
+    fetch("http://localhost:8081/servicios")
+      .then(res => res.json())
+      .then(data => setServicios(data))
+      .catch(err => console.error("Error cargando servicios:", err));
   }, []);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-
   const cerrarSesion = (e) => {
     e.preventDefault();
     console.log("Cerrar sesión");
@@ -55,56 +81,48 @@ const Cotizacion = () => {
   const subtotal = servicios
     .filter(s => serviciosSeleccionados[s.id_servicio])
     .reduce((acc, s) => acc + Number(s.costo_base || 0), 0);
-
   const impuesto = subtotal * 0.18;
   const total = subtotal + impuesto; 
-  const navigate = useNavigate();
+   
 
-  const handleGuardar = async (e) => {
+  const handleActualizar = async (e) => {
     e.preventDefault();
-    const datosCotizacion = {
-  id_cliente: Number(cliente),
-  fecha,
-  estado,
-  servicios: Object.keys(serviciosSeleccionados)
-    .filter(id => serviciosSeleccionados[id])
-    .map(id => {
-      const servicio = servicios.find(s => s.id_servicio === Number(id));
-      return {
-        id_servicio: Number(id),
-        costo_base: Number(servicio.costo_base)
-      };
-    }),
-  subtotal,
-  impuesto,
-  total
-};
 
+    const datosActualizados = {
+      id_cliente: Number(cliente),
+      fecha,
+      estado,
+      servicios: Object.keys(serviciosSeleccionados)
+        .filter(id => serviciosSeleccionados[id])
+        .map(id => {
+          const servicio = servicios.find(s => s.id_servicio === Number(id));
+          return {
+            id_servicio: Number(id),
+            costo_base: Number(servicio.costo_base)
+          };
+        }),
+      subtotal,
+      impuesto,
+      total
+    };
 
     try {
-      const response = await fetch('http://localhost:8081/cotizaciones', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(datosCotizacion)
+      const response = await fetch(`http://localhost:8081/cotizaciones/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datosActualizados)
       });
 
       if (response.ok) {
-        alert("Cotización guardada correctamente.");
-        navigate('/vercotizaciones'); 
+        alert("Cotización actualizada correctamente.");
+        navigate("/vercotizaciones");
       } else {
-        alert("Error al guardar la cotización.");
+        alert("Error al actualizar la cotización.");
       }
     } catch (error) {
-      console.error('Error al guardar la cotización:', error);
-      alert("Error en la conexión al guardar la cotización.");
+      console.error("Error:", error);
+      alert("No se pudo actualizar la cotización.");
     }
-  };
-
-  const handleEnviar = (e) => {
-    e.preventDefault();
-    console.log("Enviando cotización");
   };
 
   return (
@@ -135,49 +153,52 @@ const Cotizacion = () => {
       </div>
 
       <div className="dashboard-content">
-        <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
+        <Link to="/vercotizaciones" className="boton-retroceso" aria-label="Volver">
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
-        <h2>Bienvenido a la sección de cotización</h2>
+        <h2>Actualizar Cotización</h2>
 
         <div className="invoice-container">
           <div className="invoice-card">
             <div className="invoice-grid">
               <div className="input-group">
-                <label htmlFor="id_cliente">Cliente</label>
+                <label htmlFor="cliente">Cliente</label>
                 <select
-                  name="id_cliente"
+                  id="cliente"
                   className="campo-cita"
                   value={cliente}
-                  onChange={(e) => setCliente(e.target.value)}
+                  onChange={e => setCliente(e.target.value)}
                   required
                 >
                   <option value="">Selecciona un cliente</option>
-                  {clientes.map((cliente) => (
-                    <option key={cliente.id_cliente} value={cliente.id_cliente}>
-                      {cliente.nombre}
+                  {clientes.map(c => (
+                    <option key={c.id_cliente} value={c.id_cliente}>
+                      {c.nombre}
                     </option>
                   ))}
                 </select>
               </div>
+
               <div className="input-group">
                 <label htmlFor="fecha">Fecha</label>
                 <input
                   type="date"
                   id="fecha"
-                  name="fecha"
+                  className="campo-cita"
                   value={fecha}
-                  onChange={(e) => setFecha(e.target.value)}
+                  onChange={e => setFecha(e.target.value)}
+                  required
                 />
               </div>
+
               <div className="input-group">
                 <label htmlFor="estado">Estado</label>
                 <select
                   id="estado"
-                  name="estado"
                   className="campo-cita"
                   value={estado}
-                  onChange={(e) => setEstado(e.target.value)}
+                  onChange={e => setEstado(e.target.value)}
+                  required
                 >
                   <option value="">Selecciona estado</option>
                   <option value="pendiente">Pendiente</option>
@@ -197,28 +218,22 @@ const Cotizacion = () => {
                 </tr>
               </thead>
               <tbody>
-                {Array.isArray(servicios) && servicios.length > 0 ? (
-                  servicios.map((servicio) => (
+                {servicios.length > 0 ? (
+                  servicios.map(servicio => (
                     <tr key={servicio.id_servicio}>
                       <td>
                         <input
                           type="checkbox"
-                          id={`servicio-${servicio.id_servicio}`}
-                          name={`servicio-${servicio.id_servicio}`}
                           checked={!!serviciosSeleccionados[servicio.id_servicio]}
                           onChange={() => manejarSeleccion(servicio.id_servicio)}
                         />
                       </td>
-                      <td>
-                        <label htmlFor={`servicio-${servicio.id_servicio}`}>
-                          {servicio.nombre_servicio}
-                        </label>
-                      </td>
+                      <td>{servicio.nombre_servicio}</td>
                       <td>${Number(servicio.costo_base).toFixed(2)}</td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan="3">No hay servicios disponibles</td></tr>
+                  <tr><td colSpan="3">Cargando servicios...</td></tr>
                 )}
               </tbody>
             </table>
@@ -242,9 +257,8 @@ const Cotizacion = () => {
             </div>
 
             <div className="button-group">
-              <button onClick={handleGuardar} className="save">Guardar</button>
-              <button onClick={handleEnviar} className="send">Enviar</button>
-              <button className="cancel">Cancelar</button>
+              <button className="save" onClick={handleActualizar}>Actualizar</button>
+              <button className="cancel" onClick={() => navigate("/vercotizaciones")}>Cancelar</button>
             </div>
           </div>
         </div>
@@ -253,4 +267,4 @@ const Cotizacion = () => {
   );
 };
 
-export default Cotizacion;
+export default ActualizarCotizacion;

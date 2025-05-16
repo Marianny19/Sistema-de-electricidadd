@@ -13,7 +13,10 @@ const DetalleSolicitudServicio = require('./models/DetalleSolicitudServicio');
 const DetalleCita  = require('./models/detallecita'); 
 const Usuario = require('./models/usuario');
 const bcrypt = require('bcrypt');
-const { Op } = require('sequelize');
+const { Op } = require('sequelize'); 
+const Cotizacion = require('./models/Cotizacion');
+const DetalleCotizacion = require('./models/DetalleCotizacion');
+const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
 
 
 Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
@@ -58,6 +61,15 @@ Servicio.belongsToMany(Solicitudservicio, {
   otherKey: 'id_solicitud'
 });
 
+Servicio.hasMany(DetalleCotizacion, { foreignKey: 'id_servicio' });
+
+
+DetalleCotizacion.belongsTo(Servicio, { foreignKey: 'id_servicio', as: 'servicio' });
+DetalleCotizacion.belongsTo(Cotizacion, { foreignKey: 'id_cotizacion' });
+
+Cotizacion.hasMany(DetalleCotizacion, { foreignKey: 'id_cotizacion', as: 'detalles' });
+Cotizacion.belongsTo(Cliente, { foreignKey: 'id_cliente', as: 'cliente' });
+
 
 
 const app = express();
@@ -70,7 +82,7 @@ app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente');
 });
 
-// Ruta GET para obtener todos los clientes
+
 app.get('/clientes', async (req, res) => {
   try {
     const clientes = await Cliente.findAll();
@@ -582,18 +594,16 @@ app.put('/solicitudservicio/:id', async (req, res) => {
     const { id } = req.params;
     const { id_cliente, direccion, via_comunicacion, fecha, estado, servicios } = req.body;
 
-    // Verificar que servicios sea un array válido
+
     if (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id))) {
       return res.status(400).json({ error: 'La lista de servicios debe ser un arreglo de IDs numéricos válidos' });
     }
 
-    // Verificar que la solicitud existe
     const solicitud = await Solicitudservicio.findByPk(id);
     if (!solicitud) {
       return res.status(404).json({ error: 'Solicitud no encontrada' });
     }
 
-    // Verificar que todos los servicios existen
     const serviciosEncontrados = await Servicio.findAll({
       where: { id_servicio: servicios }
     });
@@ -602,7 +612,6 @@ app.put('/solicitudservicio/:id', async (req, res) => {
       return res.status(400).json({ error: 'Uno o más servicios no existen en la base de datos' });
     }
 
-    // Actualizar campos básicos de la solicitud
     await solicitud.update({
       id_cliente,
       direccion,
@@ -868,13 +877,12 @@ app.get('/cliente', async (req, res) => {
   }
 });
 
-// RUTA: Próximas citas (5 más cercanas)
 app.get('/proximas-citas', async (req, res) => {
   try {
     const citas = await Cita.findAll({
       where: {
         fecha: {
-          [Op.gte]: new Date()  // mayor o igual a hoy
+          [Op.gte]: new Date()  
         }
       },
       order: [['fecha', 'ASC']],
@@ -919,8 +927,155 @@ app.get('/servicios-atrasados', async (req, res) => {
   }
 });
 
+app.post('/cotizaciones', async (req, res) => {
+  const { id_cliente, estado, servicios, subtotal, impuesto, total } = req.body;
+
+  try {
+    const nuevaCotizacion = await Cotizacion.create({
+      id_cliente,
+      fecha_emision: new Date(), 
+      estado,
+      subtotal,
+      impuestos: impuesto, 
+      total
+    });
+
+    const detalles = servicios.map(servicio => ({
+      id_cotizacion: nuevaCotizacion.id_cotizacion,
+      id_servicio: servicio.id_servicio,
+      costo_base: servicio.costo_base
+    }));
+
+    await DetalleCotizacion.bulkCreate(detalles);
+
+    res.status(201).json({ message: 'Cotización guardada correctamente' });
+  } catch (error) {
+    console.error('Error al guardar cotización:', error);
+    res.status(500).json({ message: 'Error interno al guardar la cotización' });
+  }
+});
+
+app.get('/cotizaciones', async (req, res) => {
+  try {
+    const cotizaciones = await Cotizacion.findAll({
+      include: [
+        {
+          model: DetalleCotizacion,
+          as: 'detalles',
+          include: [
+            {
+              model: Servicio,
+              as: 'servicio',
+              attributes: ['id_servicio', 'nombre_servicio', 'costo_base']
+              
+            }
+          ]
+        },
+        {
+          model: Cliente,
+          as: 'cliente',
+          attributes: ['id_cliente', 'nombre'] 
+        }
+      ]
+    });
+
+    res.json(cotizaciones);
+  } catch (error) {
+    console.error('Error al obtener cotizaciones:', error);
+    res.status(500).json({ message: 'Error interno al obtener las cotizaciones' });
+  }
+});
+
+app.get('/cotizaciones/:id', async (req, res) => {
+  try {
+    const cotizacion = await Cotizacion.findByPk(req.params.id, {
+      include: [
+        {
+          model: DetalleCotizacion,
+          as: 'detalles',
+          include: [
+            {
+              model: Servicio,
+              as: 'servicio',
+              attributes: ['id_servicio', 'nombre_servicio', 'costo_base']
+            }
+          ]
+        }
+      ]
+    });
+
+    if (!cotizacion) {
+      return res.status(404).json({ message: 'Cotización no encontrada' });
+    }
+
+    const servicios = cotizacion.detalles.map(det => ({
+      id_servicio: det.id_servicio,
+      nombre_servicio: det.servicio.nombre_servicio,
+      costo_base: det.servicio.costo_base
+    }));
+
+    res.json({
+      id_cliente: cotizacion.id_cliente,
+      fecha: cotizacion.fecha,
+      estado: cotizacion.estado,
+      servicios
+    });
+  } catch (error) {
+    console.error('Error al obtener cotización:', error);
+    res.status(500).json({ message: 'Error al obtener cotización' });
+  }
+});
 
 
+app.put('/cotizaciones/:id', async (req, res) => {
+  const { id } = req.params;
+  const { id_cliente, estado, servicios, subtotal, impuesto, total } = req.body;
+
+  try {
+    const cotizacion = await Cotizacion.findByPk(id);
+    if (!cotizacion) {
+      return res.status(404).json({ message: 'Cotización no encontrada' });
+    }
+
+    await cotizacion.update({
+      id_cliente,
+      estado, 
+      fecha_emision: new Date(),
+      subtotal,
+      impuestos: impuesto,
+      total
+    });
+
+    await DetalleCotizacion.destroy({ where: { id_cotizacion: id } });
+
+    const nuevosDetalles = servicios.map(servicio => ({
+      id_cotizacion: id,
+      id_servicio: servicio.id_servicio,
+      costo_base: servicio.costo_base
+    }));
+    await DetalleCotizacion.bulkCreate(nuevosDetalles);
+
+    res.json({ message: 'Cotización actualizada correctamente' });
+  } catch (error) {
+    console.error('Error al actualizar cotización:', error);
+    res.status(500).json({ message: 'Error interno al actualizar la cotización' });
+  }
+});
+app.delete('/cotizaciones/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const cotizacion = await Cotizacion.findOne({ where: { id_cotizacion: id } });
+    if (!cotizacion) {
+      return res.status(404).json({ error: 'Cotización no encontrada' });
+    }
+    await cotizacion.update({ estado: 'Rechazada' });
+
+    res.json({ mensaje: 'Cotización cancelada correctamente' });
+  } catch (error) {
+    console.error('Error al cancelar la cotización:', error);
+    res.status(500).json({ error: 'Error al cancelar la cotizacio' });
+  }
+});
 
 
 

@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const conexion = require('../database');
+const Cotizacion = require('./Cotizacion');
 
 const Cliente = conexion.define('Cliente', {
   id_cliente: {
@@ -40,5 +41,6 @@ const Cliente = conexion.define('Cliente', {
   tableName: 'cliente',
   timestamps: false,
 });
+Cliente.hasMany(Cotizacion, { foreignKey: 'id_cliente' });
 
 module.exports = Cliente;
