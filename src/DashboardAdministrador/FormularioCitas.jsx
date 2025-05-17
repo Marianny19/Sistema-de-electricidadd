@@ -5,13 +5,17 @@ import {
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers, faSearch, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const FormularioCitas = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [citas, setCitas] = useState([]);
   const [busqueda, setBusqueda] = useState("");
+  const navigate = useNavigate();
+
+  const emailUsuario = localStorage.getItem('email');
+
 
   useEffect(() => {
     async function cargarCitas() {
@@ -50,8 +54,17 @@ const FormularioCitas = () => {
   };
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
 
+    navigate('/iniciarsesion', { replace: true });
+
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
+  };
   const citasFiltradas = citas.filter(cita =>
     cita.id_cita.toString().includes(busqueda.toLowerCase()) ||
     cita.nombre_cliente.toLowerCase().includes(busqueda.toLowerCase())
@@ -60,7 +73,9 @@ const FormularioCitas = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -74,9 +89,12 @@ const FormularioCitas = () => {
         </ul>
         <ul>
           <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </a>
+            </button>
           </li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
@@ -100,7 +118,7 @@ const FormularioCitas = () => {
                 id="buscar-empleado"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar por ID o cliente"
+                placeholder="Buscar por id o cliente"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
@@ -111,7 +129,7 @@ const FormularioCitas = () => {
               <caption>Lista de citas</caption>
               <thead>
                 <tr>
-                  <th>Codigo</th>
+                  <th>Código</th>
                   <th>Cliente</th>
                   <th>Empleado</th>
                   <th>Servicio</th>

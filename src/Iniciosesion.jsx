@@ -1,4 +1,3 @@
-// src/components/Iniciosesion.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import iniciosesion from './imagenes/Inicio_sesion.png';
@@ -36,10 +35,20 @@ const Iniciosesion = () => {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.token);
 
+      // Guardar token, rol, nombre y email en localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('rol', data.rol);
+      localStorage.setItem('nombre', data.nombre); // <-- nombre del usuario
+      localStorage.setItem('email', credenciales.email); // <-- email que usó para iniciar
+
+      // Redirigir según el rol
       if (data.rol === 'administrador') {
         navigate('/dashboard', { replace: true });
+      } else if (data.rol === 'empleado') {
+        navigate('/empleado', { replace: true });
+      } else if (data.rol === 'cliente') {
+        navigate('/dashboardempleado', { replace: true });
       } else {
         setError('Rol no autorizado');
       }

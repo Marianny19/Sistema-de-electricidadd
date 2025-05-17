@@ -6,27 +6,42 @@ import {
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const Citaregistro = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const navigate = useNavigate();
+  
+      const emailUsuario = localStorage.getItem('email');
+
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+const cerrarSesion = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+
+  navigate('/iniciarsesion', { replace: true });
+
+  window.history.pushState(null, '', '/iniciarsesion');
+  window.onpopstate = () => {
+    window.history.go(1);
+  };
+};
 
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido cliente</h2>
+        <h2>Bienvenido</h2>
+                <p className="subtexto-email">{emailUsuario}</p>
+ <ul>
+          <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
+          <li><Link to="/solicitudservicioc"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
+          <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+          <li><Link to="/notasregistro"> <FontAwesomeIcon icon={faClipboard} /> <span>Notas</span></Link></li>
+        </ul>
         <ul>
-                 <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-                 <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
-                 <li><Link to="/solicitarservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-                 <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-                 <li><Link to="/notasregistro"><FontAwesomeIcon icon={faClipboard} /> <span>Notas</span></Link></li>
-               </ul>
-               <ul>
           <li className="Cerrarsesion">
             <a href="#" onClick={cerrarSesion}>
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>

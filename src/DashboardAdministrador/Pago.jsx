@@ -5,13 +5,17 @@ import {
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers, faSearch, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const Pago = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [pagos, setPagos] = useState([]);
   const [busquedaPagoId, setBusquedaPagoId] = useState('');
+    const navigate = useNavigate();
+      const emailUsuario = localStorage.getItem('email');
+
+  
 
   useEffect(() => {
     async function cargarPagos() {
@@ -49,7 +53,17 @@ const Pago = () => {
   };
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+const cerrarSesion = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+
+  navigate('/iniciarsesion', { replace: true });
+
+  window.history.pushState(null, '', '/iniciarsesion');
+  window.onpopstate = () => {
+    window.history.go(1);
+  };
+};
 
   const handleBusquedaPago = (e) => {
     setBusquedaPagoId(e.target.value);
@@ -62,7 +76,10 @@ const Pago = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido </h2>
+                <p className="subtexto-email">{emailUsuario}</p>
+
+
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -74,13 +91,16 @@ const Pago = () => {
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
-        <ul>
-          <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
-              <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </a>
-          </li>
-        </ul>
+         <ul>
+                 <li className="Cerrarsesion">
+                   <button
+                     onClick={cerrarSesion}
+                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+                   >
+                     <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
+                   </button>
+                 </li>
+               </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -100,7 +120,7 @@ const Pago = () => {
                 id="buscar-pago"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar pago por ID"
+                placeholder="Buscar por id"
                 value={busquedaPagoId}
                 onChange={handleBusquedaPago}
               />
@@ -111,7 +131,7 @@ const Pago = () => {
               <caption>Lista de pagos</caption>
               <thead>
                 <tr>
-                  <th>ID Pago</th>
+                  <th>Código</th>
                   <th>Monto</th>
                   <th>Fecha</th>
                   <th>Método</th>

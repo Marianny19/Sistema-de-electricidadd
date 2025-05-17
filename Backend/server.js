@@ -17,8 +17,10 @@ const { Op } = require('sequelize');
 const Cotizacion = require('./models/Cotizacion');
 const DetalleCotizacion = require('./models/DetalleCotizacion');
 const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
-const { Op } = require('sequelize');
 
+
+Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
+Cita.belongsTo(Cliente, { foreignKey: 'id_cliente' });
 
 Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
 Cita.belongsTo(Cliente, { foreignKey: 'id_cliente' });
@@ -847,6 +849,18 @@ app.put('/registrotrabajo/:id', async (req, res) => {
   } catch (error) {
     console.error('Error al actualizar registro de trabajo:', error);
     res.status(500).json({ error: 'Error al actualizar registro de trabajo' });
+  }
+});
+
+
+//GET PAGO
+app.get('/pagos', async (req, res) => {
+  try {
+    const pagos = await Pago.findAll();
+    res.status(200).json(pagos);
+  } catch (error) {
+    console.error('Error al obtener pagos:', error);
+    res.status(500).json({ error: 'Error al obtener los pagos' });
   }
 });
 

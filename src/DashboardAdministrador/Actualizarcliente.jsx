@@ -11,31 +11,48 @@ import "../index.css";
 
 const Actualizarcliente = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+  const navigate = useNavigate();
 
+  const emailUsuario = localStorage.getItem('email');
+
+  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+
+    navigate('/iniciarsesion', { replace: true });
+
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
+  };
   return (
-    
+
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
-        
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
-             <li><Link to="/Dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-                    <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-                    <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
-                    <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-                    <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-                    <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-                    <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
-                    <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-                    <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
+          <li><Link to="/Dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+          <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
+          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
+          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
+          <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+          <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </a>
+            </button>
           </li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
@@ -44,9 +61,9 @@ const Actualizarcliente = () => {
       </div>
 
       <div className="dashboard-content">
-          <Link to="/clienteempleado" className="boton-retroceso" aria-label="Volver">
-                  <FontAwesomeIcon icon={faChevronLeft} />
-                </Link>
+        <Link to="/clienteempleado" className="boton-retroceso" aria-label="Volver">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </Link>
         <h2>Bienvenido a la sección de actualizar cliente</h2>
         <FormularioCliente />
       </div>

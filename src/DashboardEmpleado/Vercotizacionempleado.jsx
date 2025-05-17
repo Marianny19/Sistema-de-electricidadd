@@ -1,34 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHome, faUsers, faUser, faCalendar,
-  faFileInvoice, faFileInvoiceDollar, faMoneyCheck,
-  faClipboard, faCartArrowDown, faSignOut, faChevronLeft, faSearch, faFileText, faTasks
+  faChevronLeft, faHome, faUsers, faUser, faFileText, faCalendar,
+  faTasks, faFileInvoice, faFileInvoiceDollar, faMoneyCheck,
+  faSignOut, faSearch
 } from '@fortawesome/free-solid-svg-icons';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
-const FacturaEmpleado = () => {
+const Vercotizacionempleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [facturas, setFacturas] = useState([]);
+  const [cotizaciones, setCotizaciones] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const navigate = useNavigate();
 
   const emailUsuario = localStorage.getItem('email');
 
+
   useEffect(() => {
-    async function cargarFacturas() {
+    async function cargarCotizaciones() {
       try {
-        const response = await fetch('http://localhost:8081/facturas');
+        const response = await fetch('http://localhost:8081/cotizaciones');
         const data = await response.json();
-        setFacturas(data);
+        setCotizaciones(data);
       } catch (error) {
-        console.error('Error al cargar facturas:', error);
+        console.error('Error al cargar cotizaciones:', error);
       }
     }
 
-    cargarFacturas();
+    cargarCotizaciones();
   }, []);
+
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => {
@@ -42,12 +44,14 @@ const FacturaEmpleado = () => {
       window.history.go(1);
     };
   };
-  const handleBusqueda = (e) => {
+
+  const handleBusquedaChange = (e) => {
     setBusqueda(e.target.value);
   };
 
-  const facturasFiltradas = facturas.filter(f =>
-    f.id.toString().includes(busqueda.toLowerCase())
+  const cotizacionesFiltradas = cotizaciones.filter(c =>
+    c.id_cotizacion.toString().includes(busqueda.toLowerCase()) ||
+    c.estado.toLowerCase().includes(busqueda.toLowerCase())
   );
 
   return (
@@ -82,62 +86,60 @@ const FacturaEmpleado = () => {
       </div>
 
       <div className="dashboard-content">
-        <Link to="/dashboardempleado" className="boton-retroceso" aria-label="Volver">
+        <Link to="/dashboard" className="boton-retroceso" aria-label="Volver">
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
-        <h2>Bienvenido a la sección de Factura</h2>
+        <h2>Bienvenido a la sección de Cotizaciones</h2>
+
         <div className="main-content">
-          <button className="Registro" onClick={() => console.log("Generar reporte")}> Generar reporte </button>
+          <Link to="/cotizacionempleado"><button className="Registro">+ Nueva cotizacion </button></Link>
           <div className="input-container-wrapper">
             <div className="input-container">
               <input
-                id="buscar-factura"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar facturas"
+                placeholder="Buscar por id o estado"
                 value={busqueda}
-                onChange={handleBusqueda}
+                onChange={handleBusquedaChange}
               />
               <FontAwesomeIcon icon={faSearch} />
             </div>
 
-            <table className='tabla-factura'>
-              <caption>Lista de facturas</caption>
+            <table className="tabla-empleados">
+              <caption>Lista de cotizaciones</caption>
               <thead>
                 <tr>
                   <th>Código</th>
-                  <th>Solicitud</th>
-                  <th>Pago</th>
+                  <th>Cliente</th>
                   <th>Fecha</th>
+                  <th>Servicios</th>
+                  <th>Subtotal</th>
+                  <th>Impuestos</th>
                   <th>Total</th>
-                  <th>Descripción</th>
                   <th>Estado</th>
                 </tr>
               </thead>
               <tbody>
-                {facturasFiltradas.length === 0 ? (
-                  <tr>
-                    <td colSpan="8" style={{ textAlign: 'center' }}>
-                      No se encontraron facturas.
+                {cotizacionesFiltradas.map((c) => (
+                  <tr key={c.id_cotizacion}>
+                    <td>{c.id_cotizacion}</td>
+                    <td>{c.cliente?.nombre || 'Sin nombre'}</td>
+                    <td>{c.fecha_emision}</td>
+                    <td>
+                      {c.detalles && c.detalles.length > 0
+                        ? c.detalles.map((d) => d.servicio?.nombre_servicio).join(', ')
+                        : 'Sin servicios'}
                     </td>
-                  </tr>
-                ) : (
-                  facturasFiltradas.map((factura) => (
-                    <tr key={factura.id}>
-                      <td>{factura.id}</td>
-                      <td>{factura.solicitud_id}</td>
-                      <td>{factura.pago_id}</td>
-                      <td>{factura.fecha_emision}</td>
-                      <td>{factura.total}</td>
-                      <td>{factura.descripcion || 'N/A'}</td>
-                      <td>{factura.estado}</td>
-                      <td>
-                      </td>
-                    </tr>
-                  ))
-                )}
+
+                    <td>{c.subtotal}</td>
+                    <td>{c.impuestos}</td>
+                    <td>{c.total}</td>
+                    <td>{c.estado}</td>                  </tr>
+                ))}
               </tbody>
+
             </table>
+
           </div>
         </div>
       </div>
@@ -145,4 +147,4 @@ const FacturaEmpleado = () => {
   );
 };
 
-export default FacturaEmpleado;
+export default Vercotizacionempleado;

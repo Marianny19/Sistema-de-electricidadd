@@ -19,36 +19,36 @@ const ActualizarCotizacion = () => {
   const [servicios, setServicios] = useState([]);
   const [serviciosSeleccionados, setServiciosSeleccionados] = useState({});
 
+  const emailUsuario = localStorage.getItem("email") || "usuario@ejemplo.com";
+
   useEffect(() => {
-  if (!id) return;
+    if (!id) return;
 
-  async function cargarCotizacion() {
-    try {
-      const response = await fetch(`http://localhost:8081/cotizaciones/${id}`);
-      const data = await response.json();
+    async function cargarCotizacion() {
+      try {
+        const response = await fetch(`http://localhost:8081/cotizaciones/${id}`);
+        const data = await response.json();
 
-      if (response.ok || response.status === 200) {
-        setCliente(String(data.id_cliente));
-        setFecha(data.fecha ? data.fecha.split("T")[0] : "");
-        setEstado(data.estado);
+        if (response.ok) {
+          setCliente(String(data.id_cliente));
+          setFecha(data.fecha ? data.fecha.split("T")[0] : "");
+          setEstado(data.estado);
 
-
-        const serviciosIds = {};
-        (data.servicios || []).forEach(servicio => {
-          serviciosIds[servicio.id_servicio] = true;
-        });
-        setServiciosSeleccionados(serviciosIds);
-      } else {
-        alert(data.message || "Error al cargar cotización");
+          const serviciosIds = {};
+          (data.servicios || []).forEach(servicio => {
+            serviciosIds[servicio.id_servicio] = true;
+          });
+          setServiciosSeleccionados(serviciosIds);
+        } else {
+          alert(data.message || "Error al cargar cotización");
+        }
+      } catch (error) {
+        console.error("Error al cargar cotización:", error);
       }
-    } catch (error) {
-      console.error("Error al cargar cotización:", error);
     }
-  }
 
-  cargarCotizacion();
-}, [id]);
-
+    cargarCotizacion();
+  }, [id]);
 
   useEffect(() => {
     fetch("http://localhost:8081/clientes")
@@ -56,7 +56,6 @@ const ActualizarCotizacion = () => {
       .then(data => setClientes(data))
       .catch(err => console.error("Error cargando clientes:", err));
   }, []);
-
 
   useEffect(() => {
     fetch("http://localhost:8081/servicios")
@@ -66,9 +65,13 @@ const ActualizarCotizacion = () => {
   }, []);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = (e) => {
-    e.preventDefault();
-    console.log("Cerrar sesión");
+
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/iniciarsesion', { replace: true });
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => window.history.go(1);
   };
 
   const manejarSeleccion = (id_servicio) => {
@@ -82,8 +85,7 @@ const ActualizarCotizacion = () => {
     .filter(s => serviciosSeleccionados[s.id_servicio])
     .reduce((acc, s) => acc + Number(s.costo_base || 0), 0);
   const impuesto = subtotal * 0.18;
-  const total = subtotal + impuesto; 
-   
+  const total = subtotal + impuesto;
 
   const handleActualizar = async (e) => {
     e.preventDefault();
@@ -128,7 +130,9 @@ const ActualizarCotizacion = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -140,13 +144,15 @@ const ActualizarCotizacion = () => {
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
+
         <ul>
           <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
+            <button onClick={cerrarSesion} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}>
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </a>
+            </button>
           </li>
         </ul>
+
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -156,7 +162,7 @@ const ActualizarCotizacion = () => {
         <Link to="/vercotizaciones" className="boton-retroceso" aria-label="Volver">
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
-        <h2>Actualizar Cotización</h2>
+        <h2>Bienvenido a la sección actualizar cotización</h2>
 
         <div className="invoice-container">
           <div className="invoice-card">

@@ -18,18 +18,25 @@ const Dashboard = () => {
   const [cargando, setCargando] = useState(true);
   const navigate = useNavigate();
 
+  const emailUsuario = localStorage.getItem('email');
+
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
-  const cerrarSesion = () => {
-    localStorage.removeItem('token');
-    sessionStorage.clear();
+  //el cerrar sesion no me permita volver para atras 
+const cerrarSesion = () => {
+  localStorage.clear();
+  sessionStorage.clear();
 
-    navigate('/iniciarsesion', { replace: true });
+  navigate('/iniciarsesion', { replace: true });
 
-    window.location.reload();
+  window.history.pushState(null, '', '/iniciarsesion');
+  window.onpopstate = () => {
+    window.history.go(1);
   };
+};
+
 
   const formatearFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
@@ -107,7 +114,9 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
           <li><Link to="/"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -115,10 +124,11 @@ const Dashboard = () => {
           <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
+
         <ul>
           <li className="Cerrarsesion">
             <button
@@ -129,6 +139,7 @@ const Dashboard = () => {
             </button>
           </li>
         </ul>
+
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -136,7 +147,9 @@ const Dashboard = () => {
 
       <div className="dashboard-content">
         <h2>Bienvenido al sistema de gestión de electricidad</h2>
+
         <div className="widgets">
+          {/* Próximas citas */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faCalendar} /> Próximas citas</h3>
             <ul className="lista-personalizada">
@@ -154,6 +167,7 @@ const Dashboard = () => {
             </ul>
           </div>
 
+          {/* Servicios pendientes */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faClipboard} /> Servicios pendientes</h3>
             <ul className="lista-personalizada">

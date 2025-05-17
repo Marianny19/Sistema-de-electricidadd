@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome, faUsers, faUser, faCalendar,
@@ -12,6 +12,11 @@ const Factura = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [facturas, setFacturas] = useState([]);
   const [busqueda, setBusqueda] = useState('');
+    const navigate = useNavigate();
+
+      const emailUsuario = localStorage.getItem('email');
+
+  
 
   useEffect(() => {
     async function cargarFacturas() {
@@ -28,8 +33,17 @@ const Factura = () => {
   }, []);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+const cerrarSesion = () => {
+  localStorage.clear();
+  sessionStorage.clear();
 
+  navigate('/iniciarsesion', { replace: true });
+
+  window.history.pushState(null, '', '/iniciarsesion');
+  window.onpopstate = () => {
+    window.history.go(1);
+  };
+};
   const handleBusqueda = (e) => {
     setBusqueda(e.target.value);
   };
@@ -41,7 +55,9 @@ const Factura = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+                <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -53,13 +69,18 @@ const Factura = () => {
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
-        <ul>
-          <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
-              <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </a>
-          </li>
-        </ul>
+       
+               <ul>
+                 <li className="Cerrarsesion">
+                   <button
+                     onClick={cerrarSesion}
+                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+                   >
+                     <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
+                   </button>
+                 </li>
+               </ul>
+       
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -78,7 +99,7 @@ const Factura = () => {
                 id="buscar-factura"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar facturas"
+                placeholder="Buscar por id"
                 value={busqueda}
                 onChange={handleBusqueda}
               />
@@ -89,7 +110,7 @@ const Factura = () => {
               <caption>Lista de facturas</caption>
               <thead>
                 <tr>
-                  <th>Codigo</th>
+                  <th>Código</th>
                   <th>Solicitud</th>
                   <th>Pago</th>
                   <th>Fecha</th>

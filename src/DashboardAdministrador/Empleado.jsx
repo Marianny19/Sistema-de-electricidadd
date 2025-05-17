@@ -6,12 +6,15 @@ import {
   faSignOut, faUser, faUsers, faSearch, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const Empleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [empleados, setEmpleados] = useState([]);
   const [busquedaId, setBusquedaId] = useState('');
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     async function cargarEmpleados() {
@@ -49,9 +52,22 @@ const Empleado = () => {
     }
   };
 
-  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+  const emailUsuario = localStorage.getItem('email');
 
+
+  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+
+    navigate('/iniciarsesion', { replace: true });
+
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
+  };
   const handleBusquedaChange = (e) => {
     setBusquedaId(e.target.value);
   };
@@ -64,7 +80,9 @@ const Empleado = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -72,17 +90,18 @@ const Empleado = () => {
           <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
-              <Link to = "/iniciarsesion">
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-              </Link>
-            </a>
+            </button>
           </li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
@@ -104,7 +123,7 @@ const Empleado = () => {
                 id="buscar-empleado"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar por ID y nombre"
+                placeholder="Buscar por id y nombre"
                 value={busquedaId}
                 onChange={handleBusquedaChange}
               />
@@ -115,17 +134,17 @@ const Empleado = () => {
               <caption>Lista de empleados</caption>
               <thead>
                 <tr>
-                  <th>Codigo</th>
+                  <th>Código</th>
                   <th>Nombre</th>
                   <th>Apellido</th>
-                  <th>Cedula</th>
+                  <th>Cédula</th>
                   <th>Teléfono</th>
                   <th>Email</th>
                   <th>Cargo</th>
                   <th>Salario</th>
                   <th>Fecha ingreso</th>
                   <th>Fecha nacimiento</th>
-                  <th>Direccion</th>
+                  <th>Dirección</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>

@@ -2,30 +2,24 @@ import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCalendar, faChevronLeft, faFileInvoice, faFileInvoiceDollar,
-  faHome, faMoneyCheck, faSignOut, faUser, faUsers, faFileText, faTasks
+  faCalendar, faChevronLeft, faFileText, faSignOut,
+  faUsers, faHome, faClipboard
 } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
-const Crearsolicitud = () => {
+const Solicitudservicioc = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
-
   const emailUsuario = localStorage.getItem('email');
-
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => {
     localStorage.clear();
     sessionStorage.clear();
-
     navigate('/iniciarsesion', { replace: true });
-
     window.history.pushState(null, '', '/iniciarsesion');
-    window.onpopstate = () => {
-      window.history.go(1);
-    };
+    window.onpopstate = () => window.history.go(1);
   };
 
   return (
@@ -33,24 +27,16 @@ const Crearsolicitud = () => {
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido</h2>
         <p className="subtexto-email">{emailUsuario}</p>
-
         <ul>
-          <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-          <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
-          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
-          <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
+          <li><Link to="/dashboardcliente"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/clienteregistro"><FontAwesomeIcon icon={faUsers} /> <span>Cliente</span></Link></li>
+          <li><Link to="/solicitudservicioc"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
+          <li><Link to="/citaregistro"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
+          <li><Link to="/notasregistro"><FontAwesomeIcon icon={faClipboard} /> <span>Notas</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
-            <button
-              onClick={cerrarSesion}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
-            >
+            <button onClick={cerrarSesion} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}>
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
             </button>
           </li>
@@ -61,17 +47,17 @@ const Crearsolicitud = () => {
       </div>
 
       <div className="dashboard-content">
-        <Link to="/solicitudservicio" className="boton-retroceso" aria-label="Volver">
+        <Link to="/dashboardcliente" className="boton-retroceso" aria-label="Volver">
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
         <h2>Bienvenido a la sección de Solicitud</h2>
-        <FormRegistroTrabajo />
+        <FormRegistroSolicitud />
       </div>
     </div>
   );
 };
 
-const FormRegistroTrabajo = () => {
+const FormRegistroSolicitud = () => {
   const [formulario, setFormulario] = useState({
     id_cliente: '',
     servicios: [],
@@ -80,6 +66,7 @@ const FormRegistroTrabajo = () => {
     fecha: new Date().toISOString().split('T')[0],
     estado: 'pendiente'
   });
+
   const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
@@ -115,8 +102,7 @@ const FormRegistroTrabajo = () => {
 
     const estadosValidos = ['pendiente', 'realizado', 'atrasado', 'cancelado'];
     const { id_cliente, servicios, direccion, via_comunicacion, fecha, estado } = formulario;
-
-    const estadoFinal = estado && estadosValidos.includes(estado) ? estado : 'pendiente';
+    const estadoFinal = estadosValidos.includes(estado) ? estado : 'pendiente';
 
     if (!id_cliente || servicios.length === 0 || !direccion || !fecha) {
       alert('Todos los campos son obligatorios.');
@@ -127,15 +113,12 @@ const FormRegistroTrabajo = () => {
       const respuesta = await fetch('http://localhost:8081/solicitudservicio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formulario,
-          estado: estadoFinal
-        })
+        body: JSON.stringify({ ...formulario, estado: estadoFinal })
       });
 
       if (respuesta.ok) {
         alert('Solicitud registrada correctamente');
-        navigate('/solicitudservicio');
+        navigate('/solicitudservicioc');
         setFormulario({
           id_cliente: '',
           servicios: [],
@@ -222,6 +205,7 @@ const FormRegistroTrabajo = () => {
           value={formulario.fecha}
           onChange={handleChange}
         />
+
         <select
           name="estado"
           className="campo-cita"
@@ -234,10 +218,11 @@ const FormRegistroTrabajo = () => {
           <option value="atrasado">Atrasado</option>
           <option value="cancelado">Cancelado</option>
         </select>
+
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>
   );
 };
 
-export default Crearsolicitud;
+export default Solicitudservicioc;

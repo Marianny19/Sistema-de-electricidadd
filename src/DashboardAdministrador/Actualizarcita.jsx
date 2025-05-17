@@ -6,19 +6,34 @@ import {
   faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const Actualizarcita = () => {
-  const { id } = useParams(); // Aquí obtenemos el id de la URL
+  const { id } = useParams(); 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+  const navigate = useNavigate();
 
+  const emailUsuario = localStorage.getItem('email');
+
+  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+
+    navigate('/iniciarsesion', { replace: true });
+
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
+  };
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
           <li><Link to="/Dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -26,15 +41,18 @@ const Actualizarcita = () => {
           <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
           <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
           <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </a>
+            </button>
           </li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
@@ -47,7 +65,7 @@ const Actualizarcita = () => {
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
         <h2>Bienvenido a la sección de actualizar cita</h2>
-        <FormularioActualizarCita /> 
+        <FormularioActualizarCita />
       </div>
     </div>
   );
@@ -84,28 +102,28 @@ function FormularioActualizarCita() {
       .then(data => setServiciosLista(data))
       .catch(err => console.error('Error cargando servicios:', err));
 
- +
-    fetch(`http://localhost:8081/citas/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data) {
-        setFormulario({
-        id_cliente: data.id_cliente,
-        id_empleado: data.id_empleado,
-        servicios: data.servicios.map(s => s.id_servicio), 
-        fecha: data.fecha,
-        hora: data.hora,
-        estado: data.estado
-      });
+    +
+      fetch(`http://localhost:8081/citas/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data) {
+            setFormulario({
+              id_cliente: data.id_cliente,
+              id_empleado: data.id_empleado,
+              servicios: data.servicios.map(s => s.id_servicio),
+              fecha: data.fecha,
+              hora: data.hora,
+              estado: data.estado
+            });
 
-        } else {
-          alert("Cita no encontrada");
-        }
-      })
-      .catch(error => {
-        console.error('Error al cargar cita:', error);
-        alert('No se pudo cargar la información de la cita');
-      });
+          } else {
+            alert("Cita no encontrada");
+          }
+        })
+        .catch(error => {
+          console.error('Error al cargar cita:', error);
+          alert('No se pudo cargar la información de la cita');
+        });
   }, [id]);
 
   const handleChange = (e) => {

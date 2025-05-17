@@ -1404,3 +1404,9 @@ button.cancel {
   }
 }
 
+.subtexto-email {
+  font-size: 0.9rem;
+  color: #bbb;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}

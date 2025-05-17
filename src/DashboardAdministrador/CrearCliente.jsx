@@ -10,17 +10,30 @@ import "../index.css";
 
 const CrearCliente = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  const emailUsuario = localStorage.getItem('email');
+
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => {
-    console.log("Cerrar sesión");
-    // Aquí podrías agregar lógica de cierre de sesión real
+    localStorage.clear();
+    sessionStorage.clear();
+
+    navigate('/iniciarsesion', { replace: true });
+
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
   };
 
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -33,8 +46,11 @@ const CrearCliente = () => {
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
         <ul>
-          <li className="cerrar-sesion">
-            <button onClick={cerrarSesion} className="boton-cerrar-sesion">
+          <li className="Cerrarsesion">
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
             </button>
           </li>
@@ -86,7 +102,7 @@ function FormularioCliente() {
 
       if (respuesta.ok) {
         alert('Cliente registrado correctamente');
-        navigate('/clienteempleado'); 
+        navigate('/clienteempleado');
         setFormulario({
           nombre: '',
           apellido: '',

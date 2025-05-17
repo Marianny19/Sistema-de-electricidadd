@@ -9,25 +9,38 @@ import {
   faTasks,
   faFileInvoice,
   faFileInvoiceDollar,
-  faMoneyCheck
+  faMoneyCheck,
+  faChevronLeft,
+  faSignOutAlt
 } from '@fortawesome/free-solid-svg-icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import "../index.css";
 
 const Actualizarregistrotrabajo = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const emailUsuario = localStorage.getItem('email');
+
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/iniciarsesion', { replace: true });
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => window.history.go(1);
+  };
 
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
-           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
+          <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
           <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
@@ -37,13 +50,24 @@ const Actualizarregistrotrabajo = () => {
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
+
+        <ul>
+          <li className="Cerrarsesion">
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
+              <FontAwesomeIcon icon={faSignOutAlt} /> <span>Cerrar sesión</span>
+            </button>
+          </li>
+        </ul>
       </div>
 
       <div className="dashboard-content">
         <Link to="/registrotrabajo" className="boton-retroceso" aria-label="Volver">
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
-        <h2>Actualizar registro de trabajo</h2>
+        <h2>Bienvenidos a actualizar registro de trabajo</h2>
         <FormRegistroTrabajo />
       </div>
     </div>
@@ -186,15 +210,17 @@ const FormRegistroTrabajo = () => {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        <input
-          type="number"
-          name="id_solicitud_servicio"
-          placeholder="Solicitud"
-          className="campo-cita"
-          value={formulario.id_solicitud_servicio}
-          onChange={handleChange}
-        />
-        
+        <div className="campo-cita">
+          <label>Solicitud de Servicio:</label>
+          <Select
+            options={opcionesSolicitudes}
+            value={valorSolicitud}
+            onChange={handleSolicitudChange}
+            placeholder="Seleccionar solicitud"
+            isClearable
+          />
+        </div>
+
         <div className="campo-cita">
           <label>Empleado:</label>
           <Select
