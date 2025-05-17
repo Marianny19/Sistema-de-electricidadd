@@ -31,7 +31,6 @@ const Registrotrabajo = () => {
         const response = await fetch("http://localhost:8081/registrotrabajo");
         if (!response.ok) throw new Error("Error en la solicitud");
         const data = await response.json();
-        console.log("Respuesta del backend registros:", data);
         setRegistros(data);
       } catch (error) {
         alert("Error al cargar registros de trabajo");
@@ -41,6 +40,30 @@ const Registrotrabajo = () => {
     cargarRegistros();
   }, []);
 
+  const desactivarRegistro = async (id) => {
+    const confirmar = window.confirm("¿Estás seguro de que deseas marcar este registro como inactivo?");
+    if (!confirmar) return;
+
+    try {
+      const respuesta = await fetch(`http://localhost:8081/registrotrabajo/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (respuesta.ok) {
+        alert("Registro marcado como inactivo correctamente");
+        setRegistros(prev =>
+          prev.map(r =>
+            r.id_registro_trabajo === id ? { ...r, estado: 'inactivo' } : r
+          )
+        );
+      } else {
+        alert("Error al marcar registro como inactivo");
+      }
+    } catch (error) {
+      console.error("Error al desactivar registro:", error);
+      alert("Error de red al marcar registro como inactivo");
+    }
+  };
 
   const registrosFiltrados = registros.filter(r =>
     r.id_solicitud_servicio.toString().includes(filtro.toLowerCase()) ||
@@ -112,13 +135,14 @@ const Registrotrabajo = () => {
                   <th>Servicios</th>
                   <th>Costo extra</th>
                   <th>Fecha</th>
+                  <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {registrosFiltrados.length === 0 ? (
                   <tr>
-                    <td colSpan="7">No hay registros disponibles.</td>
+                    <td colSpan="8">No hay registros disponibles.</td>
                   </tr>
                 ) : (
                   registrosFiltrados.map((registro) => (
@@ -133,11 +157,18 @@ const Registrotrabajo = () => {
                       </td>
                       <td>${registro.costo_extra}</td>
                       <td>{new Date(registro.fecha).toLocaleDateString()}</td>
+                      <td>{registro.estado}</td>
                       <td data-label="Acciones">
                         <Link to={`/actualizarregistrotrabajo/${registro.id_registro_trabajo}`}>
                           <button className="Actualizar">Actualizar</button>
                         </Link>
-
+                        <button
+                          className="Eliminar"
+                          onClick={() => desactivarRegistro(registro.id_registro_trabajo)}
+                          disabled={registro.estado !== 'activo'}
+                        >
+                          Eliminar
+                        </button>
                       </td>
                     </tr>
                   ))

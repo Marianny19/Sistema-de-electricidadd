@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link,useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome, faUsers, faUser, faCalendar,
@@ -12,11 +12,9 @@ const Factura = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [facturas, setFacturas] = useState([]);
   const [busqueda, setBusqueda] = useState('');
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-      const emailUsuario = localStorage.getItem('email');
-
-  
+  const emailUsuario = localStorage.getItem('email');
 
   useEffect(() => {
     async function cargarFacturas() {
@@ -33,19 +31,40 @@ const Factura = () => {
   }, []);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-const cerrarSesion = () => {
-  localStorage.clear();
-  sessionStorage.clear();
 
-  navigate('/iniciarsesion', { replace: true });
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
 
-  window.history.pushState(null, '', '/iniciarsesion');
-  window.onpopstate = () => {
-    window.history.go(1);
+    navigate('/iniciarsesion', { replace: true });
+
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
   };
-};
+
   const handleBusqueda = (e) => {
     setBusqueda(e.target.value);
+  };
+
+  const eliminarFactura = async (id) => {
+    if (!window.confirm("¿Estás seguro de que quieres eliminar esta factura?")) return;
+
+    try {
+      const response = await fetch(`http://localhost:8081/facturas/${id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setFacturas(facturas.filter(factura => factura.id !== id));
+        alert('Factura eliminada correctamente');
+      } else {
+        alert('Error al eliminar la factura');
+      }
+    } catch (error) {
+      console.error('Error eliminando factura:', error);
+      alert('Error al eliminar la factura');
+    }
   };
 
   const facturasFiltradas = facturas.filter(f =>
@@ -56,7 +75,7 @@ const cerrarSesion = () => {
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido</h2>
-                <p className="subtexto-email">{emailUsuario}</p>
+        <p className="subtexto-email">{emailUsuario}</p>
 
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
@@ -69,18 +88,18 @@ const cerrarSesion = () => {
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
-       
-               <ul>
-                 <li className="Cerrarsesion">
-                   <button
-                     onClick={cerrarSesion}
-                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
-                   >
-                     <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-                   </button>
-                 </li>
-               </ul>
-       
+
+        <ul>
+          <li className="Cerrarsesion">
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
+              <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
+            </button>
+          </li>
+        </ul>
+
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -138,11 +157,11 @@ const cerrarSesion = () => {
                       <td>{factura.descripcion || 'N/A'}</td>
                       <td>{factura.estado}</td>
                       <td>
-                          <button
-                        className="Eliminar"
-                        onClick={() => eliminarPago(pago.id_pago)}>
-                        Eliminar
-                      </button>
+                        <button
+                          className="Eliminar"
+                          onClick={() => eliminarFactura(factura.id)}>
+                          Eliminar
+                        </button>
                       </td>
                     </tr>
                   ))

@@ -8,7 +8,7 @@ const Nota = conexion.define('Nota', {
     autoIncrement: true,
     allowNull: false,
   },
-  id_cita: {
+  id_cliente: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
@@ -20,6 +20,10 @@ const Nota = conexion.define('Nota', {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  estado: {
+    type: DataTypes.ENUM('activo','inactivo'),
+    allowNull: false,
+  }
 }, {
   tableName: 'nota',
   timestamps: false,

@@ -86,6 +86,9 @@ Servicio.belongsToMany(Registrotrabajo, {
   as: 'RegistrosTrabajo'  
 });
 
+Nota.belongsTo(Cliente, { foreignKey: 'id_cliente' });
+Cliente.hasMany(Nota, { foreignKey: 'id_cliente' });
+
 
 const app = express();
 const port = 8081;
@@ -236,23 +239,46 @@ app.delete('/empleados/:id', async (req, res) => {
 
 app.get('/notas', async (req, res) => {
   try {
-    const Notas = await Nota.findAll();
-    res.json(Notas);
+    const notas = await Nota.findAll({
+      include: {
+        model: Cliente,
+        attributes: ['nombre'] 
+      }
+    });
+    res.json(notas);
   } catch (error) {
     console.error('Error al obtener notas:', error);
     res.status(500).json({ error: 'Error al obtener notas' });
   }
 });
 
+
 app.post('/notas', async (req, res) => {
   try {
-    const nuevaNota = await Nota.create(req.body);
+    const { id_cliente, comentario, fecha_creacion, estado } = req.body;
+
+    if (!id_cliente) {
+      return res.status(400).json({ error: 'El id_cliente es obligatorio' });
+    }
+    if (!comentario || !fecha_creacion || !estado) {
+      return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    }
+
+    // Crear la nota en la base
+    const nuevaNota = await Nota.create({
+      id_cliente,
+      comentario,
+      fecha_creacion,
+      estado,
+    });
+
     res.status(201).json(nuevaNota);
   } catch (error) {
-    console.error('Error al registrar nota:', error);
-    res.status(500).json({ error: 'Error al registar nota' });  
+    console.error('Error al crear nota:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
+
 
 
 app.get('/citas', async (req, res) => {
@@ -852,6 +878,28 @@ app.put('/registrotrabajo/:id', async (req, res) => {
   }
 });
 
+app.delete('/registrotrabajo/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const registro = await Registrotrabajo.findOne({ where: { id_registro_trabajo: id } });
+
+    if (!registro) {
+      return res.status(404).json({ error: 'Registro de trabajo no encontrado' });
+    }
+
+    // Actualiza solo el estado a 'inactivo', NO elimina el registro
+    await registro.update({ estado: 'inactivo' });
+
+    res.json({ mensaje: 'Registro marcado como inactivo correctamente', registro });
+  } catch (error) {
+    console.error('Error al marcar registro como inactivo:', error);
+    res.status(500).json({ error: 'Error al procesar la solicitud' });
+  }
+});
+
+
+
 
 //GET PAGO
 app.get('/pagos', async (req, res) => {
@@ -895,21 +943,27 @@ app.get('/pagos/:id', async (req, res) => {
 
 
 
-// Actualizar pago
-app.put('/pagos/:id', async (req, res) => {
+//Eliminar pago
+app.delete('/pagos/:id', async (req, res) => {
   const { id } = req.params;
+
   try {
-    const pago = await Pago.findOne({ where: { id_pago: id } });  
+    const pago = await Pago.findOne({ where: { id_pago: id } });
+
     if (!pago) {
-      return res.status(404).json({ error: 'Pago no encontrado' });  
+      return res.status(404).json({ error: 'Pago no encontrado' });
     }
-    await pago.update(req.body);
-    res.json({ mensaje: 'Pago actualizado correctamente', pago });  
+
+    await pago.update({ estado: 'inactivo' });
+
+    res.json({ mensaje: 'Pago marcado como inactivo correctamente', pago });
   } catch (error) {
-    console.error('Error al actualizar pago:', error);
-    res.status(500).json({ error: 'Error al actualizar pago' });
+    console.error('Error al marcar pago como inactivo:', error);
+    res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 });
+
+
 
 app.get('/facturas', async (req, res) => {
   try {
