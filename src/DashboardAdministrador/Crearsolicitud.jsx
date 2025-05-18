@@ -78,6 +78,7 @@ const FormRegistroTrabajo = () => {
     direccion: '',
     via_comunicacion: '',
     fecha: new Date().toISOString().split('T')[0],
+    hora: '',
     estado: 'pendiente'
   });
   const navigate = useNavigate();
@@ -142,6 +143,7 @@ const FormRegistroTrabajo = () => {
           direccion: '',
           via_comunicacion: '',
           fecha: new Date().toISOString().split('T')[0],
+          hora: '',
           estado: 'pendiente'
         });
       } else {
@@ -222,6 +224,15 @@ const FormRegistroTrabajo = () => {
           value={formulario.fecha}
           onChange={handleChange}
         />
+
+        <input
+              type="time"
+              name="hora"
+              className="campo-cita"
+              value={formulario.hora}
+              onChange={handleChange}
+            />
+            
         <select
           name="estado"
           className="campo-cita"

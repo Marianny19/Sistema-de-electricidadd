@@ -147,6 +147,7 @@ const Solicitudservicio = () => {
                   <th>Dirección</th>
                   <th>Vía comunicación</th>
                   <th>Fecha</th>
+                  <th>Hora</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
@@ -169,6 +170,7 @@ const Solicitudservicio = () => {
                       <td data-label="Dirección">{solicitud.direccion}</td>
                       <td data-label="Vía de Comunicación">{solicitud.via_comunicacion}</td>
                       <td data-label="Fecha">{solicitud.fecha}</td>
+                      <td data-label="Hora">{solicitud.hora}</td>
                       <td data-label="Estado">{solicitud.estado}</td>
                       <td data-label="Acciones">
                         <Link to={`/actualizarsolicitud/${solicitud.id_solicitud}`}>

@@ -280,7 +280,6 @@ app.post('/notas', async (req, res) => {
 });
 
 
-
 app.get('/citas', async (req, res) => {
   try {
     const citas = await Cita.findAll({
@@ -325,7 +324,7 @@ app.get('/citas', async (req, res) => {
 // POST /citas
 app.post('/citas', async (req, res) => {
   try {
-    const { id_cliente, id_empleado, fecha, hora, servicios } = req.body; 
+    const { id_cliente, id_empleado, id_solicitud, fecha, hora, servicios } = req.body; 
 
     const citaExistente = await Cita.findOne({
       where: { id_empleado, fecha, hora }
@@ -340,6 +339,7 @@ app.post('/citas', async (req, res) => {
     const citaNueva = await Cita.create({
       id_cliente,
       id_empleado,
+      id_solicitud,
       fecha,
       hora,
       estado: 'agendada'
@@ -458,6 +458,7 @@ app.get('/citas/:id', async (req, res) => {
       id_cita: cita.id_cita,
       id_cliente: cita.id_cliente,
       id_empleado: cita.id_empleado,
+      id_solicitud: cita.id_solicitud,
       fecha: cita.fecha,
       hora: cita.hora,
       estado: cita.estado,
@@ -552,6 +553,7 @@ app.get('/solicitudservicio', async (req, res) => {
       direccion: s.direccion,
       via_comunicacion: s.via_comunicacion,
       fecha: s.fecha,
+      hora: s.hora,
       estado: s.estado
     }));
 
@@ -585,6 +587,7 @@ app.get('/solicitudservicio/:id', async (req, res) => {
       direccion: solicitud.direccion,
       via_comunicacion: solicitud.via_comunicacion,
       fecha: solicitud.fecha,
+      hora: solicitud.hora,
       estado: solicitud.estado,
       servicios: solicitud.Servicios.map(s => ({
         id_servicio: s.id_servicio,
@@ -600,7 +603,7 @@ app.get('/solicitudservicio/:id', async (req, res) => {
 
 app.post('/solicitudservicio', async (req, res) => {
   try {
-    const { id_cliente, direccion, via_comunicacion, fecha, estado, servicios } = req.body;
+    const { id_cliente, direccion, via_comunicacion, fecha, hora, estado, servicios } = req.body;
 
     if (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id))) {
       return res.status(400).json({ error: 'La lista de servicios debe ser un arreglo de IDs numéricos válidos' });
@@ -619,6 +622,7 @@ app.post('/solicitudservicio', async (req, res) => {
       direccion,
       via_comunicacion,
       fecha,
+      hora,
       estado
     });
 
@@ -634,7 +638,7 @@ app.post('/solicitudservicio', async (req, res) => {
 app.put('/solicitudservicio/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { id_cliente, direccion, via_comunicacion, fecha, estado, servicios } = req.body;
+    const { id_cliente, direccion, via_comunicacion, fecha, hora, estado, servicios } = req.body;
 
 
     if (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id))) {
@@ -659,6 +663,7 @@ app.put('/solicitudservicio/:id', async (req, res) => {
       direccion,
       via_comunicacion,
       fecha,
+      hora,
       estado
     });
     await solicitud.setServicios(servicios);

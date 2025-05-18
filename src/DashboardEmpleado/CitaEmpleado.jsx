@@ -107,6 +107,7 @@ const CitaEmpelado = () => {
                   <th>Código</th>
                   <th>Cliente</th>
                   <th>Empleado</th>
+                  <th>Solicitud</th>
                   <th>Servicio</th>
                   <th>Fecha</th>
                   <th>Hora</th>
@@ -122,6 +123,8 @@ const CitaEmpelado = () => {
                       <td data-label="Id cita">{cita.id_cita}</td>
                       <td data-label="Cliente">{cita.nombre_cliente}</td>
                       <td data-label="Empleado">{cita.nombre_empleado}</td>
+                      <td data-label="Solicitud">{cita.id_solicitud}</td>
+
                       <td data-label="Servicio">
                         {cita.servicios ? cita.servicios : 'No hay servicios'}
                       </td>

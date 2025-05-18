@@ -123,6 +123,7 @@ const RegistrarServicioEmpleado = () => {
                   <th>Dirección</th>
                   <th>Vía comunicación</th>
                   <th>Fecha</th>
+                  <th>Hora</th>
                   <th>Estado</th>
                 </tr>
               </thead>
@@ -144,6 +145,7 @@ const RegistrarServicioEmpleado = () => {
                       <td data-label="Dirección">{solicitud.direccion}</td>
                       <td data-label="Vía de Comunicación">{solicitud.via_comunicacion}</td>
                       <td data-label="Fecha">{solicitud.fecha}</td>
+                      <td data-label="Hora">{solicitud.hora}</td>
                       <td data-label="Estado">{solicitud.estado}</td>
                     </tr>
                   ))

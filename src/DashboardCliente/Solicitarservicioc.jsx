@@ -64,6 +64,7 @@ const FormRegistroSolicitud = () => {
     direccion: '',
     via_comunicacion: '',
     fecha: new Date().toISOString().split('T')[0],
+    hora: '',
     estado: 'pendiente'
   });
 
@@ -125,6 +126,7 @@ const FormRegistroSolicitud = () => {
           direccion: '',
           via_comunicacion: '',
           fecha: new Date().toISOString().split('T')[0],
+          hora: '',
           estado: 'pendiente'
         });
       } else {
@@ -203,6 +205,14 @@ const FormRegistroSolicitud = () => {
           name="fecha"
           className="campo-cita"
           value={formulario.fecha}
+          onChange={handleChange}
+        />
+
+          <input
+          type="time"
+          name="hora"
+          className="campo-cita"
+          value={formulario.hora}
           onChange={handleChange}
         />
 

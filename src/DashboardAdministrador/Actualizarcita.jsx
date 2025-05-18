@@ -10,7 +10,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const Actualizarcita = () => {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
 
@@ -79,6 +79,7 @@ function FormularioActualizarCita() {
   const [formulario, setFormulario] = useState({
     id_cliente: '',
     id_empleado: '',
+    id_solicitud: '',
     servicios: [],
     fecha: '',
     hora: '',
@@ -110,6 +111,7 @@ function FormularioActualizarCita() {
             setFormulario({
               id_cliente: data.id_cliente,
               id_empleado: data.id_empleado,
+              id_solicitud: data.id_solicitud,
               servicios: data.servicios.map(s => s.id_servicio),
               fecha: data.fecha,
               hora: data.hora,
@@ -175,6 +177,9 @@ function FormularioActualizarCita() {
             <option key={empleado.id_empleado} value={empleado.id_empleado}>{empleado.nombre}</option>
           ))}
         </select>
+
+        <input type="number" name="solicitud" placeholder='Solicitud' className="campo-cita" value={formulario.id_solicitud} onChange={handleChange} required />
+
 
         <div className="campo-cita">
           <label>Servicios:</label>

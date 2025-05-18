@@ -239,6 +239,14 @@ function Editarsolicitud() {
               onChange={handleChange}
             />
 
+             <input
+              type="time"
+              name="hora"
+              className="campo-cita"
+              value={formulario.hora}
+              onChange={handleChange}
+            />
+
             <select
               name="estado"
               className="campo-cita"

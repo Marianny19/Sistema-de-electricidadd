@@ -16,6 +16,10 @@ const Cita = conexion.define('Cita', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  id_solicitud: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   fecha: {
     type: DataTypes.DATE,
     allowNull: false,

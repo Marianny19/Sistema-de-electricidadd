@@ -78,6 +78,7 @@ function Crearcitas() {
   const [formulario, setFormulario] = useState({
     id_cliente: '',
     id_empleado: '',
+    id_solicitud: '',
     servicios: [],
     fecha: '',
     hora: '',
@@ -138,7 +139,7 @@ function Crearcitas() {
 
   const handleSubmit = async (e) => {
   e.preventDefault();
-  const { id_cliente, id_empleado, servicios, fecha, hora, estado } = formulario;
+  const { id_cliente, id_empleado, id_solicitud, servicios, fecha, hora, estado } = formulario;
 
   if (!id_cliente || !id_empleado || servicios.length === 0 || !fecha || !hora || !estado) {
     alert('Por favor completa todos los campos.');
@@ -162,6 +163,7 @@ function Crearcitas() {
       setFormulario({
         id_cliente: '',
         id_empleado: '',
+        id_solicitud: '',
         servicios: [],
         fecha: '',
         hora: '',
@@ -208,6 +210,17 @@ function Crearcitas() {
             <option key={empleado.id_empleado} value={empleado.id_empleado}>{empleado.nombre}</option>
           ))}
         </select>
+
+         <input
+          type="number"
+          name="id_solicitud"
+          placeholder='Solicitud'
+          className="campo-cita"
+          value={formulario.id_solicitud}
+          onChange={handleChange}
+          required
+          min={new Date().toISOString().split('T')[0]}
+        />
 
         <div className="campo-cita">
           <label>Servicios:</label>
