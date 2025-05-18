@@ -6,7 +6,7 @@ import {
   faFileInvoiceDollar, faHome, faMoneyCheck, faSignOut,
   faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 import { Chart } from "chart.js/auto";
 
@@ -17,15 +17,25 @@ const Dashboardempleado = () => {
   const [pendientes, setPendientes] = useState([]);
   const [atrasados, setAtrasados] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const navigate = useNavigate();
+
+  const emailUsuario = localStorage.getItem('email');
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
   const cerrarSesion = () => {
-    console.log("Cerrar sesión");
-  };
+    localStorage.clear();
+    sessionStorage.clear();
 
+    navigate('/iniciarsesion', { replace: true });
+
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
+  };
   const formatearFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
     return fecha.toLocaleDateString('es-ES', {
@@ -58,67 +68,72 @@ const Dashboardempleado = () => {
   }, []);
 
   useEffect(() => {
-  const graficoExistente = Chart.getChart("graficoTareas");
-  if (graficoExistente) {
-    graficoExistente.destroy(); // Evita duplicados al actualizar
-  }
+    const graficoExistente = Chart.getChart("graficoTareas");
+    if (graficoExistente) {
+      graficoExistente.destroy();
+    }
 
-  const ctx = document.getElementById("graficoTareas")?.getContext("2d");
-  if (!ctx) return;
+    const ctx = document.getElementById("graficoTareas")?.getContext("2d");
+    if (!ctx) return;
 
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Completados", "Pendientes", "Atrasados"],
-      datasets: [
-        {
-          label: "Cantidad",
-          data: [
-            15, 
-            pendientes.length,
-            atrasados.length
-          ],
-          borderWidth: 1
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false }
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Completados", "Pendientes", "Atrasados"],
+        datasets: [
+          {
+            label: "Cantidad",
+            data: [
+              15,
+              pendientes.length,
+              atrasados.length
+            ],
+            borderWidth: 1
+          }
+        ]
       },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 1
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
           }
         }
       }
-    }
-  });
-}, [pendientes, atrasados]);
+    });
+  }, [pendientes, atrasados]);
 
 
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
-         <ul>
-                 <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
-                        <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-                        <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
-                        <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
-                        <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
-                        <li><Link to="/cotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
-                        <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-                        <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
-               </ul>
-               <ul>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
+          <ul>
+          <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+          <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+          <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
+          <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
+          <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
+          <li><Link to="/vercotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
+          <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+          <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
+        </ul>
+        <ul>
           <li className="Cerrarsesion">
-            <Link to="/iniciarsesion" onClick={cerrarSesion}>
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </Link>
+            </button>
           </li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
@@ -129,7 +144,6 @@ const Dashboardempleado = () => {
       <div className="dashboard-content">
         <h2>Bienvenido al sistema de gestión de electricidad</h2>
         <div className="widgets">
-          {/* Próximas citas */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faCalendar} /> Próximas citas</h3>
             <ul className="lista-personalizada">
@@ -147,7 +161,6 @@ const Dashboardempleado = () => {
             </ul>
           </div>
 
-          {/* Servicios pendientes */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faClipboard} /> Servicios pendientes</h3>
             <ul className="lista-personalizada">
@@ -165,7 +178,6 @@ const Dashboardempleado = () => {
             </ul>
           </div>
 
-          {/* Servicios atrasados */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faClipboard} /> Servicios atrasados</h3>
             <ul className="lista-personalizada">
@@ -182,10 +194,10 @@ const Dashboardempleado = () => {
               )}
             </ul>
           </div>
-         <div className="widget tarjeta grafico-tarjeta">
-  <h3>Estadísticas de servicios</h3>
-  <canvas id="graficoTareas" className="grafico-canvas"></canvas>
-</div>
+          <div className="widget tarjeta grafico-tarjeta">
+            <h3>Estadísticas de servicios</h3>
+            <canvas id="graficoTareas" className="grafico-canvas"></canvas>
+          </div>
 
         </div>
       </div>

@@ -5,13 +5,15 @@ import {
   faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
   faSignOut, faUser, faUsers, faSearch, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const Pago = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [pagos, setPagos] = useState([]);
   const [busquedaPagoId, setBusquedaPagoId] = useState('');
+  const navigate = useNavigate();
+  const emailUsuario = localStorage.getItem('email');
 
   useEffect(() => {
     async function cargarPagos() {
@@ -27,8 +29,8 @@ const Pago = () => {
     cargarPagos();
   }, []);
 
-  const eliminarPago = async (id) => {
-    const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este pago?");
+  const desactivarPago = async (id) => {
+    const confirmar = window.confirm("¿Estás seguro de que deseas desactivar este pago?");
     if (!confirmar) return;
 
     try {
@@ -37,24 +39,38 @@ const Pago = () => {
       });
 
       if (respuesta.ok) {
-        setPagos(prevPagos => prevPagos.filter(p => p.id_pago !== id));
-        alert("Pago eliminado correctamente");
+        setPagos(prevPagos =>
+          prevPagos.map(p =>
+            p.id_pago === id ? { ...p, estado: 'inactivo' } : p
+          )
+        );
+        alert("Pago marcado como inactivo");
       } else {
-        alert("Error al eliminar pago");
+        alert("Error al desactivar pago");
       }
     } catch (error) {
-      console.error('Error al eliminar pago:', error);
-      alert("Error de red al eliminar pago");
+      console.error('Error al desactivar pago:', error);
+      alert("Error de red al desactivar pago");
     }
   };
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/iniciarsesion', { replace: true });
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
+  };
 
   const handleBusquedaPago = (e) => {
     setBusquedaPagoId(e.target.value);
   };
 
+  // Aquí quitamos el filtro por estado para mostrar todos los pagos
   const pagosFiltrados = pagos.filter(p =>
     p.id_pago.toString().includes(busquedaPagoId.toLowerCase())
   );
@@ -62,7 +78,8 @@ const Pago = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -76,9 +93,12 @@ const Pago = () => {
         </ul>
         <ul>
           <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </a>
+            </button>
           </li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
@@ -100,7 +120,7 @@ const Pago = () => {
                 id="buscar-pago"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar pago por ID"
+                placeholder="Buscar por id"
                 value={busquedaPagoId}
                 onChange={handleBusquedaPago}
               />
@@ -111,7 +131,7 @@ const Pago = () => {
               <caption>Lista de pagos</caption>
               <thead>
                 <tr>
-                  <th>ID Pago</th>
+                  <th>Código</th>
                   <th>Monto</th>
                   <th>Fecha</th>
                   <th>Método</th>
@@ -133,7 +153,8 @@ const Pago = () => {
                       </Link>
                       <button
                         className="Eliminar"
-                        onClick={() => eliminarPago(pago.id_pago)}>
+                        disabled={pago.estado === 'inactivo'}
+                        onClick={() => desactivarPago(pago.id_pago)}>
                         Eliminar
                       </button>
                     </td>

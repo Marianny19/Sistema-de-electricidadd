@@ -24,6 +24,10 @@ const Solicitudservicio = conexion.define('Solicitudservicio', {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  hora: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
   estado: {
     type: DataTypes.ENUM('Pendiente', 'Realizado', 'Atrasado', 'Cancelado'),
     allowNull: false,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome, faUsers, faUser, faCalendar,
@@ -8,12 +8,15 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import "../index.css";
 
-const cerrarSesion = () => alert('Sesión cerrada');
+
 
 const PagoEmpleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [pagos, setPagos] = useState([]);
   const [busquedaId, setBusquedaId] = useState('');
+  const navigate = useNavigate();
+
+  const emailUsuario = localStorage.getItem('email');
 
   useEffect(() => {
     async function cargarPagos() {
@@ -32,6 +35,17 @@ const PagoEmpleado = () => {
   const handleToggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+
+    navigate('/iniciarsesion', { replace: true });
+
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
+  };
 
   const handleBusquedaCambio = (e) => {
     setBusquedaId(e.target.value);
@@ -44,22 +58,27 @@ const PagoEmpleado = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
           <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
           <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
           <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
           <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
-          <li><Link to="/cotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotizacion</span></Link></li>
+          <li><Link to="/vercotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
           <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
         </ul>
         <ul>
           <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
+            <button
+              onClick={cerrarSesion}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+            >
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </a>
+            </button>
           </li>
         </ul>
         <button className="toggle-btn" onClick={handleToggleSidebar}>
@@ -83,7 +102,7 @@ const PagoEmpleado = () => {
                 id="buscar-pago"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar pago por ID"
+                placeholder="Buscar por id"
                 value={busquedaId}
                 onChange={handleBusquedaCambio}
               />

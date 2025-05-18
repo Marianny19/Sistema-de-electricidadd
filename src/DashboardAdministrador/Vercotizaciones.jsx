@@ -5,13 +5,17 @@ import {
   faTasks, faFileInvoice, faFileInvoiceDollar, faMoneyCheck,
   faSignOut, faSearch
 } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const Vercotizaciones = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [cotizaciones, setCotizaciones] = useState([]);
   const [busqueda, setBusqueda] = useState('');
+    const navigate = useNavigate();
+  
+      const emailUsuario = localStorage.getItem('email');
+
 
   useEffect(() => {
     async function cargarCotizaciones() {
@@ -49,7 +53,17 @@ const Vercotizaciones = () => {
   };
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-  const cerrarSesion = () => console.log("Cerrar sesión");
+const cerrarSesion = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+
+  navigate('/iniciarsesion', { replace: true });
+
+  window.history.pushState(null, '', '/iniciarsesion');
+  window.onpopstate = () => {
+    window.history.go(1);
+  };
+};
 
   const handleBusquedaChange = (e) => {
     setBusqueda(e.target.value);
@@ -63,7 +77,9 @@ const Vercotizaciones = () => {
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido usuario</h2>
+        <h2>Bienvenido</h2>
+                <p className="subtexto-email">{emailUsuario}</p>
+
         <ul>
           <li><Link to="/dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -75,15 +91,16 @@ const Vercotizaciones = () => {
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
-        <ul>
-          <li className="Cerrarsesion">
-            <a href="#" onClick={cerrarSesion}>
-              <Link to="/iniciarsesion">
-                <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-              </Link>
-            </a>
-          </li>
-        </ul>
+       <ul>
+               <li className="Cerrarsesion">
+                 <button
+                   onClick={cerrarSesion}
+                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+                 >
+                   <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
+                 </button>
+               </li>
+             </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -102,7 +119,7 @@ const Vercotizaciones = () => {
               <input
                 className="Buscar"
                 type="search"
-                placeholder="Buscar por ID o estado"
+                placeholder="Buscar por id o estado"
                 value={busqueda}
                 onChange={handleBusquedaChange}
               />
@@ -113,7 +130,7 @@ const Vercotizaciones = () => {
               <caption>Lista de cotizaciones</caption>
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>Código</th>
                   <th>Cliente</th>
                   <th>Fecha</th>
                   <th>Servicios</th>

@@ -17,8 +17,10 @@ const { Op } = require('sequelize');
 const Cotizacion = require('./models/Cotizacion');
 const DetalleCotizacion = require('./models/DetalleCotizacion');
 const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
-const { Op } = require('sequelize');
 
+
+Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
+Cita.belongsTo(Cliente, { foreignKey: 'id_cliente' });
 
 Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
 Cita.belongsTo(Cliente, { foreignKey: 'id_cliente' });
@@ -83,6 +85,9 @@ Servicio.belongsToMany(Registrotrabajo, {
   otherKey: 'id_registro_trabajo',
   as: 'RegistrosTrabajo'  
 });
+
+Nota.belongsTo(Cliente, { foreignKey: 'id_cliente' });
+Cliente.hasMany(Nota, { foreignKey: 'id_cliente' });
 
 
 const app = express();
@@ -234,21 +239,43 @@ app.delete('/empleados/:id', async (req, res) => {
 
 app.get('/notas', async (req, res) => {
   try {
-    const Notas = await Nota.findAll();
-    res.json(Notas);
+    const notas = await Nota.findAll({
+      include: {
+        model: Cliente,
+        attributes: ['nombre'] 
+      }
+    });
+    res.json(notas);
   } catch (error) {
     console.error('Error al obtener notas:', error);
     res.status(500).json({ error: 'Error al obtener notas' });
   }
 });
 
+
 app.post('/notas', async (req, res) => {
   try {
-    const nuevaNota = await Nota.create(req.body);
+    const { id_cliente, comentario, fecha_creacion, estado } = req.body;
+
+    if (!id_cliente) {
+      return res.status(400).json({ error: 'El id_cliente es obligatorio' });
+    }
+    if (!comentario || !fecha_creacion || !estado) {
+      return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    }
+
+    // Crear la nota en la base
+    const nuevaNota = await Nota.create({
+      id_cliente,
+      comentario,
+      fecha_creacion,
+      estado,
+    });
+
     res.status(201).json(nuevaNota);
   } catch (error) {
-    console.error('Error al registrar nota:', error);
-    res.status(500).json({ error: 'Error al registar nota' });  
+    console.error('Error al crear nota:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -297,7 +324,7 @@ app.get('/citas', async (req, res) => {
 // POST /citas
 app.post('/citas', async (req, res) => {
   try {
-    const { id_cliente, id_empleado, fecha, hora, servicios } = req.body; 
+    const { id_cliente, id_empleado, id_solicitud, fecha, hora, servicios } = req.body; 
 
     const citaExistente = await Cita.findOne({
       where: { id_empleado, fecha, hora }
@@ -312,6 +339,7 @@ app.post('/citas', async (req, res) => {
     const citaNueva = await Cita.create({
       id_cliente,
       id_empleado,
+      id_solicitud,
       fecha,
       hora,
       estado: 'agendada'
@@ -430,6 +458,7 @@ app.get('/citas/:id', async (req, res) => {
       id_cita: cita.id_cita,
       id_cliente: cita.id_cliente,
       id_empleado: cita.id_empleado,
+      id_solicitud: cita.id_solicitud,
       fecha: cita.fecha,
       hora: cita.hora,
       estado: cita.estado,
@@ -524,6 +553,7 @@ app.get('/solicitudservicio', async (req, res) => {
       direccion: s.direccion,
       via_comunicacion: s.via_comunicacion,
       fecha: s.fecha,
+      hora: s.hora,
       estado: s.estado
     }));
 
@@ -557,6 +587,7 @@ app.get('/solicitudservicio/:id', async (req, res) => {
       direccion: solicitud.direccion,
       via_comunicacion: solicitud.via_comunicacion,
       fecha: solicitud.fecha,
+      hora: solicitud.hora,
       estado: solicitud.estado,
       servicios: solicitud.Servicios.map(s => ({
         id_servicio: s.id_servicio,
@@ -572,7 +603,7 @@ app.get('/solicitudservicio/:id', async (req, res) => {
 
 app.post('/solicitudservicio', async (req, res) => {
   try {
-    const { id_cliente, direccion, via_comunicacion, fecha, estado, servicios } = req.body;
+    const { id_cliente, direccion, via_comunicacion, fecha, hora, estado, servicios } = req.body;
 
     if (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id))) {
       return res.status(400).json({ error: 'La lista de servicios debe ser un arreglo de IDs numéricos válidos' });
@@ -591,6 +622,7 @@ app.post('/solicitudservicio', async (req, res) => {
       direccion,
       via_comunicacion,
       fecha,
+      hora,
       estado
     });
 
@@ -606,7 +638,7 @@ app.post('/solicitudservicio', async (req, res) => {
 app.put('/solicitudservicio/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { id_cliente, direccion, via_comunicacion, fecha, estado, servicios } = req.body;
+    const { id_cliente, direccion, via_comunicacion, fecha, hora, estado, servicios } = req.body;
 
 
     if (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id))) {
@@ -631,6 +663,7 @@ app.put('/solicitudservicio/:id', async (req, res) => {
       direccion,
       via_comunicacion,
       fecha,
+      hora,
       estado
     });
     await solicitud.setServicios(servicios);
@@ -850,6 +883,40 @@ app.put('/registrotrabajo/:id', async (req, res) => {
   }
 });
 
+app.delete('/registrotrabajo/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const registro = await Registrotrabajo.findOne({ where: { id_registro_trabajo: id } });
+
+    if (!registro) {
+      return res.status(404).json({ error: 'Registro de trabajo no encontrado' });
+    }
+
+    // Actualiza solo el estado a 'inactivo', NO elimina el registro
+    await registro.update({ estado: 'inactivo' });
+
+    res.json({ mensaje: 'Registro marcado como inactivo correctamente', registro });
+  } catch (error) {
+    console.error('Error al marcar registro como inactivo:', error);
+    res.status(500).json({ error: 'Error al procesar la solicitud' });
+  }
+});
+
+
+
+
+//GET PAGO
+app.get('/pagos', async (req, res) => {
+  try {
+    const pagos = await Pago.findAll();
+    res.status(200).json(pagos);
+  } catch (error) {
+    console.error('Error al obtener pagos:', error);
+    res.status(500).json({ error: 'Error al obtener los pagos' });
+  }
+});
+
 
  
 // Ruta POST para crear un nuevo pago
@@ -881,21 +948,27 @@ app.get('/pagos/:id', async (req, res) => {
 
 
 
-// Actualizar pago
-app.put('/pagos/:id', async (req, res) => {
+//Eliminar pago
+app.delete('/pagos/:id', async (req, res) => {
   const { id } = req.params;
+
   try {
-    const pago = await Pago.findOne({ where: { id_pago: id } });  
+    const pago = await Pago.findOne({ where: { id_pago: id } });
+
     if (!pago) {
-      return res.status(404).json({ error: 'Pago no encontrado' });  
+      return res.status(404).json({ error: 'Pago no encontrado' });
     }
-    await pago.update(req.body);
-    res.json({ mensaje: 'Pago actualizado correctamente', pago });  
+
+    await pago.update({ estado: 'inactivo' });
+
+    res.json({ mensaje: 'Pago marcado como inactivo correctamente', pago });
   } catch (error) {
-    console.error('Error al actualizar pago:', error);
-    res.status(500).json({ error: 'Error al actualizar pago' });
+    console.error('Error al marcar pago como inactivo:', error);
+    res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 });
+
+
 
 app.get('/facturas', async (req, res) => {
   try {
