@@ -3,11 +3,6 @@ const conexion = require('../database');
 
 
 const DetalleCita = conexion.define('DetalleCita', {
-    id_detallecita: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
     id_cita: {
       type: DataTypes.INTEGER,
       allowNull: false,

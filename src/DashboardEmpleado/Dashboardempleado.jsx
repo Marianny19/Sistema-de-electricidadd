@@ -10,7 +10,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
 import { Chart } from "chart.js/auto";
 
-
 const Dashboardempleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [citas, setCitas] = useState([]);
@@ -28,14 +27,37 @@ const Dashboardempleado = () => {
   const cerrarSesion = () => {
     localStorage.clear();
     sessionStorage.clear();
-
     navigate('/iniciarsesion', { replace: true });
-
     window.history.pushState(null, '', '/iniciarsesion');
     window.onpopstate = () => {
       window.history.go(1);
     };
   };
+
+  const formatearFechaHora = (fechaISO, hora) => {
+    const [horaStr, minutosStr] = hora.split(':');
+    const fecha = new Date(fechaISO);
+    fecha.setHours(parseInt(horaStr), parseInt(minutosStr), 0, 0);
+
+    const opcionesFecha = {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    };
+
+    const opcionesHora = {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    };
+
+    const fechaFormateada = fecha.toLocaleDateString('es-ES', opcionesFecha);
+    const horaFormateada = fecha.toLocaleTimeString('es-ES', opcionesHora);
+
+    return `${fechaFormateada} – ${horaFormateada}`;
+  };
+
   const formatearFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
     return fecha.toLocaleDateString('es-ES', {
@@ -109,14 +131,13 @@ const Dashboardempleado = () => {
     });
   }, [pendientes, atrasados]);
 
-
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido</h2>
         <p className="subtexto-email">{emailUsuario}</p>
 
-          <ul>
+        <ul>
           <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
           <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
           <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
@@ -126,6 +147,7 @@ const Dashboardempleado = () => {
           <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
         </ul>
+
         <ul>
           <li className="Cerrarsesion">
             <button
@@ -136,6 +158,7 @@ const Dashboardempleado = () => {
             </button>
           </li>
         </ul>
+
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -154,7 +177,7 @@ const Dashboardempleado = () => {
               ) : (
                 citas.map((cita) => (
                   <li key={cita.id_cita}>
-                    <strong>{formatearFecha(cita.fecha)}</strong> a las <strong>{cita.hora}</strong> – Estado: <em>{cita.estado}</em>
+                    {formatearFechaHora(cita.fecha, cita.hora)} – Estado: <em>{cita.estado}</em>
                   </li>
                 ))
               )}
@@ -194,11 +217,11 @@ const Dashboardempleado = () => {
               )}
             </ul>
           </div>
+
           <div className="widget tarjeta grafico-tarjeta">
             <h3>Estadísticas de servicios</h3>
             <canvas id="graficoTareas" className="grafico-canvas"></canvas>
           </div>
-
         </div>
       </div>
     </div>

@@ -4,11 +4,7 @@ const Solicitudservicio = require('./solicitudservicio');
 const Servicio = require('./Servicio');
 
 const DetalleSolicitudServicio = conexion.define('DetalleSolicitudServicio', {
-  id_detalle_solicitud: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
+
   id_solicitud: {
     type: DataTypes.INTEGER,
     allowNull: false,
