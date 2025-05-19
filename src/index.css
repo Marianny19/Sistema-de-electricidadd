@@ -1166,6 +1166,17 @@ button.cancel {
   margin-bottom: 0px;
   margin-left: 10px;
 }
+.Imprimir  {
+  padding: 10px;
+  width: 70px;
+  background-color: #040293;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  margin-bottom: 0px;
+  margin-left: 10px;
+} 
 
 .logo-dashboard {
   display: flex;
@@ -1303,11 +1314,14 @@ button.cancel {
   }
 
   .Actualizar,
-  .Eliminar {
+  .Eliminar,
+  .Imprimir
+   {
     width: 100%;
     margin-left: 0;
     margin-top: 5px;
   }
+  
 
   .logo-dashboard img {
     height: 100px;
