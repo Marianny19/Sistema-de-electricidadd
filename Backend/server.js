@@ -360,7 +360,7 @@ app.post('/citas', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Error interno del servidor' });
+    return res.status(500).json({ error: 'La fecha y la hora que seleccionaste no estan disponibles, intenta con otra' });
   }
 });
 
@@ -504,8 +504,8 @@ app.get('/validar-fecha', async (req, res) => {
     });
 
     const todasLasHoras = [
-      '08:00:00', '10:00:00', '01:00:00', '03:00:00',
-      '06:00:00',
+      '08:00:00', '10:00:00', '13:00:00', '15:00:00',
+      '18:00:00',
     ];
 
     const horasOcupadas = citas.map(cita => cita.hora);
@@ -893,7 +893,6 @@ app.delete('/registrotrabajo/:id', async (req, res) => {
       return res.status(404).json({ error: 'Registro de trabajo no encontrado' });
     }
 
-    // Actualiza solo el estado a 'inactivo', NO elimina el registro
     await registro.update({ estado: 'inactivo' });
 
     res.json({ mensaje: 'Registro marcado como inactivo correctamente', registro });
@@ -1097,15 +1096,21 @@ app.get('/cliente', async (req, res) => {
 
 app.get('/proximas-citas', async (req, res) => {
   try {
+    // Obtener la fecha de hoy a las 00:00 (hora local)
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // resetea a medianoche local
+
     const citas = await Cita.findAll({
       where: {
         fecha: {
-          [Op.gte]: new Date() 
+          [Op.gte]: hoy // compara solo contra la fecha de hoy local
         }
       },
       order: [['fecha', 'ASC']],
-      limit: 5
+      // Puedes dejar o quitar el limit según necesites
+      // limit: 5
     });
+
     res.json(citas);
   } catch (error) {
     console.error('Error al obtener próximas citas:', error);
@@ -1113,12 +1118,18 @@ app.get('/proximas-citas', async (req, res) => {
   }
 });
 
+
+
 app.get('/servicios-pendientes', async (req, res) => {
   try {
     const servicios = await Solicitudservicio.findAll({
       where: { estado: 'pendiente' },
-      include: [Cliente]
+      include: [Cliente],
+      order: [['fecha', 'ASC']]
     });
+
+    console.log('Servicios pendientes fechas:', servicios.map(s => s.fecha));
+
     res.json(servicios);
   } catch (error) {
     console.error('Error al obtener servicios pendientes:', error);
@@ -1136,7 +1147,8 @@ app.get('/servicios-atrasados', async (req, res) => {
           [Op.lt]: hoy
         }
       },
-      include: [Cliente]
+      include: [Cliente],
+      order: [['fecha', 'ASC']]
     });
     res.json(servicios);
   } catch (error) {

@@ -14,14 +14,12 @@ const Crearsolicitud = () => {
 
   const emailUsuario = localStorage.getItem('email');
 
-
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+
   const cerrarSesion = () => {
     localStorage.clear();
     sessionStorage.clear();
-
     navigate('/iniciarsesion', { replace: true });
-
     window.history.pushState(null, '', '/iniciarsesion');
     window.onpopstate = () => {
       window.history.go(1);
@@ -45,6 +43,7 @@ const Crearsolicitud = () => {
           <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
           <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
         </ul>
+
         <ul>
           <li className="Cerrarsesion">
             <button
@@ -55,6 +54,7 @@ const Crearsolicitud = () => {
             </button>
           </li>
         </ul>
+
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -77,10 +77,11 @@ const FormRegistroTrabajo = () => {
     servicios: [],
     direccion: '',
     via_comunicacion: '',
-    fecha: new Date().toISOString().split('T')[0],
+    fecha: '',
     hora: '',
     estado: 'pendiente'
   });
+  const [errorValidacion, setErrorValidacion] = useState('');
   const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
@@ -97,63 +98,92 @@ const FormRegistroTrabajo = () => {
       .catch(err => console.error('Error cargando servicios:', err));
   }, []);
 
+  // Manejo campos generales
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormulario({ ...formulario, [name]: value });
+    setFormulario(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleServiciosChange = (selectedOptions) => {
-    const idsSeleccionados = selectedOptions.map(op => op.value);
-    setFormulario({ ...formulario, servicios: idsSeleccionados });
-  };
-
+  // Manejo cliente select
   const handleClienteChange = (selectedOption) => {
-    setFormulario({ ...formulario, id_cliente: selectedOption ? selectedOption.value : '' });
+    setFormulario(prev => ({
+      ...prev,
+      id_cliente: selectedOption ? selectedOption.value : ''
+    }));
+  };
+
+  // Manejo servicios múltiples
+  const handleServiciosChange = (selectedOptions) => {
+    setFormulario(prev => ({
+      ...prev,
+      servicios: selectedOptions ? selectedOptions.map(option => option.value) : []
+    }));
+  };
+
+  const validarFormulario = () => {
+    if (!formulario.id_cliente) {
+      setErrorValidacion('Debe seleccionar un cliente');
+      return false;
+    }
+    if (formulario.servicios.length === 0) {
+      setErrorValidacion('Debe seleccionar al menos un servicio');
+      return false;
+    }
+    if (!formulario.direccion.trim()) {
+      setErrorValidacion('La dirección es requerida');
+      return false;
+    }
+    if (!formulario.via_comunicacion.trim()) {
+      setErrorValidacion('La vía de comunicación es requerida');
+      return false;
+    }
+    if (!formulario.fecha) {
+      setErrorValidacion('Debe seleccionar una fecha');
+      return false;
+    }
+    if (!formulario.hora) {
+      setErrorValidacion('Debe seleccionar una hora');
+      return false;
+    }
+    if (!formulario.estado) {
+      setErrorValidacion('Debe seleccionar un estado');
+      return false;
+    }
+    setErrorValidacion('');
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const estadosValidos = ['pendiente', 'realizado', 'atrasado', 'cancelado'];
-    const { id_cliente, servicios, direccion, via_comunicacion, fecha, estado } = formulario;
-
-    const estadoFinal = estado && estadosValidos.includes(estado) ? estado : 'pendiente';
-
-    if (!id_cliente || servicios.length === 0 || !direccion || !fecha) {
-      alert('Todos los campos son obligatorios.');
-      return;
-    }
+    if (!validarFormulario()) return;
 
     try {
       const respuesta = await fetch('http://localhost:8081/solicitudservicio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formulario,
-          estado: estadoFinal
-        })
+        body: JSON.stringify(formulario)
       });
 
       if (respuesta.ok) {
         alert('Solicitud registrada correctamente');
-        navigate('/solicitudservicio');
         setFormulario({
           id_cliente: '',
           servicios: [],
           direccion: '',
           via_comunicacion: '',
-          fecha: new Date().toISOString().split('T')[0],
+          fecha: '',
           hora: '',
           estado: 'pendiente'
         });
+        navigate('/solicitudservicio');
       } else {
         const error = await respuesta.json();
         console.error('Error del servidor:', error);
-        alert('Error al registrar solicitud');
+        alert('La fecha y la hora que seleccionaste no estan disponibles, intenta con otra');
       }
     } catch (error) {
       console.error('Error en el registro:', error);
-      alert('Error de red al registrar solicitud');
+      alert('La fecha y la hora que seleccionaste no estan disponibles, intenta con otra');
     }
   };
 
@@ -161,6 +191,7 @@ const FormRegistroTrabajo = () => {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
+
         <div className="campo-cita">
           <label>Cliente:</label>
           <Select
@@ -223,16 +254,23 @@ const FormRegistroTrabajo = () => {
           className="campo-cita"
           value={formulario.fecha}
           onChange={handleChange}
+          min={new Date().toISOString().split('T')[0]}
         />
 
-        <input
-              type="time"
-              name="hora"
-              className="campo-cita"
-              value={formulario.hora}
-              onChange={handleChange}
-            />
-            
+        <select
+          name="hora"
+          className="campo-cita"
+          value={formulario.hora}
+          onChange={handleChange}
+        >
+          <option value="">Seleccione una hora</option>
+          <option value="08:00">08:00</option>
+          <option value="10:00">10:00</option>
+          <option value="13:00">13:00</option>
+          <option value="15:00">15:00</option>
+          <option value="18:00">18:00</option>
+        </select>
+
         <select
           name="estado"
           className="campo-cita"
@@ -245,6 +283,9 @@ const FormRegistroTrabajo = () => {
           <option value="atrasado">Atrasado</option>
           <option value="cancelado">Cancelado</option>
         </select>
+
+        {errorValidacion && <p className="error-validacion">{errorValidacion}</p>}
+
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

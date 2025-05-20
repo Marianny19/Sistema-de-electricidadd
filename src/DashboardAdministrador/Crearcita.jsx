@@ -176,7 +176,7 @@ function Crearcitas() {
     }
   } catch (error) {
     console.error('Error de red:', error);
-    alert('Error de red al registrar cita');
+    alert('La fecha y la hora que seleccionaste no estan disponibles, intenta con otra');
   }
 };
 
@@ -222,21 +222,23 @@ function Crearcitas() {
           min={new Date().toISOString().split('T')[0]}
         />
 
-        <div className="campo-cita">
-          <label>Servicios:</label>
-          <Select
-            isMulti
-            options={serviciosLista.map(servicio => ({
-              value: servicio.id_servicio,
-              label: servicio.nombre_servicio
-            }))}
-            value={serviciosLista
-              .filter(serv => formulario.servicios.includes(serv.id_servicio))
-              .map(serv => ({ value: serv.id_servicio, label: serv.nombre_servicio }))}
-            onChange={handleServiciosChange}
-            placeholder="Selecciona uno o más servicios"
-          />
-        </div>
+    <div className="campo-cita">
+  <label>Servicios:</label>
+  <Select
+    isMulti
+    options={serviciosLista.map(servicio => ({
+      value: servicio.id_servicio,
+      label: servicio.nombre_servicio
+    }))}
+    value={serviciosLista
+      .filter(serv => formulario.servicios.includes(serv.id_servicio))
+      .map(serv => ({ value: serv.id_servicio, label: serv.nombre_servicio }))}
+    onChange={handleServiciosChange}
+    placeholder="Selecciona uno o más servicios"
+    classNamePrefix="custom-select"
+  />
+</div>
+
 
         <input
           type="date"

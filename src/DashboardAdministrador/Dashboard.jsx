@@ -24,26 +24,34 @@ const Dashboard = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
-  //el cerrar sesion no me permita volver para atras 
-const cerrarSesion = () => {
-  localStorage.clear();
-  sessionStorage.clear();
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
 
-  navigate('/iniciarsesion', { replace: true });
+    navigate('/iniciarsesion', { replace: true });
 
-  window.history.pushState(null, '', '/iniciarsesion');
-  window.onpopstate = () => {
-    window.history.go(1);
+    window.history.pushState(null, '', '/iniciarsesion');
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
   };
-};
-
 
   const formatearFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
-    return fecha.toLocaleDateString('es-ES', {
+    const fechaLocal = new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000);
+    return fechaLocal.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
+    });
+  };
+
+  const formatearHora = (fechaISO) => {
+    const fecha = new Date(fechaISO);
+    const fechaLocal = new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000);
+    return fechaLocal.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -149,7 +157,6 @@ const cerrarSesion = () => {
         <h2>Bienvenido al sistema de gestión de electricidad</h2>
 
         <div className="widgets">
-          {/* Próximas citas */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faCalendar} /> Próximas citas</h3>
             <ul className="lista-personalizada">
@@ -160,14 +167,13 @@ const cerrarSesion = () => {
               ) : (
                 citas.map((cita) => (
                   <li key={cita.id_cita}>
-                    <strong>{formatearFecha(cita.fecha)}</strong> a las <strong>{cita.hora}</strong> – Estado: <em>{cita.estado}</em>
+                    <strong>{formatearFecha(cita.fecha)}</strong> a las <strong>{formatearHora(cita.fecha)}</strong> – Estado: <em>{cita.estado}</em>
                   </li>
                 ))
               )}
             </ul>
           </div>
 
-          {/* Servicios pendientes */}
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faClipboard} /> Servicios pendientes</h3>
             <ul className="lista-personalizada">
