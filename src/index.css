@@ -330,32 +330,21 @@ h1 {
   padding: 20px 10px;
 }
 
-.sidebar h2, .sidebar ul li a span {
-  transition: opacity 0.3s, width 0.3s;
-  opacity: 1;
-  width: auto;
-}
-
-.sidebar.collapsed h2, .sidebar.collapsed ul li a span {
+.sidebar.collapsed h2,
+.sidebar.collapsed ul li a span {
   opacity: 0;
   width: 0;
   overflow: hidden;
 }
 
+
+
 .sidebar.collapsed ul li a {
-  text-align: center;
+  justify-content: center;
+  display: flex;
+  align-items: center;
   padding: 10px 0;
-}
-
-.sidebar.collapsed ul li a i {
-  transition: opacity 0.3s;
-  margin-right: 0;
-}
-
-.sidebar.collapsed .Cerrarsesion {
-  width: 60px;
-  text-align: center;
-  padding: 10px 0;
+  gap: 0; 
 }
 
 .sidebar h2 {
@@ -391,6 +380,7 @@ h1 {
 .sidebar ul li a:hover {
   background-color: #040293;
 }
+
 
 /* RESPONSIVE: LOGO, IDENTIFICACION, SIDEBAR */
 @media (max-width: 768px) {
