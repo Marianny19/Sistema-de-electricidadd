@@ -4,12 +4,7 @@ const Registrotrabajo = require('./registrotrabajo');
 const Servicio = require('./Servicio');
 
 const Detalleregistrotrabajo = conexion.define('Detalleregistrotrabajo', {
-  id_detalleregistro: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  id_registro_trabajo: {
+    id_registro_trabajo: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
