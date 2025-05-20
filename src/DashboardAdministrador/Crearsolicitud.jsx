@@ -12,6 +12,7 @@ const Crearsolicitud = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
 
+
   const emailUsuario = localStorage.getItem('email');
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
@@ -86,25 +87,27 @@ const FormRegistroTrabajo = () => {
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
 
-  useEffect(() => {
-    fetch('http://localhost:8081/clientes')
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(err => console.error('Error cargando clientes:', err));
+useEffect(() => {
+  fetch('http://localhost:8081/clientes')
+    .then(res => res.json())
+    .then(data => {
+      const clientesActivos = data.filter(cliente => cliente.estado === 'activo');
+      setClientes(clientesActivos);
+    })
+    .catch(err => console.error('Error cargando clientes:', err));
 
-    fetch('http://localhost:8081/servicios')
-      .then(res => res.json())
-      .then(data => setServiciosLista(data))
-      .catch(err => console.error('Error cargando servicios:', err));
-  }, []);
+  fetch('http://localhost:8081/servicios')
+    .then(res => res.json())
+    .then(data => setServiciosLista(data))
+    .catch(err => console.error('Error cargando servicios:', err));
+}, []);
 
-  // Manejo campos generales
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormulario(prev => ({ ...prev, [name]: value }));
   };
 
-  // Manejo cliente select
   const handleClienteChange = (selectedOption) => {
     setFormulario(prev => ({
       ...prev,
@@ -112,7 +115,6 @@ const FormRegistroTrabajo = () => {
     }));
   };
 
-  // Manejo servicios múltiples
   const handleServiciosChange = (selectedOptions) => {
     setFormulario(prev => ({
       ...prev,
@@ -270,20 +272,6 @@ const FormRegistroTrabajo = () => {
           <option value="15:00">15:00</option>
           <option value="18:00">18:00</option>
         </select>
-
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-        >
-          <option value="">Estado</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="realizado">Realizado</option>
-          <option value="atrasado">Atrasado</option>
-          <option value="cancelado">Cancelado</option>
-        </select>
-
         {errorValidacion && <p className="error-validacion">{errorValidacion}</p>}
 
         <button type="submit" className="boton-cita">REGISTRAR</button>

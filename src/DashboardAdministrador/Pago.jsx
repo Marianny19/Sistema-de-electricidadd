@@ -70,7 +70,6 @@ const Pago = () => {
     setBusquedaPagoId(e.target.value);
   };
 
-  // Aquí quitamos el filtro por estado para mostrar todos los pagos
   const pagosFiltrados = pagos.filter(p =>
     p.id_pago.toString().includes(busquedaPagoId.toLowerCase())
   );
@@ -132,10 +131,13 @@ const Pago = () => {
               <thead>
                 <tr>
                   <th>Código</th>
+                  <th>Solicitud</th>
+                  <th>Factura</th>
                   <th>Monto</th>
                   <th>Fecha</th>
                   <th>Método</th>
                   <th>Estado</th>
+                  <th>Descripción</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -143,10 +145,14 @@ const Pago = () => {
                 {pagosFiltrados.map((pago) => (
                   <tr key={pago.id_pago}>
                     <td>{pago.id_pago}</td>
+                    <td>{pago.id_solicitud}</td>
+                    <td>{pago.factura_id}</td>
                     <td>{pago.monto}</td>
                     <td>{pago.fecha_pago}</td>
                     <td>{pago.metodo_pago}</td>
                     <td>{pago.estado}</td>
+                    <td>{pago.descripcion}</td>
+
                     <td>
                       <Link to={`/actualizarpago/${pago.id_pago}`}>
                         <button className="Actualizar">Actualizar</button>

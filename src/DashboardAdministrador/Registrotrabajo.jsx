@@ -139,41 +139,42 @@ const Registrotrabajo = () => {
                   <th>Acciones</th>
                 </tr>
               </thead>
-              <tbody>
-                {registrosFiltrados.length === 0 ? (
-                  <tr>
-                    <td colSpan="8">No hay registros disponibles.</td>
-                  </tr>
-                ) : (
-                  registrosFiltrados.map((registro) => (
-                    <tr key={registro.id_registro_trabajo || registro.id}>
-                      <td>{registro.id_registro_trabajo || registro.id}</td>
-                      <td>{registro.id_solicitud_servicio}</td>
-                      <td>{registro.id_empleado}</td>
-                      <td>
-                        {registro.servicios && Array.isArray(registro.servicios)
-                          ? registro.servicios.map(s => s.nombre_servicio).join(", ")
-                          : "Sin servicios"}
-                      </td>
-                      <td>${registro.costo_extra}</td>
-                      <td>{new Date(registro.fecha).toLocaleDateString()}</td>
-                      <td>{registro.estado}</td>
-                      <td data-label="Acciones">
-                        <Link to={`/actualizarregistrotrabajo/${registro.id_registro_trabajo}`}>
-                          <button className="Actualizar">Actualizar</button>
-                        </Link>
-                        <button
-                          className="Eliminar"
-                          onClick={() => desactivarRegistro(registro.id_registro_trabajo)}
-                          disabled={registro.estado !== 'activo'}
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
+             <tbody>
+  {registrosFiltrados.length === 0 ? (
+    <tr>
+      <td colSpan="8">No hay registros disponibles.</td>
+    </tr>
+  ) : (
+    registrosFiltrados.map((registro) => (
+      <tr key={registro.id_registro_trabajo || registro.id}>
+        <td>{registro.id_registro_trabajo || registro.id}</td>
+        <td>{registro.id_solicitud_servicio}</td>
+        <td>{registro.empleado ? registro.empleado.nombre : registro.id_empleado}</td> 
+        <td>
+          {registro.servicios && Array.isArray(registro.servicios)
+            ? registro.servicios.map(s => s.nombre_servicio).join(", ")
+            : "Sin servicios"}
+        </td>
+        <td>${registro.costo_extra}</td>
+        <td>{new Date(registro.fecha).toLocaleDateString()}</td>
+        <td>{registro.estado}</td>
+        <td data-label="Acciones">
+          <Link to={`/actualizarregistrotrabajo/${registro.id_registro_trabajo}`}>
+            <button className="Actualizar">Actualizar</button>
+          </Link>
+          <button
+            className="Eliminar"
+            onClick={() => desactivarRegistro(registro.id_registro_trabajo)}
+            disabled={registro.estado !== 'activo'}
+          >
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+
             </table>
           </div>
         </div>

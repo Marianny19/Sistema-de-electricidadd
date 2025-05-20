@@ -130,8 +130,6 @@ const Clienteempleado = () => {
                     <td>{cliente.email}</td>
                     <td>{cliente.direccion}</td>
                     <td>{cliente.estado}</td>
-                    <td>
-                    </td>
                   </tr>
                 ))}
               </tbody>

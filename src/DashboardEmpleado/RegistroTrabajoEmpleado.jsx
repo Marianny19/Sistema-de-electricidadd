@@ -111,7 +111,6 @@ const RegistroTrabajoEmpleado = () => {
                   <th>Servicios</th>
                   <th>Costo extra</th>
                   <th>Fecha</th>
-                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,12 +131,6 @@ const RegistroTrabajoEmpleado = () => {
                       </td>
                       <td>${registro.costo_extra}</td>
                       <td>{new Date(registro.fecha).toLocaleDateString()}</td>
-                      <td data-label="Acciones">
-                        <Link to={`/actualizarregistrotrabajo/${registro.id_registro_trabajo}`}>
-                          <button className="Actualizar">Actualizar</button>
-                        </Link>
-
-                      </td>
                     </tr>
                   ))
                 )}

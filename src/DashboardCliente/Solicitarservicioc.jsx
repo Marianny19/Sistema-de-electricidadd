@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import Select from 'react-select';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Select from 'react-select';
 import {
-  faCalendar, faChevronLeft, faFileText, faSignOut,
-  faUsers, faHome, faClipboard
+  faCalendar, faClipboard, faChevronLeft, faFileText,
+  faHome, faSignOut
 } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
@@ -14,12 +14,15 @@ const Solicitudservicioc = () => {
   const emailUsuario = localStorage.getItem('email');
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+
   const cerrarSesion = () => {
     localStorage.clear();
     sessionStorage.clear();
     navigate('/iniciarsesion', { replace: true });
     window.history.pushState(null, '', '/iniciarsesion');
-    window.onpopstate = () => window.history.go(1);
+    window.onpopstate = () => {
+      window.history.go(1);
+    };
   };
 
   return (
@@ -35,9 +38,9 @@ const Solicitudservicioc = () => {
         </ul>
         <ul>
           <li className="Cerrarsesion">
-            <button onClick={cerrarSesion} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}>
+            <a href="#" onClick={cerrarSesion}>
               <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-            </button>
+            </a>
           </li>
         </ul>
         <button className="toggle-btn" onClick={toggleSidebar}>
@@ -49,33 +52,40 @@ const Solicitudservicioc = () => {
         <Link to="/dashboardcliente" className="boton-retroceso" aria-label="Volver">
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
-        <h2>Bienvenido a la sección de Solicitud</h2>
+        <h2>Bienvenido a la sección de solicitudes de servicio</h2>
         <FormRegistroSolicitud />
       </div>
     </div>
   );
 };
 
-const FormRegistroSolicitud = () => {
-  const [formulario, setFormulario] = useState({
-    id_cliente: '',
-    servicios: [],
-    direccion: '',
-    via_comunicacion: '',
-    fecha: new Date().toISOString().split('T')[0],
-    hora: '',
-    estado: 'pendiente'
-  });
-
-  const navigate = useNavigate();
+function FormRegistroSolicitud() {
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
+  const [formulario, setFormulario] = useState({
+    id_cliente: '',
+    descripcion: '',
+    direccion: '',
+    servicios: []
+  });
 
   useEffect(() => {
+    const emailUsuario = localStorage.getItem('email')?.toLowerCase();
+
     fetch('http://localhost:8081/clientes')
       .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(err => console.error('Error cargando clientes:', err));
+      .then(data => {
+        const clienteActivo = data.find(
+          cliente => cliente.email.toLowerCase() === emailUsuario && cliente.estado === 'activo'
+        );
+        if (clienteActivo) {
+          setClientes([clienteActivo]);
+          setFormulario(f => ({ ...f, id_cliente: clienteActivo.id_cliente }));
+        } else {
+          console.warn('No se encontró cliente activo con ese email');
+        }
+      })
+      .catch(err => console.error('Error al cargar cliente:', err));
 
     fetch('http://localhost:8081/servicios')
       .then(res => res.json())
@@ -84,57 +94,47 @@ const FormRegistroSolicitud = () => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormulario({ ...formulario, [name]: value });
+    setFormulario({
+      ...formulario,
+      [e.target.name]: e.target.value
+    });
   };
 
   const handleServiciosChange = (selectedOptions) => {
-    const idsSeleccionados = selectedOptions.map(op => op.value);
+    const idsSeleccionados = selectedOptions ? selectedOptions.map(op => op.value) : [];
     setFormulario({ ...formulario, servicios: idsSeleccionados });
-  };
-
-  const handleClienteChange = (selectedOption) => {
-    setFormulario({ ...formulario, id_cliente: selectedOption ? selectedOption.value : '' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { id_cliente, descripcion, direccion, servicios } = formulario;
 
-    const estadosValidos = ['pendiente', 'realizado', 'atrasado', 'cancelado'];
-    const { id_cliente, servicios, direccion, via_comunicacion, fecha, estado } = formulario;
-    const estadoFinal = estadosValidos.includes(estado) ? estado : 'pendiente';
-
-    if (!id_cliente || servicios.length === 0 || !direccion || !fecha) {
-      alert('Todos los campos son obligatorios.');
+    if (!id_cliente || !descripcion || !direccion || servicios.length === 0) {
+      alert('Por favor completa todos los campos.');
       return;
     }
 
     try {
-      const respuesta = await fetch('http://localhost:8081/solicitudservicio', {
+      const res = await fetch('http://localhost:8081/solicitudservicio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formulario, estado: estadoFinal })
+        body: JSON.stringify(formulario)
       });
 
-      if (respuesta.ok) {
+      if (res.ok) {
         alert('Solicitud registrada correctamente');
-        navigate('/solicitudservicioc');
         setFormulario({
-          id_cliente: '',
-          servicios: [],
+          id_cliente: clientes[0]?.id_cliente || '',
+          descripcion: '',
           direccion: '',
-          via_comunicacion: '',
-          fecha: new Date().toISOString().split('T')[0],
-          hora: '',
-          estado: 'pendiente'
+          servicios: []
         });
       } else {
-        const error = await respuesta.json();
-        console.error('Error del servidor:', error);
-        alert('Error al registrar solicitud');
+        const error = await res.json();
+        alert(`Error: ${error.error}`);
       }
     } catch (error) {
-      console.error('Error en el registro:', error);
+      console.error('Error de red:', error);
       alert('Error de red al registrar solicitud');
     }
   };
@@ -143,27 +143,15 @@ const FormRegistroSolicitud = () => {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        <div className="campo-cita">
-          <label>Cliente:</label>
-          <Select
-            className="react-select-custom"
-            classNamePrefix="react-select"
-            options={clientes.map(cliente => ({
-              value: cliente.id_cliente,
-              label: cliente.nombre
-            }))}
-            value={
-              clientes
-                .filter(c => c.id_cliente === formulario.id_cliente)
-                .map(c => ({ value: c.id_cliente, label: c.nombre }))[0] || null
-            }
-            onChange={handleClienteChange}
-            placeholder="Buscar cliente por nombre"
-            isClearable
-          />
-        </div>
 
-        <div className="campo-cita">
+        <input
+          type="text"
+          className="campo-cita"
+          value={clientes.length > 0 ? clientes[0].nombre : ''}
+          readOnly
+        />
+
+         <div className="campo-cita">
           <label>Servicios:</label>
           <Select
             isMulti
@@ -207,7 +195,7 @@ const FormRegistroSolicitud = () => {
           onChange={handleChange}
         />
 
-          <input
+        <input
           type="time"
           name="hora"
           className="campo-cita"
@@ -215,23 +203,13 @@ const FormRegistroSolicitud = () => {
           onChange={handleChange}
         />
 
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-        >
-          <option value="">Estado</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="realizado">Realizado</option>
-          <option value="atrasado">Atrasado</option>
-          <option value="cancelado">Cancelado</option>
-        </select>
 
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>
   );
-};
+}
 
 export default Solicitudservicioc;
+
+

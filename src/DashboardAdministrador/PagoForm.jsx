@@ -75,11 +75,13 @@ const PagoForm = () => {
 function Crearcitas() {
   const [formulario, setFormulario] = useState({
     id_solicitud: '',
+    factura_id: '',
     fecha_pago: new Date().toISOString().split('T')[0],
     monto: '',
     hora_pago: new Date().toTimeString().split(' ')[0],
-    metodo_pago: '',
+    metodo_pago: 'efectivo',
     estado: 'activo',
+    descripcion: '',
   });
 
   const handleChange = (e) => {
@@ -103,11 +105,13 @@ function Crearcitas() {
         alert('Pago registrado correctamente');
         setFormulario({
           id_solicitud: '',
+          factura_id: '',
           fecha_pago: new Date().toISOString().split('T')[0],
           monto: '',
           hora_pago: new Date().toTimeString().split(' ')[0],
-          metodo_pago: '',
+          metodo_pago: 'efectivo',
           estado: 'activo',
+          descripcion: '',
         });
       } else {
         alert('Error al registrar el pago');
@@ -128,6 +132,15 @@ function Crearcitas() {
           placeholder="Solicitud"
           className="campo-cita"
           value={formulario.id_solicitud}
+          onChange={handleChange}
+        />
+
+         <input
+          type="number"
+          name="factura_id"
+          placeholder="Factura"
+          className="campo-cita"
+          value={formulario.factura_id}
           onChange={handleChange}
         />
         <input
@@ -161,20 +174,18 @@ function Crearcitas() {
           value={formulario.metodo_pago}
           onChange={handleChange}
         >
-          <option value="">Método de pago</option>
           <option value="efectivo">Efectivo</option>
-          <option value="transferencia">Transferencia</option>
         </select>
-        <select
-          name="estado"
+
+
+        <input
+          type="text"
+          name="descripcion"
+          placeholder="Descripcion"
           className="campo-cita"
-          value={formulario.estado}
+          value={formulario.descripcion}
           onChange={handleChange}
-        >
-          <option value="">Estado</option>
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
+        />
 
         <button type="submit" className="boton-cita">Registrar Pago</button>
       </form>

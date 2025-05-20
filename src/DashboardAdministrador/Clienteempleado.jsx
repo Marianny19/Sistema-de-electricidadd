@@ -18,9 +18,6 @@ const Clienteempleado = () => {
 
   const emailUsuario = localStorage.getItem('email');
 
-
-
-
   useEffect(() => {
     async function cargarClientes() {
       try {

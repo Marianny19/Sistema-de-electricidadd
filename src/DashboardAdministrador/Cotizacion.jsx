@@ -18,6 +18,7 @@ const Cotizacion = () => {
   const [serviciosSeleccionados, setServiciosSeleccionados] = useState({});
   const [clientes, setClientes] = useState([]);
 
+
   const navigate = useNavigate();
   const emailUsuario = localStorage.getItem('email');
 
@@ -27,10 +28,13 @@ const Cotizacion = () => {
       .then(data => setServicios(data))
       .catch(error => console.error('Error al cargar servicios:', error));
 
-    fetch('http://localhost:8081/clientes')
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(error => console.error('Error cargando clientes:', error));
+  fetch('http://localhost:8081/clientes')
+    .then(res => res.json())
+    .then(data => {
+      const clientesActivos = data.filter(cliente => cliente.estado === 'activo');
+      setClientes(clientesActivos);
+    })
+    .catch(err => console.error('Error al cargar clientes:', err));
 
     const hoy = new Date();
     const dia = String(hoy.getDate()).padStart(2, '0');
@@ -41,7 +45,7 @@ const Cotizacion = () => {
     if (!fecha) {
       setFecha(fechaActual);
     }
-  }, []);  
+  }, []);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
@@ -140,8 +144,8 @@ const Cotizacion = () => {
       head: [["Servicio", "Precio"]],
       body: serviciosTabla,
       headStyles: {
-        fillColor: '#040293',  
-        textColor: 255,       
+        fillColor: '#040293',
+        textColor: 255,
         fontStyle: 'bold'
       }
     });
@@ -152,13 +156,13 @@ const Cotizacion = () => {
     doc.text(`Impuesto (18%): $${impuesto.toFixed(2)}`, 14, finalY + 18);
     doc.text(`Total: $${total.toFixed(2)}`, 14, finalY + 26);
 
-    
-doc.setFontSize(12); 
-doc.setFont("helvetica", "bold");
-doc.setTextColor('#040293'); 
 
-doc.text("Gracias por elegirnos", 105, finalY + 40, { align: "center" });
-doc.text("*Estos precios pueden variar dependiendo la complejidad del trabajo*", 105, finalY + 50, { align: "center" });
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor('#040293');
+
+    doc.text("Gracias por elegirnos", 105, finalY + 40, { align: "center" });
+    doc.text("*Estos precios pueden variar dependiendo la complejidad del trabajo*", 105, finalY + 50, { align: "center" });
 
     doc.save(`cotizacion_${clienteSeleccionado ? clienteSeleccionado.nombre : 'cliente'}.pdf`);
   };
@@ -231,15 +235,7 @@ doc.text("*Estos precios pueden variar dependiendo la complejidad del trabajo*",
                 <label>Fecha</label>
                 <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
               </div>
-              <div className="input-group">
-                <label>Estado</label>
-                <select className="campo-cita" value={estado} onChange={(e) => setEstado(e.target.value)}>
-                  <option value="">Selecciona estado</option>
-                  <option value="pendiente">Pendiente</option>
-                  <option value="aceptada">Aceptada</option>
-                  <option value="rechazada">Rechazada</option>
-                </select>
-              </div>
+              
             </div>
 
             <h3>Servicios disponibles</h3>
@@ -283,7 +279,10 @@ doc.text("*Estos precios pueden variar dependiendo la complejidad del trabajo*",
             <div className="button-group">
               <button onClick={handleGuardar} className="save">Guardar</button>
               <button onClick={handleEnviar} className="send">Enviar</button>
-              <button className="cancel">Cancelar</button>
+              <button className="cancel" onClick={() => navigate('/vercotizaciones')}>
+                Cancelar
+              </button>
+
             </div>
           </div>
         </div>

@@ -131,10 +131,6 @@ function FormularioCliente() {
         <input type="text" name="telefono" placeholder="Teléfono" className="campo-cita" value={formulario.telefono} onChange={handleChange} required />
         <input type="email" name="email" placeholder="Email" className="campo-cita" value={formulario.email} onChange={handleChange} required />
         <input type="text" name="direccion" placeholder="Dirección" className="campo-cita" value={formulario.direccion} onChange={handleChange} required />
-        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange} required>
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

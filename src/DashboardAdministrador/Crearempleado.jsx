@@ -146,11 +146,6 @@ function FormularioEmpleado() {
         <input type="date" name="fecha_ingreso" placeholder="Fecha ingreso" className="campo-cita" value={formulario.fecha_ingreso} onChange={handleChange} />
         <input type="date" name="fecha_nacimiento" placeholder="Fecha nacimiento" className="campo-cita" value={formulario.fecha_nacimiento} onChange={handleChange} />
         <input type="text" name="direccion" placeholder="Dirección" className="campo-cita" value={formulario.direccion} onChange={handleChange} />
-        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange}>
-          <option value="">Estado</option>
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
         <button type="submit" className="boton-cita">Registrar empleado</button>
       </form>
     </div>

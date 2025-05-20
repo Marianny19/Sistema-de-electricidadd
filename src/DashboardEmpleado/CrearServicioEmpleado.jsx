@@ -82,17 +82,20 @@ const FormRegistroTrabajo = () => {
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
 
-  useEffect(() => {
-    fetch('http://localhost:8081/clientes')
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(err => console.error('Error cargando clientes:', err));
+ useEffect(() => {
+  fetch('http://localhost:8081/clientes')
+    .then(res => res.json())
+    .then(data => {
+      const clientesActivos = data.filter(cliente => cliente.estado === 'activo');
+      setClientes(clientesActivos);
+    })
+    .catch(err => console.error('Error cargando clientes:', err));
 
-    fetch('http://localhost:8081/servicios')
-      .then(res => res.json())
-      .then(data => setServiciosLista(data))
-      .catch(err => console.error('Error cargando servicios:', err));
-  }, []);
+  fetch('http://localhost:8081/servicios')
+    .then(res => res.json())
+    .then(data => setServiciosLista(data))
+    .catch(err => console.error('Error cargando servicios:', err));
+}, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -228,20 +231,6 @@ const FormRegistroTrabajo = () => {
           value={formulario.fecha}
           onChange={handleChange}
         />
-
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-        >
-          <option value="">Estado</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="realizado">Realizado</option>
-          <option value="atrasado">Atrasado</option>
-          <option value="cancelado">Cancelado</option>
-        </select>
-
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

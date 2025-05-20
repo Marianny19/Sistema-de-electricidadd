@@ -150,16 +150,21 @@ const FormRegistroTrabajo = () => {
   const handleEmpleadoChange = selectedOption => {
     setFormulario(prev => ({ ...prev, id_empleado: selectedOption ? selectedOption.value : null }));
   };
+  const opcionesSolicitudes = solicitudes
+    .filter(sol => sol.id_solicitud_servicio === formulario.id_solicitud_servicio)
+    .map(sol => ({
+      value: sol.id_solicitud_servicio,
+      label: sol.descripcion || `Solicitud #${sol.id_solicitud_servicio}`
+    }));
 
-  const opcionesSolicitudes = solicitudes.map(sol => ({
-    value: sol.id_solicitud_servicio,
-    label: sol.descripcion || `Solicitud #${sol.id_solicitud_servicio}`
-  }));
 
-  const opcionesEmpleados = empleados.map(emp => ({
-    value: emp.id_empleado,
-    label: emp.nombre
-  }));
+  const opcionesEmpleados = empleados
+    .filter(emp => emp.id_empleado === formulario.id_empleado)
+    .map(emp => ({
+      value: emp.id_empleado,
+      label: emp.nombre
+    }));
+
 
   const opcionesServicios = serviciosLista.map(serv => ({
     value: serv.id_servicio,
@@ -211,7 +216,7 @@ const FormRegistroTrabajo = () => {
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
         <div className="campo-cita">
-          <label>Solicitud de Servicio:</label>
+          <label>Solicitud de servicio:</label>
           <Select
             options={opcionesSolicitudes}
             value={valorSolicitud}
@@ -252,6 +257,7 @@ const FormRegistroTrabajo = () => {
           onChange={handleChange}
           step="0.01"
           min="0"
+          required
         />
 
         <input
@@ -260,18 +266,9 @@ const FormRegistroTrabajo = () => {
           className="campo-cita"
           value={formulario.fecha}
           onChange={handleChange}
+          required
         />
 
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-        >
-          <option value="">Estado</option>
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
 
         <button type="submit" className="boton-cita">ACTUALIZAR</button>
       </form>

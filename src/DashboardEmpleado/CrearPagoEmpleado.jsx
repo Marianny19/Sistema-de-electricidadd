@@ -162,17 +162,6 @@ function Crearcitas() {
           <option value="efectivo">Efectivo</option>
           <option value="transferencia">Transferencia</option>
         </select>
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-        >
-          <option value="">Estado</option>
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
-
         <button type="submit" className="boton-cita">Registrar Pago</button>
       </form>
     </div>

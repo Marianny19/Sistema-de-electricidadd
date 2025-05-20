@@ -27,10 +27,13 @@ const Cotizacion = () => {
       .then(data => setServicios(data))
       .catch(error => console.error('Error al cargar servicios:', error));
 
-    fetch('http://localhost:8081/clientes')
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(error => console.error('Error cargando clientes:', error));
+  fetch('http://localhost:8081/clientes')
+    .then(res => res.json())
+    .then(data => {
+      const clientesActivos = data.filter(cliente => cliente.estado === 'activo');
+      setClientes(clientesActivos);
+    })
+    .catch(err => console.error('Error al cargar clientes:', err));
 
     const hoy = new Date();
     const dia = String(hoy.getDate()).padStart(2, '0');
@@ -282,7 +285,7 @@ doc.text("*Estos precios pueden variar dependiendo la complejidad del trabajo*",
             <div className="button-group">
               <button onClick={handleGuardar} className="save">Guardar</button>
               <button onClick={handleEnviar} className="send">Enviar</button>
-              <button className="cancel">Cancelar</button>
+              <button className="cancel" onClick={() => navigate('/vercotizacionempleado')}>Cancelar</button>
             </div>
           </div>
         </div>

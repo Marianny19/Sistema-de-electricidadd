@@ -131,7 +131,7 @@ const Solicitudservicio = () => {
                 id="buscar-empleado"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar por id y nombre"
+                placeholder="Buscar por cliente"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
