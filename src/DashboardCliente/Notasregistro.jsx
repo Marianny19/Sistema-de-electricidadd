@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar, faChevronLeft, faClipboard, faFileText,
-  faHome, faSignOut, faUsers
+  faHome, faSignOut
 } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import "../index.css";
@@ -65,32 +65,44 @@ const Notasregistro = () => {
 
 function FormularioNota() {
   const [formulario, setFormulario] = useState({
-    id_cliente: '', // Guardamos como string para el select
+    id_cliente: '',
     comentario: '',
     fecha_creacion: '',
     estado: 'activo',
   });
 
-  const [clientes, setClientes] = useState([]);
+  const [clienteNombre, setClienteNombre] = useState('');
 
   useEffect(() => {
-    const cargarClientes = async () => {
+    const emailUsuario = localStorage.getItem('email')?.toLowerCase();
+
+    const cargarCliente = async () => {
       try {
         const response = await fetch('http://localhost:8081/clientes');
         const data = await response.json();
-        setClientes(data);
+        const cliente = data.find(
+          c => c.email.toLowerCase() === emailUsuario && c.estado === 'activo'
+        );
+
+        if (cliente) {
+          setFormulario(f => ({ ...f, id_cliente: cliente.id_cliente }));
+          setClienteNombre(cliente.nombre);
+        } else {
+          console.warn('No se encontró cliente activo con ese email.');
+        }
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar cliente:', error);
       }
     };
-    cargarClientes();
+
+    cargarCliente();
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormulario(prev => ({
       ...prev,
-      [name]: value, // Guardamos siempre como string
+      [name]: value,
     }));
   };
 
@@ -104,23 +116,17 @@ function FormularioNota() {
       return;
     }
 
-    // Convertir id_cliente a número antes de enviar al backend
-    const payload = {
-      ...formulario,
-      id_cliente: Number(id_cliente),
-    };
-
     try {
       const respuesta = await fetch('http://localhost:8081/notas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...formulario, id_cliente: Number(id_cliente) }),
       });
 
       if (respuesta.ok) {
         alert('Nota registrada correctamente');
         setFormulario({
-          id_cliente: '',
+          id_cliente: formulario.id_cliente,
           comentario: '',
           fecha_creacion: '',
           estado: 'activo',
@@ -140,20 +146,12 @@ function FormularioNota() {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">DEJANOS UNA NOTA O SUGERENCIA</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        <select
-          name="id_cliente"
+        <input
+          type="text"
           className="campo-cita"
-          value={formulario.id_cliente}
-          onChange={handleChange}
-        >
-          <option value="">Selecciona tu nombre</option>
-          {clientes.map(cliente => (
-            <option key={cliente.id_cliente} value={String(cliente.id_cliente)}>
-              {cliente.nombre}
-            </option>
-          ))}
-        </select>
-
+          value={clienteNombre}
+          readOnly
+        />
         <input
           type="text"
           name="comentario"
@@ -161,6 +159,7 @@ function FormularioNota() {
           className="campo-cita"
           value={formulario.comentario}
           onChange={handleChange}
+          required
         />
         <input
           type="datetime-local"
@@ -168,16 +167,9 @@ function FormularioNota() {
           className="campo-cita"
           value={formulario.fecha_creacion}
           onChange={handleChange}
+          required
         />
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-        >
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
+       
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

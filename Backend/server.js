@@ -17,6 +17,10 @@ const { Op } = require('sequelize');
 const Cotizacion = require('./models/Cotizacion');
 const DetalleCotizacion = require('./models/DetalleCotizacion');
 const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
+const Factura = require('./models/factura');
+const DetalleFactura = require('./models/detallefactura');
+const sequelize = require('./database'); // o './conexion' según el archivo correcto
+
 
 
 Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
@@ -67,6 +71,8 @@ Servicio.belongsToMany(Solicitudservicio, {
 Servicio.hasMany(DetalleCotizacion, { foreignKey: 'id_servicio' });
 
 
+Factura.belongsTo(Pago, { foreignKey: 'id_pago' });
+
 DetalleCotizacion.belongsTo(Servicio, { foreignKey: 'id_servicio', as: 'servicio' });
 DetalleCotizacion.belongsTo(Cotizacion, { foreignKey: 'id_cotizacion' });
 
@@ -88,6 +94,8 @@ Servicio.belongsToMany(Registrotrabajo, {
 
 Nota.belongsTo(Cliente, { foreignKey: 'id_cliente' });
 Cliente.hasMany(Nota, { foreignKey: 'id_cliente' });
+
+
 
 
 const app = express();
@@ -324,7 +332,20 @@ app.get('/citas', async (req, res) => {
 // POST /citas
 app.post('/citas', async (req, res) => {
   try {
-    const { id_cliente, id_empleado, id_solicitud, fecha, hora, servicios } = req.body; 
+    const { id_cliente, id_empleado, id_solicitud, fecha, hora, servicios } = req.body;
+
+    if (!id_cliente || !id_empleado || !id_solicitud || !fecha || !hora) {
+      return res.status(400).json({ error: 'Faltan datos obligatorios' });
+    }
+
+    const solicitud = await Solicitudservicio.findByPk(id_solicitud);
+    if (!solicitud) {
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+
+    if (solicitud.estado === 'cancelada' || solicitud.estado === 'realizada') {
+      return res.status(400).json({ error: 'No se pueden crear citas para solicitudes canceladas o realizadas' });
+    }
 
     const citaExistente = await Cita.findOne({
       where: { id_empleado, fecha, hora }
@@ -360,9 +381,10 @@ app.post('/citas', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'La fecha y la hora que seleccionaste no estan disponibles, intenta con otra' });
+    return res.status(500).json({ error: 'La fecha y la hora que seleccionaste no están disponibles, intenta con otra' });
   }
 });
+
 
 
 //Actualizar cita
@@ -725,7 +747,7 @@ app.get('/registrotrabajo', async (req, res) => {
           as: 'Servicios',  
           attributes: ['id_servicio', 'nombre_servicio'],
           through: { attributes: [] }
-        }
+        },
       ]
     });
 
@@ -738,7 +760,7 @@ app.get('/registrotrabajo', async (req, res) => {
       estado: r.estado,
       servicios: r.Servicios?.map(s => ({
         id_servicio: s.id_servicio,
-        nombre_servicio: s.nombre_servicio
+        nombre_servicio: s.nombre_servicio,
       })) || []
     }));
 
@@ -763,6 +785,16 @@ app.post('/registrotrabajo', async (req, res) => {
 
     if (!id_solicitud_servicio || !id_empleado || !fecha || !estado) {
       return res.status(400).json({ error: 'Faltan datos obligatorios' });
+    }
+
+    const solicitud = await Solicitudservicio.findByPk(id_solicitud_servicio);
+    if (!solicitud) {
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+
+    if (solicitud.estado === 'cancelada' || solicitud.estado === 'realizada') {
+      console.log(`La solicitud ${id_solicitud_servicio} ya ha sido cerrada (estado: ${solicitud.estado}).`);
+      return res.status(400).json({ error: 'No se pueden crear registros de trabajo para solicitudes canceladas o terminadas' });
     }
 
     if (servicios && (!Array.isArray(servicios) || servicios.some(id => !Number.isInteger(id)))) {
@@ -795,6 +827,7 @@ app.post('/registrotrabajo', async (req, res) => {
     res.status(500).json({ error: 'Error al crear registro' });
   }
 });
+
 
 app.get('/registrotrabajo/:id', async (req, res) => {
   try {
@@ -918,16 +951,42 @@ app.get('/pagos', async (req, res) => {
 
 
  
-// Ruta POST para crear un nuevo pago
 app.post('/pagos', async (req, res) => {
   try {
-    const nuevoPago = await Pago.create(req.body);
-    res.status(201).json(nuevoPago);
+    const {
+      id_solicitud,
+      factura_id,
+      fecha_pago,
+      monto,
+      hora_pago,
+      metodo_pago,
+      estado,
+      descripcion
+    } = req.body;
+
+    if (!monto) {
+      return res.status(400).json({ error: 'El campo monto es obligatorio' });
+    }
+
+    const nuevoPago = await Pago.create({
+      id_solicitud,
+      factura_id,
+      fecha_pago,
+      monto,
+      hora_pago,
+      metodo_pago,
+      estado,
+      descripcion
+    });
+
+    res.status(201).json({ message: 'Pago registrado correctamente', pago: nuevoPago });
   } catch (error) {
-    console.error('Error al registrar pago:', error);
-    res.status(500).json({ error: 'Error al registar pago' });  
+    console.error('Error al crear pago:', error);
+    res.status(500).json({ error: 'Error al crear pago' });
   }
 });
+
+
 
 
 // Obtener un pago por ID
@@ -969,26 +1028,57 @@ app.delete('/pagos/:id', async (req, res) => {
 
 
 
-app.get('/facturas', async (req, res) => {
+
+app.post('/facturas', async (req, res) => {
+  const {
+    solicitud_id,
+    fecha_emision,
+    monto_pendiente,
+    monto_pagado,
+    total,
+    estado,
+    detalles 
+  } = req.body;
+
+  const connection = await conexion.getConnection();
+
   try {
-    const [rows] = await conexion.query(`
-      SELECT 
-        f.id,
-        f.solicitud_id,
-        f.pago_id,
-        f.fecha_emision,
-        f.total,
-        f.estado,
-        df.descripcion
-      FROM factura f
-      LEFT JOIN detalle_factura df ON f.id = df.factura_id
-    `);
-    res.json(rows);
+    await connection.beginTransaction();
+
+    const [facturaResult] = await connection.query(
+      `INSERT INTO factura (solicitud_id, fecha_emision, monto_pendiente, monto_pagado, total, estado)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [solicitud_id, fecha_emision, monto_pendiente || 0, monto_pagado || 0, total, estado]
+    );
+
+    const facturaId = facturaResult.insertId;
+
+    if (Array.isArray(detalles)) {
+      for (const detalle of detalles) {
+        const { descripcion, cantidad, precio_unitario } = detalle;
+        await connection.query(
+          `INSERT INTO detalle_factura (factura_id, descripcion, cantidad, precio_unitario)
+           VALUES (?, ?, ?, ?)`,
+          [facturaId, descripcion, cantidad, precio_unitario]
+        );
+      }
+    }
+
+    await connection.commit();
+
+    res.status(201).json({ message: 'Factura y detalles creados', facturaId });
   } catch (error) {
-    console.error("Error al obtener facturas:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    await connection.rollback();
+    console.error('Error al crear factura y detalles:', error);
+    res.status(500).json({ error: 'Error interno al crear factura y detalles' });
+  } finally {
+    connection.release();
   }
 });
+
+
+
+
 
 
 app.post('/cliente', async (req, res) => {
@@ -1033,12 +1123,12 @@ app.post('/login', async (req, res) => {
 
   try {
     const usuario = await Usuario.findOne({ where: { email } });
+
     if (!usuario) {
       return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
     }
 
     const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
-
     if (!passwordMatch) {
       return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
     }
@@ -1047,12 +1137,42 @@ app.post('/login', async (req, res) => {
       return res.status(403).json({ error: 'Usuario no activo' });
     }
 
-    res.json({ id_usuario: usuario.id_usuario, email: usuario.email, rol: usuario.rol });
+    if (usuario.rol === 'empleado') {
+      const empleado = await Empleado.findOne({ where: { email } });
+
+      if (!empleado) {
+        return res.status(403).json({ error: 'Empleado no registrado' });
+      }
+
+      if (empleado.estado !== 'activo') {
+        return res.status(403).json({ error: 'Empleado inactivo' });
+      }
+    }
+
+    if (usuario.rol === 'cliente') {
+      const cliente = await Cliente.findOne({ where: { email } });
+
+      if (!cliente) {
+        return res.status(403).json({ error: 'Cliente no registrado' });
+      }
+
+      if (cliente.estado !== 'activo') {
+        return res.status(403).json({ error: 'Cliente inactivo' });
+      }
+    }
+
+    res.json({
+      id_usuario: usuario.id_usuario,
+      email: usuario.email,
+      rol: usuario.rol
+    });
+
   } catch (error) {
     console.error('Error en login:', error);
     res.status(500).json({ error: 'Error interno en el servidor' });
   }
 });
+
 
 
 
@@ -1312,3 +1432,4 @@ app.delete('/cotizaciones/:id', async (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
+

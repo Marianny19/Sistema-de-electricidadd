@@ -7,33 +7,29 @@ import {
   faSignOut, faUser, faUsers, faFileText, faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import "../index.css";
 
 const Actualizarcita = () => {
   const { id } = useParams();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
-
   const emailUsuario = localStorage.getItem('email');
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => {
     localStorage.clear();
     sessionStorage.clear();
-
     navigate('/iniciarsesion', { replace: true });
-
     window.history.pushState(null, '', '/iniciarsesion');
     window.onpopstate = () => {
       window.history.go(1);
     };
   };
+
   return (
     <div className="dashboard">
       <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Bienvenido</h2>
         <p className="subtexto-email">{emailUsuario}</p>
-
         <ul>
           <li><Link to="/Dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
           <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
@@ -76,6 +72,7 @@ function FormularioActualizarCita() {
   const [clientes, setClientes] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
+
   const [formulario, setFormulario] = useState({
     id_cliente: '',
     id_empleado: '',
@@ -86,70 +83,80 @@ function FormularioActualizarCita() {
     estado: 'activo'
   });
 
+  const [nombreCliente, setNombreCliente] = useState('');
+  const [nombreEmpleado, setNombreEmpleado] = useState('');
+
   useEffect(() => {
-    // Cargar clientes, empleados y servicios
-    fetch('http://localhost:8081/clientes')
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(err => console.error('Error al cargar clientes:', err));
+    const cargarDatos = async () => {
+      try {
+        // Carga clientes activos
+        const resClientes = await fetch('http://localhost:8081/clientes');
+        const clientesData = await resClientes.json();
+        setClientes(clientesData.filter(c => c.estado === 'activo'));
 
-    fetch('http://localhost:8081/empleados')
-      .then(res => res.json())
-      .then(data => setEmpleados(data))
-      .catch(err => console.error('Error al cargar empleados:', err));
+        // Carga empleados activos
+        const resEmpleados = await fetch('http://localhost:8081/empleados');
+        const empleadosData = await resEmpleados.json();
+        setEmpleados(empleadosData.filter(e => e.estado === 'activo'));
 
-    fetch('http://localhost:8081/servicios')
-      .then(res => res.json())
-      .then(data => setServiciosLista(data))
-      .catch(err => console.error('Error cargando servicios:', err));
+        // Carga servicios
+        const resServicios = await fetch('http://localhost:8081/servicios');
+        const serviciosData = await resServicios.json();
+        setServiciosLista(serviciosData);
 
-    +
-      fetch(`http://localhost:8081/citas/${id}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data) {
-            setFormulario({
-              id_cliente: data.id_cliente,
-              id_empleado: data.id_empleado,
-              id_solicitud: data.id_solicitud,
-              servicios: data.servicios.map(s => s.id_servicio),
-              fecha: data.fecha,
-              hora: data.hora,
-              estado: data.estado
-            });
+        // Carga cita
+        const resCita = await fetch(`http://localhost:8081/citas/${id}`);
+        const citaData = await resCita.json();
 
-          } else {
-            alert("Cita no encontrada");
-          }
-        })
-        .catch(error => {
-          console.error('Error al cargar cita:', error);
-          alert('No se pudo cargar la información de la cita');
-        });
+        if (citaData) {
+          setFormulario({
+            id_cliente: citaData.id_cliente,
+            id_empleado: citaData.id_empleado,
+            id_solicitud: citaData.id_solicitud,
+            servicios: citaData.servicios.map(s => s.id_servicio),
+            fecha: citaData.fecha.split('T')[0], // Para input date
+            hora: citaData.hora,
+            estado: citaData.estado
+          });
+
+          // Obtener nombre cliente
+          const cliente = clientesData.find(c => c.id_cliente === citaData.id_cliente);
+          setNombreCliente(cliente ? cliente.nombre : '');
+
+          // Obtener nombre empleado
+          const empleado = empleadosData.find(e => e.id_empleado === citaData.id_empleado);
+          setNombreEmpleado(empleado ? empleado.nombre : '');
+        } else {
+          alert("Cita no encontrada");
+        }
+      } catch (error) {
+        console.error('Error al cargar datos:', error);
+        alert('Error al cargar la información de la cita');
+      }
+    };
+
+    cargarDatos();
   }, [id]);
 
   const handleChange = (e) => {
-    setFormulario({
-      ...formulario,
-      [e.target.name]: e.target.value
-    });
+    setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
   const handleServiciosChange = (selectedOptions) => {
-    const idsSeleccionados = selectedOptions.map(op => op.value);
-    setFormulario({ ...formulario, servicios: idsSeleccionados });
+    const ids = selectedOptions.map(op => op.value);
+    setFormulario({ ...formulario, servicios: ids });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const respuesta = await fetch(`http://localhost:8081/citas/${id}`, {
+      const res = await fetch(`http://localhost:8081/citas/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formulario)
       });
 
-      if (respuesta.ok) {
+      if (res.ok) {
         alert('Cita actualizada correctamente');
       } else {
         alert('Error al actualizar la cita');
@@ -164,22 +171,31 @@ function FormularioActualizarCita() {
     <div className="contenedor-cita">
       <h1 className="titulo-cita">MODIFICA LOS CAMPOS NECESARIOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        <select name="id_cliente" className="campo-cita" value={formulario.id_cliente} onChange={handleChange} required>
-          <option value="">Selecciona un cliente</option>
-          {clientes.map((cliente) => (
-            <option key={cliente.id_cliente} value={cliente.id_cliente}>{cliente.nombre}</option>
-          ))}
-        </select>
+        <input
+          type="text"
+          className="campo-cita"
+          value={nombreCliente}
+          readOnly
+          placeholder="Cliente asignado"
+        />
 
-        <select name="id_empleado" className="campo-cita" value={formulario.id_empleado} onChange={handleChange} required>
-          <option value="">Selecciona un empleado</option>
-          {empleados.map((empleado) => (
-            <option key={empleado.id_empleado} value={empleado.id_empleado}>{empleado.nombre}</option>
-          ))}
-        </select>
+        <input
+          type="text"
+          className="campo-cita"
+          value={nombreEmpleado}
+          readOnly
+          placeholder="Empleado asignado"
+        />
 
-        <input type="number" name="solicitud" placeholder='Solicitud' className="campo-cita" value={formulario.id_solicitud} onChange={handleChange} required />
-
+        <input
+          type="number"
+          name="id_solicitud"
+          placeholder="Solicitud"
+          className="campo-cita"
+          value={formulario.id_solicitud}
+          onChange={handleChange}
+          required
+        />
 
         <div className="campo-cita">
           <label>Servicios:</label>
@@ -197,15 +213,24 @@ function FormularioActualizarCita() {
           />
         </div>
 
-        <input type="date" name="fecha" className="campo-cita" value={formulario.fecha} onChange={handleChange} required />
-        <input type="time" name="hora" className="campo-cita" value={formulario.hora} onChange={handleChange} required />
+        <input
+          type="date"
+          name="fecha"
+          className="campo-cita"
+          value={formulario.fecha}
+          onChange={handleChange}
+          required
+        />
 
-        <select name="estado" className="campo-cita" value={formulario.estado} onChange={handleChange} required>
-          <option value="">Estado</option>
-          <option value="agendada">Agendada</option>
-          <option value="completada">Completada</option>
-          <option value="cancelada">Cancelada</option>
-        </select>
+        <input
+          type="time"
+          name="hora"
+          className="campo-cita"
+          value={formulario.hora}
+          onChange={handleChange}
+          required
+        />
+
 
         <button type="submit" className="boton-cita">ACTUALIZAR</button>
       </form>

@@ -51,6 +51,7 @@ import Actualizarregistrotrabajo from './DashboardAdministrador/Actualizarregist
 import CrearRegistroTrabajo from './DashboardEmpleado/CrearRegistroEmpleado.jsx';
 import Vercotizacionempleado from './DashboardEmpleado/Vercotizacionempleado.jsx';
 import Solicitarservicioc from './DashboardCliente/Solicitarservicioc.jsx';
+import Crearfactura from './DashboardAdministrador/Crearfactura.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -83,6 +84,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/crearsolicitud" element={<RutaProtegidaPorRol rolesPermitidos={['administrador']}><Crearsolicitud /></RutaProtegidaPorRol>} />
         <Route path="/registrotrabajo" element={<RutaProtegidaPorRol rolesPermitidos={['administrador']}><Registrotrabajo /></RutaProtegidaPorRol>} />
         <Route path="/crearregistrotrabajo" element={<RutaProtegidaPorRol rolesPermitidos={['administrador']}><Crearregistrotrabajo /></RutaProtegidaPorRol>} />
+        <Route path="/crearfactura" element={<RutaProtegidaPorRol rolesPermitidos={['administrador']}><Crearfactura /></RutaProtegidaPorRol>} />
+
 
         <Route path="/creartrabajo" element={<RutaProtegidaPorRol rolesPermitidos={['empleado']}><CrearRegistroTrabajo /></RutaProtegidaPorRol>} />
         <Route path="/solicitarservicio" element={<RutaProtegidaPorRol rolesPermitidos={['administrador']}><Solicitarservicio /></RutaProtegidaPorRol>} />

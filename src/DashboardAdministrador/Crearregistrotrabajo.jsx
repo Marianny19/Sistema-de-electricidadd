@@ -91,10 +91,13 @@ const FormRegistroTrabajo = () => {
       .then(data => setSolicitudes(data))
       .catch(err => console.error('Error cargando solicitudes:', err));
 
-    fetch('http://localhost:8081/empleados')
-      .then(res => res.json())
-      .then(data => setEmpleados(data))
-      .catch(err => console.error('Error cargando empleados:', err));
+   fetch('http://localhost:8081/empleados')
+  .then(res => res.json())
+  .then(data => {
+    const empleadosActivos = data.filter(empleado => empleado.estado === 'activo');
+    setEmpleados(empleadosActivos);
+  })
+  .catch(err => console.error('Error cargando empleados:', err));
 
     fetch('http://localhost:8081/servicios')
       .then(res => res.json())
@@ -156,11 +159,11 @@ const FormRegistroTrabajo = () => {
           estado: 'activo'
         });
       } else {
-        alert('Error al registrar el trabajo');
+        alert('La solicitud seleccionada ya se ha cerrado');
       }
     } catch (error) {
-      console.error('Error en el registro:', error);
-      alert('Error de red al registrar el trabajo');
+      console.error('La solicitud seleccionada ya se ha cerrado:', error);
+      alert('La solicitud seleccionada ya se ha cerrado');
     }
   };
 
@@ -231,17 +234,6 @@ const FormRegistroTrabajo = () => {
           value={formulario.fecha}
           onChange={handleChange}
         />
-
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-        >
-          <option value="">Estado</option>
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
 
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>

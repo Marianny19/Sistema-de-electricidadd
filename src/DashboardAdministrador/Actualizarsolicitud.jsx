@@ -23,58 +23,53 @@ function Editarsolicitud() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const emailUsuario = localStorage.getItem('email');
 
-
+  // Estado inicial con hora incluida
   const [formulario, setFormulario] = useState({
     id_cliente: '',
+    nombreCliente: '',
     servicios: [],
     direccion: '',
     via_comunicacion: '',
     fecha: new Date().toISOString().split('T')[0],
+    hora: '',
     estado: ''
   });
 
-  const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
 
   useEffect(() => {
     const obtenerDatos = async () => {
       try {
+        // Traemos la solicitud
         const resSolicitud = await fetch(`http://localhost:8081/solicitudservicio/${id}`);
         const data = await resSolicitud.json();
 
+        // Traemos el cliente para obtener su nombre
+        const resCliente = await fetch(`http://localhost:8081/clientes/${data.id_cliente}`);
+        const clienteData = await resCliente.json();
+
+        // Traemos lista de servicios
+        const resServicios = await fetch('http://localhost:8081/servicios');
+        const serviciosData = await resServicios.json();
+
         setFormulario({
           id_cliente: data.id_cliente,
+          nombreCliente: clienteData.nombre,
           servicios: data.servicios.map(s => s.id_servicio),
           direccion: data.direccion,
           via_comunicacion: data.via_comunicacion,
-          fecha: data.fecha.split('T')[0],
+          fecha: data.fecha ? data.fecha.split('T')[0] : '',
+          hora: data.hora || '',
           estado: data.estado || ''
         });
-      } catch (error) {
-        console.error('Error cargando solicitud:', error);
-      }
-    };
 
-    const obtenerClientesYServicios = async () => {
-      try {
-        const [resClientes, resServicios] = await Promise.all([
-          fetch('http://localhost:8081/clientes'),
-          fetch('http://localhost:8081/servicios')
-        ]);
-
-        const clientesData = await resClientes.json();
-        const serviciosData = await resServicios.json();
-
-
-        setClientes(clientesData);
         setServiciosLista(serviciosData);
       } catch (error) {
-        console.error('Error cargando clientes o servicios:', error);
+        console.error('Error cargando datos:', error);
       }
     };
 
     obtenerDatos();
-    obtenerClientesYServicios();
   }, [id]);
 
   const handleChange = (e) => {
@@ -83,18 +78,18 @@ function Editarsolicitud() {
   };
 
   const handleServiciosChange = (selectedOptions) => {
-    const idsSeleccionados = selectedOptions.map(op => op.value);
+    const idsSeleccionados = selectedOptions ? selectedOptions.map(op => op.value) : [];
     setFormulario({ ...formulario, servicios: idsSeleccionados });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const estadosValidos = ['pendiente', 'realizado', 'atrasado', 'cancelado'];
-    const { id_cliente, servicios, direccion, via_comunicacion, fecha, estado } = formulario;
+    const estadosValidos = ['pendiente', 'cancelada', 'realizada'];
+    const { id_cliente, servicios, direccion, via_comunicacion, fecha, estado, hora } = formulario;
     const estadoFinal = estado && estadosValidos.includes(estado) ? estado : 'pendiente';
 
-    if (!id_cliente || servicios.length === 0 || !direccion || !fecha) {
+    if (!id_cliente || servicios.length === 0 || !direccion || !fecha || !estado) {
       alert('Todos los campos son obligatorios.');
       return;
     }
@@ -104,7 +99,12 @@ function Editarsolicitud() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formulario,
+          id_cliente,
+          servicios,
+          direccion,
+          via_comunicacion,
+          fecha,
+          hora,
           estado: estadoFinal
         })
       });
@@ -179,20 +179,12 @@ function Editarsolicitud() {
         <div className="contenedor-cita">
           <h1 className="titulo-cita">EDITAR SOLICITUD</h1>
           <form className="formulario-cita" onSubmit={handleSubmit}>
-            <select
-              name="id_cliente"
+            <input
+              type="text"
               className="campo-cita"
-              value={formulario.id_cliente}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Seleccione un cliente</option>
-              {clientes.map(c => (
-                <option key={c.id_cliente} value={c.id_cliente}>
-                  {c.nombre}
-                </option>
-              ))}
-            </select>
+              value={formulario.nombreCliente}
+              readOnly
+            />
 
             <div className="campo-cita">
               <label>Servicios:</label>
@@ -239,7 +231,7 @@ function Editarsolicitud() {
               onChange={handleChange}
             />
 
-             <input
+            <input
               type="time"
               name="hora"
               className="campo-cita"
@@ -255,9 +247,8 @@ function Editarsolicitud() {
             >
               <option value="">Estado</option>
               <option value="pendiente">Pendiente</option>
-              <option value="realizado">Realizado</option>
-              <option value="atrasado">Atrasado</option>
-              <option value="cancelado">Cancelado</option>
+              <option value="cancelada">Cancelada</option>
+              <option value="realizada">Realizada</option>
             </select>
 
             <button type="submit" className="boton-cita">ACTUALIZAR</button>

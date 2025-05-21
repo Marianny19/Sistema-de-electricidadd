@@ -79,22 +79,38 @@ function Crearcitas() {
     estado: 'agendada'
   });
 
-  useEffect(() => {
-    fetch('http://localhost:8081/clientes')
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(err => console.error('Error al cargar clientes:', err));
+ useEffect(() => {
+  const emailUsuario = localStorage.getItem('email')?.toLowerCase(); // <- agregado aquí también
 
-    fetch('http://localhost:8081/empleados')
-      .then(res => res.json())
-      .then(data => setEmpleados(data))
-      .catch(err => console.error('Error al cargar empleados:', err));
+  fetch('http://localhost:8081/clientes')
+    .then(res => res.json())
+    .then(data => {
+      const clienteActivo = data.find(
+        cliente => cliente.email.toLowerCase() === emailUsuario && cliente.estado === 'activo'
+      );
+      if (clienteActivo) {
+        setClientes([clienteActivo]);
+        setFormulario(f => ({ ...f, id_cliente: clienteActivo.id_cliente }));
+      } else {
+        console.warn('No se encontró cliente activo con ese email');
+      }
+    })
+    .catch(err => console.error('Error al cargar cliente:', err));
 
-    fetch('http://localhost:8081/servicios')
-      .then(res => res.json())
-      .then(data => setServiciosLista(data))
-      .catch(err => console.error('Error cargando servicios:', err));
-  }, []);
+  fetch('http://localhost:8081/empleados')
+    .then(res => res.json())
+    .then(data => {
+      const empleadosActivos = data.filter(empleado => empleado.estado === 'activo');
+      setEmpleados(empleadosActivos);
+    })
+    .catch(err => console.error('Error al cargar empleados:', err));
+
+  fetch('http://localhost:8081/servicios')
+    .then(res => res.json())
+    .then(data => setServiciosLista(data))
+    .catch(err => console.error('Error cargando servicios:', err));
+}, []);
+
 
   useEffect(() => {
     const { fecha, id_empleado } = formulario;
@@ -179,18 +195,13 @@ function Crearcitas() {
       <h1 className="titulo-cita">LLENA LOS CAMPOS REQUERIDOS</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
 
-        <select
-          name="id_cliente"
-          className="campo-cita"
-          value={formulario.id_cliente}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Selecciona un cliente</option>
-          {clientes.map(cliente => (
-            <option key={cliente.id_cliente} value={cliente.id_cliente}>{cliente.nombre}</option>
-          ))}
-        </select>
+      <input
+  type="text"
+  className="campo-cita"
+  value={clientes.length > 0 ? clientes[0].nombre : ''}
+  readOnly
+/>
+
 
         <select
           name="id_empleado"
@@ -219,6 +230,8 @@ function Crearcitas() {
           <label>Servicios:</label>
           <Select
             isMulti
+            className="react-select-custom"
+            classNamePrefix="react-select"
             options={serviciosLista.map(servicio => ({
               value: servicio.id_servicio,
               label: servicio.nombre_servicio
@@ -227,7 +240,7 @@ function Crearcitas() {
               .filter(serv => formulario.servicios.includes(serv.id_servicio))
               .map(serv => ({ value: serv.id_servicio, label: serv.nombre_servicio }))}
             onChange={handleServiciosChange}
-            placeholder="Selecciona uno o más servicios"
+            placeholder="Buscar y seleccionar servicios"
           />
         </div>
 
@@ -255,19 +268,7 @@ function Crearcitas() {
           ))}
         </select>
 
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Estado</option>
-          <option value="agendada">Agendada</option>
-          <option value="completada">Completada</option>
-          <option value="cancelada">Cancelada</option>
-        </select>
-
+    
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>

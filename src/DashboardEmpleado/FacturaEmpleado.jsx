@@ -126,7 +126,6 @@ const FacturaEmpleado = () => {
                     <tr key={factura.id}>
                       <td>{factura.id}</td>
                       <td>{factura.solicitud_id}</td>
-                      <td>{factura.pago_id}</td>
                       <td>{factura.fecha_emision}</td>
                       <td>{factura.total}</td>
                       <td>{factura.descripcion || 'N/A'}</td>

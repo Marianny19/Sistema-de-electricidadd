@@ -9,7 +9,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import "../index.css";
 
 const Actualizarpago = () => {
-  const { id } = useParams(); // Aquí obtenemos el id de la URL
+  const { id } = useParams(); 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
     const navigate = useNavigate();
   
@@ -75,11 +75,13 @@ const ActualizarPago = () => {
   const { id } = useParams();  
   const [formulario, setFormulario] = useState({
     id_solicitud: '',
+    factura_id: '',
     fecha_pago: '',
     monto: '',
     hora_pago: '',
     metodo_pago: '',
     estado: 'activo',
+    descripcion: '',
   });
 
   useEffect(() => {
@@ -138,6 +140,15 @@ const ActualizarPago = () => {
           value={formulario.id_solicitud}
           onChange={handleChange}
         />
+
+         <input
+          type="number"
+          name="factura_id"
+          placeholder="Factura"
+          className="campo-cita"
+          value={formulario.id_solicitud}
+          onChange={handleChange}
+        />
         <input
           type="date"
           name="fecha_pago"
@@ -171,8 +182,6 @@ const ActualizarPago = () => {
         >
           <option value="">Método de pago</option>
           <option value="efectivo">Efectivo</option>
-          <option value="tarjeta">Tarjeta</option>
-          <option value="transferencia">Transferencia</option>
         </select>
         <select
           name="estado"
@@ -184,6 +193,15 @@ const ActualizarPago = () => {
           <option value="activo">Activo</option>
           <option value="inactivo">Inactivo</option>
         </select>
+
+           <input
+          type="text"
+          name="descripcion"
+          placeholder="Descripcion"
+          className="campo-cita"
+          value={formulario.descripcion}
+          onChange={handleChange}
+        />
 
         <button type="submit" className="boton-cita">Actualizar Pago</button>
       </form>

@@ -85,22 +85,30 @@ function Crearcitas() {
     estado: 'agendada'
   });
 
-  useEffect(() => {
-    fetch('http://localhost:8081/clientes')
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(err => console.error('Error al cargar clientes:', err));
+useEffect(() => {
+  fetch('http://localhost:8081/clientes')
+    .then(res => res.json())
+    .then(data => {
+      const clientesActivos = data.filter(cliente => cliente.estado === 'activo');
+      setClientes(clientesActivos);
+    })
+    .catch(err => console.error('Error al cargar clientes:', err));
 
-    fetch('http://localhost:8081/empleados')
-      .then(res => res.json())
-      .then(data => setEmpleados(data))
-      .catch(err => console.error('Error al cargar empleados:', err));
+fetch('http://localhost:8081/empleados')
+  .then(res => res.json())
+  .then(data => {
+    const empleadosActivos = data.filter(empleado => empleado.estado === 'activo');
+    setEmpleados(empleadosActivos);
+  })
+  .catch(err => console.error('Error al cargar empleados:', err));
 
-    fetch('http://localhost:8081/servicios')
-      .then(res => res.json())
-      .then(data => setServiciosLista(data))
-      .catch(err => console.error('Error cargando servicios:', err));
-  }, []);
+
+  fetch('http://localhost:8081/servicios')
+    .then(res => res.json())
+    .then(data => setServiciosLista(data))
+    .catch(err => console.error('Error cargando servicios:', err));
+}, []);
+
 
   useEffect(() => {
     const { fecha, id_empleado } = formulario;
@@ -262,19 +270,6 @@ function Crearcitas() {
           {horasDisponibles.map(hora => (
             <option key={hora} value={hora}>{hora.slice(0, 5)}</option>
           ))}
-        </select>
-
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Estado</option>
-          <option value="agendada">Agendada</option>
-          <option value="completada">Completada</option>
-          <option value="cancelada">Cancelada</option>
         </select>
 
         <button type="submit" className="boton-cita">REGISTRAR</button>

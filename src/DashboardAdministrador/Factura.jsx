@@ -20,6 +20,7 @@ const Factura = () => {
     async function cargarFacturas() {
       try {
         const response = await fetch('http://localhost:8081/facturas');
+        if (!response.ok) throw new Error('Error al cargar facturas');
         const data = await response.json();
         setFacturas(data);
       } catch (error) {
@@ -68,8 +69,17 @@ const Factura = () => {
   };
 
   const facturasFiltradas = facturas.filter(f =>
-    f.id.toString().includes(busqueda.toLowerCase())
+    f.id.toString().includes(busqueda.toLowerCase()) ||
+    f.solicitud_id?.toString().includes(busqueda.toLowerCase()) ||
+    (f.estado?.toLowerCase().includes(busqueda.toLowerCase()))
   );
+
+  // Función para formatear fecha en formato local dd/mm/yyyy
+  const formatearFecha = (fechaStr) => {
+    if (!fechaStr) return 'N/A';
+    const fecha = new Date(fechaStr);
+    return fecha.toLocaleDateString();
+  };
 
   return (
     <div className="dashboard">
@@ -110,17 +120,20 @@ const Factura = () => {
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
         <h2>Bienvenido a la sección de Factura</h2>
+
         <div className="main-content">
-          <button className="Registro" onClick={() => console.log("Generar reporte")}> Generar reporte </button>
+          <Link to="/crearfactura"><button className="Registro">+ Nueva factura</button></Link>
+
           <div className="input-container-wrapper">
             <div className="input-container">
               <input
                 id="buscar-factura"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar por id"
+                placeholder="Buscar por ID, solicitud, pago o estado"
                 value={busqueda}
                 onChange={handleBusqueda}
+                autoComplete="off"
               />
               <FontAwesomeIcon icon={faSearch} />
             </div>
@@ -131,7 +144,6 @@ const Factura = () => {
                 <tr>
                   <th>Código</th>
                   <th>Solicitud</th>
-                  <th>Pago</th>
                   <th>Fecha</th>
                   <th>Total</th>
                   <th>Descripción</th>
@@ -149,10 +161,9 @@ const Factura = () => {
                 ) : (
                   facturasFiltradas.map((factura) => (
                     <tr key={factura.id}>
-                      <td>{factura.id}</td> 
+                      <td>{factura.id}</td>
                       <td>{factura.solicitud_id}</td>
-                      <td>{factura.pago_id}</td>
-                      <td>{factura.fecha_emision}</td>
+                      <td>{formatearFecha(factura.fecha_emision)}</td>
                       <td>{factura.total}</td>
                       <td>{factura.descripcion || 'N/A'}</td>
                       <td>{factura.estado}</td>

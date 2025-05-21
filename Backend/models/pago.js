@@ -2,13 +2,17 @@ const { DataTypes } = require('sequelize');
 const conexion = require('../database');
 
 const Pago = conexion.define('Pago', {
-    id_pago: {
+    id_pago: {        // este es el nombre correcto
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
     },
     id_solicitud: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    factura_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
@@ -25,16 +29,21 @@ const Pago = conexion.define('Pago', {
         allowNull: false,
     },
     metodo_pago: {
-        type: DataTypes.ENUM('efectivo','transferencia'),
+        type: DataTypes.ENUM('efectivo'),
         allowNull: false,
     },
     estado: {
         type: DataTypes.ENUM('activo','inactivo'),
         allowNull: false, 
     },
+    descripcion: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
 }, {
     tableName: 'pago',
     timestamps: false,
 });
+
 
 module.exports = Pago;

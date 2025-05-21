@@ -264,19 +264,6 @@ function Crearcitas() {
           ))}
         </select>
 
-        <select
-          name="estado"
-          className="campo-cita"
-          value={formulario.estado}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Estado</option>
-          <option value="agendada">Agendada</option>
-          <option value="completada">Completada</option>
-          <option value="cancelada">Cancelada</option>
-        </select>
-
         <button type="submit" className="boton-cita">REGISTRAR</button>
       </form>
     </div>
