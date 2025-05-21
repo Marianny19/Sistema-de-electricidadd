@@ -36,9 +36,7 @@ const Factura = () => {
   const cerrarSesion = () => {
     localStorage.clear();
     sessionStorage.clear();
-
     navigate('/iniciarsesion', { replace: true });
-
     window.history.pushState(null, '', '/iniciarsesion');
     window.onpopstate = () => {
       window.history.go(1);
@@ -74,7 +72,6 @@ const Factura = () => {
     (f.estado?.toLowerCase().includes(busqueda.toLowerCase()))
   );
 
-  // Función para formatear fecha en formato local dd/mm/yyyy
   const formatearFecha = (fechaStr) => {
     if (!fechaStr) return 'N/A';
     const fecha = new Date(fechaStr);
@@ -154,28 +151,35 @@ const Factura = () => {
               <tbody>
                 {facturasFiltradas.length === 0 ? (
                   <tr>
-                    <td colSpan="8" style={{ textAlign: 'center' }}>
+                    <td colSpan="7" style={{ textAlign: 'center' }}>
                       No se encontraron facturas.
                     </td>
                   </tr>
                 ) : (
-                  facturasFiltradas.map((factura) => (
-                    <tr key={factura.id}>
-                      <td>{factura.id}</td>
-                      <td>{factura.solicitud_id}</td>
-                      <td>{formatearFecha(factura.fecha_emision)}</td>
-                      <td>{factura.total}</td>
-                      <td>{factura.descripcion || 'N/A'}</td>
-                      <td>{factura.estado}</td>
-                      <td>
-                        <button
-                          className="Eliminar"
-                          onClick={() => eliminarFactura(factura.id)}>
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                  facturasFiltradas.map((factura) => {
+                    // Concatenar las descripciones de los detalles
+                    const descripcionDetalles = factura.detalles && factura.detalles.length > 0
+                      ? factura.detalles.map(d => d.descripcion).join(', ')
+                      : 'N/A';
+
+                    return (
+                      <tr key={factura.id}>
+                        <td>{factura.id}</td>
+                        <td>{factura.solicitud_id}</td>
+                        <td>{formatearFecha(factura.fecha_emision)}</td>
+                        <td>{factura.total}</td>
+                        <td>{descripcionDetalles}</td>
+                        <td>{factura.estado}</td>
+                        <td>
+                          <button
+                            className="Eliminar"
+                            onClick={() => eliminarFactura(factura.id)}>
+                            Eliminar
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })
                 )}
               </tbody>
             </table>

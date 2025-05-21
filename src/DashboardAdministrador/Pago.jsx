@@ -137,7 +137,6 @@ const Pago = () => {
                   <th>Fecha</th>
                   <th>Método</th>
                   <th>Estado</th>
-                  <th>Descripción</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -151,7 +150,6 @@ const Pago = () => {
                     <td>{pago.fecha_pago}</td>
                     <td>{pago.metodo_pago}</td>
                     <td>{pago.estado}</td>
-                    <td>{pago.descripcion}</td>
 
                     <td>
                       <Link to={`/actualizarpago/${pago.id_pago}`}>

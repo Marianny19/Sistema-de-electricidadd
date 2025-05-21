@@ -50,6 +50,8 @@ Servicio.belongsToMany(Cita, {
 Cliente.hasMany(Solicitudservicio, { foreignKey: 'id_cliente' });
 Solicitudservicio.belongsTo(Cliente, { foreignKey: 'id_cliente' });
 
+Factura.hasMany(DetalleFactura, { foreignKey: 'factura_id', as: 'detalles' });
+
 Solicitudservicio.belongsToMany(Servicio, {
   through: {
     model: DetalleSolicitudServicio,
@@ -58,6 +60,9 @@ Solicitudservicio.belongsToMany(Servicio, {
   foreignKey: 'id_solicitud',
   otherKey: 'id_servicio'
 });
+
+Solicitudservicio.hasMany(Pago, { foreignKey: 'id_solicitud' });
+Pago.belongsTo(Solicitudservicio, { foreignKey: 'id_solicitud' });
 
 Servicio.belongsToMany(Solicitudservicio, {
   through: {
@@ -95,6 +100,8 @@ Servicio.belongsToMany(Registrotrabajo, {
 Nota.belongsTo(Cliente, { foreignKey: 'id_cliente' });
 Cliente.hasMany(Nota, { foreignKey: 'id_cliente' });
 
+Solicitudservicio.hasMany(Registrotrabajo, { foreignKey: 'id_solicitud_servicio' });
+Registrotrabajo.belongsTo(Solicitudservicio, { foreignKey: 'id_solicitud_servicio' });
 
 
 
@@ -961,7 +968,6 @@ app.post('/pagos', async (req, res) => {
       hora_pago,
       metodo_pago,
       estado,
-      descripcion
     } = req.body;
 
     if (!monto) {
@@ -976,7 +982,7 @@ app.post('/pagos', async (req, res) => {
       hora_pago,
       metodo_pago,
       estado,
-      descripcion
+     
     });
 
     res.status(201).json({ message: 'Pago registrado correctamente', pago: nuevoPago });
@@ -1028,7 +1034,6 @@ app.delete('/pagos/:id', async (req, res) => {
 
 
 
-
 app.post('/facturas', async (req, res) => {
   const {
     solicitud_id,
@@ -1040,42 +1045,138 @@ app.post('/facturas', async (req, res) => {
     detalles 
   } = req.body;
 
-  const connection = await conexion.getConnection();
+  const t = await Factura.sequelize.transaction();
 
   try {
-    await connection.beginTransaction();
+   
+    const nuevaFactura = await Factura.create({
+      solicitud_id,
+      fecha_emision,
+      monto_pendiente,
+      monto_pagado,
+      total,
+      estado
+    }, { transaction: t });
 
-    const [facturaResult] = await connection.query(
-      `INSERT INTO factura (solicitud_id, fecha_emision, monto_pendiente, monto_pagado, total, estado)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [solicitud_id, fecha_emision, monto_pendiente || 0, monto_pagado || 0, total, estado]
-    );
-
-    const facturaId = facturaResult.insertId;
-
+   
     if (Array.isArray(detalles)) {
       for (const detalle of detalles) {
-        const { descripcion, cantidad, precio_unitario } = detalle;
-        await connection.query(
-          `INSERT INTO detalle_factura (factura_id, descripcion, cantidad, precio_unitario)
-           VALUES (?, ?, ?, ?)`,
-          [facturaId, descripcion, cantidad, precio_unitario]
-        );
+        await DetalleFactura.create({
+          factura_id: nuevaFactura.id,
+          descripcion: detalle.descripcion,
+          monto: detalle.monto,
+          estado: 'activo'
+        }, { transaction: t });
       }
     }
 
-    await connection.commit();
+    await t.commit();
+    res.status(201).json(nuevaFactura);
 
-    res.status(201).json({ message: 'Factura y detalles creados', facturaId });
   } catch (error) {
-    await connection.rollback();
-    console.error('Error al crear factura y detalles:', error);
-    res.status(500).json({ error: 'Error interno al crear factura y detalles' });
-  } finally {
-    connection.release();
+    await t.rollback();
+    console.error('Error al crear factura:', error);
+    res.status(500).json({ error: 'Error al crear la factura' });
   }
 });
 
+app.get('/solicitudservicio/:id/monto-total', async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('ID solicitud recibida:', id);
+
+    
+    const solicitud = await Solicitudservicio.findByPk(id, {
+      include: [
+        {
+          model: Servicio,
+          attributes: ['id_servicio', 'nombre_servicio', 'costo_base'],
+          through: { attributes: [] }  
+        },
+        {
+          model: Registrotrabajo,
+          attributes: ['id_registro_trabajo', 'costo_extra']
+        }
+      ]
+    });
+
+    if (!solicitud) {
+      console.log('Solicitud no encontrada con id:', id);
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+
+    
+    let totalSolicitud = 0;
+    if (solicitud.Servicios && solicitud.Servicios.length > 0) {
+      totalSolicitud += solicitud.Servicios.reduce((acc, s) => acc + Number(s.costo_base || 0), 0);
+    }
+
+   
+    if (solicitud.Registrotrabajos && solicitud.Registrotrabajos.length > 0) {
+      totalSolicitud += solicitud.Registrotrabajos.reduce((acc, r) => acc + Number(r.costo_extra || 0), 0);
+    }
+
+    console.log('Total calculado de la solicitud:', totalSolicitud);
+
+   
+    let monto_pagado = 0;
+    try {
+      const pagos = await Pago.findAll({
+        where: { id_solicitud: id }
+      });
+
+      monto_pagado = pagos.reduce((acc, pago) => {
+        const monto = parseFloat(pago.monto);
+        return acc + (isNaN(monto) ? 0 : monto);
+      }, 0);
+
+      console.log('Monto pagado encontrado:', monto_pagado);
+
+    } catch (errPagos) {
+      console.error('Error al obtener pagos:', errPagos.message);
+      return res.status(500).json({ error: 'Error obteniendo pagos', detalle: errPagos.message });
+    }
+
+    const monto_pendiente = totalSolicitud - monto_pagado;
+
+    return res.json({
+      monto_total: Number(totalSolicitud.toFixed(2)),
+      monto_pagado: Number(monto_pagado.toFixed(2)),
+      monto_pendiente: Number(monto_pendiente.toFixed(2))
+    });
+
+  } catch (error) {
+    console.error('Error al obtener monto total:', error.message);
+    return res.status(500).json({ error: 'Error interno del servidor', detalle: error.message });
+  }
+});
+app.get('/facturas', async (req, res) => {
+  try {
+    const facturas = await Factura.findAll({
+      attributes: [
+        'id',
+        'solicitud_id',
+        'fecha_emision',
+        'monto_pendiente',
+        'monto_pagado',
+        'total',
+        'estado'
+      ],
+      include: [
+        {
+          model: DetalleFactura,
+          as: 'detalles',
+          attributes: ['descripcion', 'monto']
+        }
+      ],
+      order: [['fecha_emision', 'DESC']]
+    });
+    res.json(facturas);
+  } catch (error) {
+    console.error('Error obteniendo facturas:', error);
+    res.status(500).json({ message: 'Error al obtener facturas', error: error.message });
+  }
+});
 
 
 

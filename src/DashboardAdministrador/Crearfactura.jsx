@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCalendar, faCartArrowDown, faChevronLeft, faClipboard,
-  faFileInvoice, faFileInvoiceDollar, faHome, faMoneyCheck,
-  faSignOut, faUser, faUsers, faFileText, faTasks, faTrash
+  faCalendar, faChevronLeft, faFileInvoice, faFileInvoiceDollar,
+  faHome, faMoneyCheck, faSignOut, faUser, faUsers,
+  faFileText, faTasks, faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import "../index.css";
 
@@ -14,6 +14,7 @@ const Crearfactura = () => {
   const emailUsuario = localStorage.getItem('email');
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+
   const cerrarSesion = () => {
     localStorage.clear();
     sessionStorage.clear();
@@ -63,6 +64,7 @@ const Crearfactura = () => {
 
 function FormularioFactura() {
   const navigate = useNavigate();
+
   const [factura, setFactura] = useState({
     solicitud_id: '',
     fecha_emision: '',
@@ -72,10 +74,71 @@ function FormularioFactura() {
     estado: 'activo'
   });
 
-  const [detalles, setDetalles] = useState([]); // Empieza vacío
+  const [detalles, setDetalles] = useState([]);
+  const [cargandoTotal, setCargandoTotal] = useState(false);
+
+  // Función para obtener todos los montos desde backend según el id de solicitud
+  const obtenerMontos = async (solicitud_id) => {
+    try {
+      const response = await fetch(`http://localhost:8081/solicitudservicio/${solicitud_id}/monto-total`);
+      if (!response.ok) throw new Error('Solicitud no encontrada');
+      const data = await response.json();
+      return {
+        monto_total: Number(data.monto_total) || 0,
+        monto_pagado: Number(data.monto_pagado) || 0,
+        monto_pendiente: Number(data.monto_pendiente) || 0
+      };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Al cambiar el ID de solicitud, actualiza montos con info backend
+  const handleSolicitudIdChange = async (e) => {
+    const solicitud_id = e.target.value.trim();
+    setFactura((prev) => ({ ...prev, solicitud_id }));
+
+    if (!solicitud_id || isNaN(solicitud_id) || Number(solicitud_id) <= 0) {
+      // Limpiar montos si ID inválido
+      setFactura((prev) => ({
+        ...prev,
+        total: '',
+        monto_pagado: '',
+        monto_pendiente: '',
+      }));
+      return;
+    }
+
+    setCargandoTotal(true);
+    try {
+      const montos = await obtenerMontos(solicitud_id);
+
+      setFactura((prev) => ({
+        ...prev,
+        total: montos.monto_total.toFixed(2),
+        monto_pagado: montos.monto_pagado.toFixed(2),
+        monto_pendiente: montos.monto_pendiente.toFixed(2)
+      }));
+    } catch (error) {
+      alert('No se pudo cargar el monto total para la solicitud: ' + error.message);
+      setFactura((prev) => ({
+        ...prev,
+        total: '',
+        monto_pagado: '',
+        monto_pendiente: ''
+      }));
+    } finally {
+      setCargandoTotal(false);
+    }
+  };
 
   const handleFacturaChange = (e) => {
-    setFactura({ ...factura, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'solicitud_id') {
+      handleSolicitudIdChange(e);
+    } else if (!['total', 'monto_pendiente', 'monto_pagado'].includes(name)) {
+      setFactura((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleDetalleChange = (index, e) => {
@@ -94,58 +157,103 @@ function FormularioFactura() {
     setDetalles(nuevosDetalles);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const resFactura = await fetch('http://localhost:8081/factura', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(factura)
-      });
+  if (detalles.length === 0) {
+    alert('Debe agregar al menos un detalle');
+    return;
+  }
 
-      if (!resFactura.ok) throw new Error('Error al registrar factura');
+  try {
+    const res = await fetch('http://localhost:8081/facturas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        solicitud_id: factura.solicitud_id,
+        fecha_emision: factura.fecha_emision,
+        estado: factura.estado,
 
-      const nuevaFactura = await resFactura.json();
-      const facturaId = nuevaFactura.id;
+        // Aquí envías los montos
+        monto_pendiente: Number(factura.monto_pendiente) || 0,
+        monto_pagado: Number(factura.monto_pagado) || 0,
+        total: Number(factura.total) || 0,
 
-      for (const detalle of detalles) {
-        await fetch('http://localhost:8081/detallefactura', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            factura_id: facturaId,
-            descripcion: detalle.descripcion,
-            monto: detalle.monto
-          })
-        });
-      }
+        detalles: detalles.map(d => ({
+          descripcion: d.descripcion,
+          monto: Number(d.monto)
+        }))
+      })
+    });
 
-      alert('Factura registrada correctamente');
-      navigate('/factura');
-
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Ocurrió un error al registrar la factura');
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || 'Error al registrar factura');
     }
-  };
+
+    alert('Factura registrada correctamente');
+    navigate('/factura');
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Ocurrió un error al registrar la factura: ' + error.message);
+  }
+};
 
   return (
     <div className="contenedor-cita">
       <h1 className="titulo-cita">REGISTRO DE FACTURA</h1>
       <form className="formulario-cita" onSubmit={handleSubmit}>
-        <input type="number" name="solicitud_id" placeholder="ID de solicitud" className="campo-cita" value={factura.solicitud_id} onChange={handleFacturaChange} required />
-        <input type="date" name="fecha_emision" className="campo-cita" value={factura.fecha_emision} onChange={handleFacturaChange} required />
-        <input type="number" name="monto_pendiente" placeholder="Monto pendiente" className="campo-cita" value={factura.monto_pendiente} onChange={handleFacturaChange} required />
-        <input type="number" name="monto_pagado" placeholder="Monto pagado" className="campo-cita" value={factura.monto_pagado} onChange={handleFacturaChange} required />
-        <input type="number" name="total" placeholder="Total" className="campo-cita" value={factura.total} onChange={handleFacturaChange} required />
+        <input
+          type="number"
+          name="solicitud_id"
+          placeholder="ID de solicitud"
+          className="campo-cita"
+          value={factura.solicitud_id}
+          onChange={handleFacturaChange}
+          required
+          min="1"
+        />
+        <input
+          type="date"
+          name="fecha_emision"
+          className="campo-cita"
+          value={factura.fecha_emision}
+          onChange={handleFacturaChange}
+          required
+        />
+        <input
+          type="number"
+          name="monto_pendiente"
+          placeholder="Monto pendiente"
+          className="campo-cita"
+          value={factura.monto_pendiente}
+          readOnly
+          style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
+        />
+        <input
+          type="number"
+          name="monto_pagado"
+          placeholder="Monto pagado"
+          className="campo-cita"
+          value={factura.monto_pagado}
+          readOnly
+          style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
+        />
+        <input
+          type="text"
+          name="total"
+          placeholder={cargandoTotal ? 'Cargando total...' : 'Total'}
+          className="campo-cita"
+          value={factura.total}
+          readOnly
+          style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
+          required
+        />
 
-        {/* Botón para agregar detalle */}
         <button type="button" className="boton-cita" onClick={agregarDetalle} style={{ margin: '15px 0' }}>
           Agregar detalle
         </button>
 
-        {/* Mostrar los campos solo si hay detalles */}
         {detalles.length > 0 && detalles.map((detalle, index) => (
           <div key={index} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
             <input
@@ -166,30 +274,25 @@ function FormularioFactura() {
               value={detalle.monto}
               onChange={(e) => handleDetalleChange(index, e)}
               required
+              min="0"
+              step="0.01"
               style={{ flex: 1 }}
             />
-            {index > 0 && (
-              <button
-                type="button"
-                className="boton-eliminar-detalle"
-                onClick={() => eliminarDetalle(index)}
-                title="Eliminar detalle"
-                style={{
-                  backgroundColor: '#e74c3c',
-                  border: 'none',
-                  color: 'white',
-                  padding: '5px 10px',
-                  cursor: 'pointer',
-                  borderRadius: '4px'
-                }}
-              >
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-            )}
+            <button
+              type="button"
+              className="boton-eliminar"
+              onClick={() => eliminarDetalle(index)}
+              aria-label={`Eliminar detalle ${index + 1}`}
+              style={{ flex: '0 0 auto' }}
+            >
+              <FontAwesomeIcon icon={faTrash} />
+            </button>
           </div>
         ))}
 
-        <button type="submit" className="boton-cita">REGISTRAR FACTURA</button>
+        <button type="submit" className="boton-cita">
+          Guardar factura
+        </button>
       </form>
     </div>
   );
