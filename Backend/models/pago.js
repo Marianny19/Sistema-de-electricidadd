@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const conexion = require('../database');
 
 const Pago = conexion.define('Pago', {
-    id_pago: {        // este es el nombre correcto
+    id_pago: {        
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -36,10 +36,7 @@ const Pago = conexion.define('Pago', {
         type: DataTypes.ENUM('activo','inactivo'),
         allowNull: false, 
     },
-    descripcion: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
+   
 }, {
     tableName: 'pago',
     timestamps: false,

@@ -81,8 +81,7 @@ const ActualizarPago = () => {
     hora_pago: '',
     metodo_pago: '',
     estado: 'activo',
-    descripcion: '',
-  });
+    });
 
   useEffect(() => {
     fetch(`http://localhost:8081/pagos/${id}`)
@@ -194,14 +193,7 @@ const ActualizarPago = () => {
           <option value="inactivo">Inactivo</option>
         </select>
 
-           <input
-          type="text"
-          name="descripcion"
-          placeholder="Descripcion"
-          className="campo-cita"
-          value={formulario.descripcion}
-          onChange={handleChange}
-        />
+
 
         <button type="submit" className="boton-cita">Actualizar Pago</button>
       </form>
