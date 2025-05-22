@@ -36,6 +36,11 @@ const Pago = conexion.define('Pago', {
         type: DataTypes.ENUM('activo','inactivo'),
         allowNull: false, 
     },
+
+    descripcion: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
    
 }, {
     tableName: 'pago',

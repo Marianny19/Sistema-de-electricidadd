@@ -8,11 +8,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import "../index.css";
 
-const FacturaEmpleado = () => {
+const Facturaempleado = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [facturas, setFacturas] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const navigate = useNavigate();
+ 
 
   const emailUsuario = localStorage.getItem('email');
 
@@ -20,6 +21,7 @@ const FacturaEmpleado = () => {
     async function cargarFacturas() {
       try {
         const response = await fetch('http://localhost:8081/facturas');
+        if (!response.ok) throw new Error('Error al cargar facturas');
         const data = await response.json();
         setFacturas(data);
       } catch (error) {
@@ -31,24 +33,34 @@ const FacturaEmpleado = () => {
   }, []);
 
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+
   const cerrarSesion = () => {
     localStorage.clear();
     sessionStorage.clear();
-
     navigate('/iniciarsesion', { replace: true });
-
     window.history.pushState(null, '', '/iniciarsesion');
     window.onpopstate = () => {
       window.history.go(1);
     };
   };
+
   const handleBusqueda = (e) => {
     setBusqueda(e.target.value);
   };
 
+  
+
   const facturasFiltradas = facturas.filter(f =>
-    f.id.toString().includes(busqueda.toLowerCase())
+    f.id.toString().includes(busqueda.toLowerCase()) ||
+    f.solicitud_id?.toString().includes(busqueda.toLowerCase()) ||
+    (f.estado?.toLowerCase().includes(busqueda.toLowerCase()))
   );
+
+  const formatearFecha = (fechaStr) => {
+    if (!fechaStr) return 'N/A';
+    const fecha = new Date(fechaStr);
+    return fecha.toLocaleDateString();
+  };
 
   return (
     <div className="dashboard">
@@ -56,16 +68,17 @@ const FacturaEmpleado = () => {
         <h2>Bienvenido</h2>
         <p className="subtexto-email">{emailUsuario}</p>
 
-        <ul>
-          <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
-          <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-          <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
-          <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
-          <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
-          <li><Link to="/vercotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
-          <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
-        </ul>
+       <ul>
+                 <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+                 <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+                 <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
+                 <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
+                 <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
+                 <li><Link to="/vercotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
+                 <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+                 <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
+               </ul>
+
         <ul>
           <li className="Cerrarsesion">
             <button
@@ -76,6 +89,7 @@ const FacturaEmpleado = () => {
             </button>
           </li>
         </ul>
+
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -86,17 +100,19 @@ const FacturaEmpleado = () => {
           <FontAwesomeIcon icon={faChevronLeft} />
         </Link>
         <h2>Bienvenido a la sección de Factura</h2>
+
         <div className="main-content">
-          <button className="Registro" onClick={() => console.log("Generar reporte")}> Generar reporte </button>
+
           <div className="input-container-wrapper">
             <div className="input-container">
               <input
                 id="buscar-factura"
                 className="Buscar"
                 type="search"
-                placeholder="Buscar facturas"
+                placeholder="Buscar por ID, solicitud, pago o estado"
                 value={busqueda}
                 onChange={handleBusqueda}
+                autoComplete="off"
               />
               <FontAwesomeIcon icon={faSearch} />
             </div>
@@ -107,7 +123,6 @@ const FacturaEmpleado = () => {
                 <tr>
                   <th>Código</th>
                   <th>Solicitud</th>
-                  <th>Pago</th>
                   <th>Fecha</th>
                   <th>Total</th>
                   <th>Descripción</th>
@@ -117,23 +132,28 @@ const FacturaEmpleado = () => {
               <tbody>
                 {facturasFiltradas.length === 0 ? (
                   <tr>
-                    <td colSpan="8" style={{ textAlign: 'center' }}>
+                    <td colSpan="7" style={{ textAlign: 'center' }}>
                       No se encontraron facturas.
                     </td>
                   </tr>
                 ) : (
-                  facturasFiltradas.map((factura) => (
-                    <tr key={factura.id}>
-                      <td>{factura.id}</td>
-                      <td>{factura.solicitud_id}</td>
-                      <td>{factura.fecha_emision}</td>
-                      <td>{factura.total}</td>
-                      <td>{factura.descripcion || 'N/A'}</td>
-                      <td>{factura.estado}</td>
-                      <td>
-                      </td>
-                    </tr>
-                  ))
+                  facturasFiltradas.map((factura) => {
+                    const descripcionDetalles = factura.detalles && factura.detalles.length > 0
+                      ? factura.detalles.map(d => d.descripcion).join(', ')
+                      : 'N/A';
+
+                    return (
+                      <tr key={factura.id}>
+                        <td>{factura.id}</td>
+                        <td>{factura.solicitud_id}</td>
+                        <td>{formatearFecha(factura.fecha_emision)}</td>
+                        <td>{factura.total}</td>
+                        <td>{descripcionDetalles}</td>
+                        <td>{factura.estado}</td>
+
+                      </tr>
+                    )
+                  })
                 )}
               </tbody>
             </table>
@@ -144,4 +164,4 @@ const FacturaEmpleado = () => {
   );
 };
 
-export default FacturaEmpleado;
+export default Facturaempleado;

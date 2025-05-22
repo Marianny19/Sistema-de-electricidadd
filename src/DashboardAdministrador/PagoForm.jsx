@@ -114,11 +114,11 @@ function Crearcitas() {
           descripcion: '',
         });
       } else {
-        alert('Error al registrar el pago');
+        alert('Error a registrar pago, la factura esta inactiva');
       }
     } catch (error) {
       console.error('Error en el pago: ', error);
-      alert('Error de red al registrar pago');
+      alert('Error a registrar pago, la factura esta inactiva');
     }
   };
 

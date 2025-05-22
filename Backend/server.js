@@ -76,7 +76,6 @@ Servicio.belongsToMany(Solicitudservicio, {
 Servicio.hasMany(DetalleCotizacion, { foreignKey: 'id_servicio' });
 
 
-Factura.belongsTo(Pago, { foreignKey: 'id_pago' });
 
 DetalleCotizacion.belongsTo(Servicio, { foreignKey: 'id_servicio', as: 'servicio' });
 DetalleCotizacion.belongsTo(Cotizacion, { foreignKey: 'id_cotizacion' });
@@ -351,6 +350,7 @@ app.post('/citas', async (req, res) => {
     }
 
     if (solicitud.estado === 'cancelada' || solicitud.estado === 'realizada') {
+      console.log(`La solicitud ${id_solicitud} está ${solicitud.estado}, no se puede agendar cita.`);
       return res.status(400).json({ error: 'No se pueden crear citas para solicitudes canceladas o realizadas' });
     }
 
@@ -388,7 +388,9 @@ app.post('/citas', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'La fecha y la hora que seleccionaste no están disponibles, intenta con otra' });
+    return res.status(500).json({
+      error: 'La fecha y la hora que seleccionaste no están disponibles, intenta con otra'
+    });
   }
 });
 
@@ -968,10 +970,19 @@ app.post('/pagos', async (req, res) => {
       hora_pago,
       metodo_pago,
       estado,
+      descripcion,
     } = req.body;
 
     if (!monto) {
       return res.status(400).json({ error: 'El campo monto es obligatorio' });
+    }
+
+    const factura = await Factura.findByPk(factura_id);
+    if (!factura) {
+      return res.status(404).json({ error: 'Factura no encontrada' });
+    }
+    if (factura.estado !== 'activo') {
+      return res.status(400).json({ error: 'No se puede registrar pago para una factura inactiva' });
     }
 
     const nuevoPago = await Pago.create({
@@ -982,7 +993,7 @@ app.post('/pagos', async (req, res) => {
       hora_pago,
       metodo_pago,
       estado,
-     
+      descripcion,
     });
 
     res.status(201).json({ message: 'Pago registrado correctamente', pago: nuevoPago });
@@ -992,6 +1003,53 @@ app.post('/pagos', async (req, res) => {
   }
 });
 
+
+
+app.put('/pagos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      id_solicitud,
+      factura_id,
+      fecha_pago,
+      monto,
+      hora_pago,
+      metodo_pago,
+      estado,
+    } = req.body;
+
+    if (!monto) {
+      return res.status(400).json({ error: 'El campo monto es obligatorio' });
+    }
+
+    const pagoExistente = await Pago.findByPk(id);
+    if (!pagoExistente) {
+      return res.status(404).json({ error: 'Pago no encontrado' });
+    }
+
+    const solicitud = await Solicitudservicio.findByPk(id_solicitud);
+    if (!solicitud) {
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+
+
+    await pagoExistente.update({
+      id_solicitud,
+      factura_id,
+      fecha_pago,
+      monto,
+      hora_pago,
+      metodo_pago,
+      estado,
+    });
+
+    res.status(200).json({ message: 'Pago actualizado correctamente', pago: pagoExistente });
+
+  } catch (error) {
+    console.error('Error al actualizar el pago:', error);
+    res.status(500).json({ error: 'Error al actualizar el pago' });
+  }
+});
 
 
 
@@ -1027,7 +1085,7 @@ app.delete('/pagos/:id', async (req, res) => {
 
     res.json({ mensaje: 'Pago marcado como inactivo correctamente', pago });
   } catch (error) {
-    console.error('Error al marcar pago como inactivo:', error);
+    console.error('Error al marcar pago como inactivo:', error);h
     res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 });
@@ -1048,7 +1106,16 @@ app.post('/facturas', async (req, res) => {
   const t = await Factura.sequelize.transaction();
 
   try {
-   
+    const solicitud = await Solicitudservicio.findByPk(solicitud_id);
+    if (!solicitud) {
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+
+    if (solicitud.estado === 'cancelada' || solicitud.estado === 'realizada') {
+      console.log(`No se puede facturar solicitud ${solicitud_id} porque está ${solicitud.estado}.`);
+      return res.status(400).json({ error: 'No se pueden crear facturas para solicitudes canceladas o realizadas' });
+    }
+
     const nuevaFactura = await Factura.create({
       solicitud_id,
       fecha_emision,
@@ -1058,7 +1125,6 @@ app.post('/facturas', async (req, res) => {
       estado
     }, { transaction: t });
 
-   
     if (Array.isArray(detalles)) {
       for (const detalle of detalles) {
         await DetalleFactura.create({
@@ -1079,6 +1145,7 @@ app.post('/facturas', async (req, res) => {
     res.status(500).json({ error: 'Error al crear la factura' });
   }
 });
+
 
 app.get('/solicitudservicio/:id/monto-total', async (req, res) => {
   try {
@@ -1150,6 +1217,7 @@ app.get('/solicitudservicio/:id/monto-total', async (req, res) => {
     return res.status(500).json({ error: 'Error interno del servidor', detalle: error.message });
   }
 });
+
 app.get('/facturas', async (req, res) => {
   try {
     const facturas = await Factura.findAll({
@@ -1178,7 +1246,24 @@ app.get('/facturas', async (req, res) => {
   }
 });
 
+app.delete('/facturas/:id', async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    const facturas = await Factura.findOne({ where: { id: id } });
+
+    if (!facturas) {
+      return res.status(404).json({ error: 'Factura no encontrada' });
+    }
+
+    await facturas.update({ estado: 'inactivo' });
+
+    res.json({ mensaje: 'Factura marcada como inactiva correctamente', facturas });
+  } catch (error) {
+    console.error('Error al marcar factura como inactiva:', error);
+    res.status(500).json({ error: 'Error al procesar la solicitud' });
+  }
+});
 
 
 
@@ -1379,15 +1464,15 @@ app.get('/servicios-atrasados', async (req, res) => {
 });
 
 app.post('/cotizaciones', async (req, res) => {
-  const { id_cliente, estado, servicios, subtotal, impuesto, total } = req.body;
+  const { id_cliente, servicios, subtotal, impuesto, descuento, total } = req.body;
 
   try {
     const nuevaCotizacion = await Cotizacion.create({
       id_cliente,
       fecha_emision: new Date(), 
-      estado,
       subtotal,
       impuestos: impuesto, 
+      descuento,
       total
     });
 
@@ -1480,7 +1565,7 @@ app.get('/cotizaciones/:id', async (req, res) => {
 
 app.put('/cotizaciones/:id', async (req, res) => {
   const { id } = req.params;
-  const { id_cliente, estado, servicios, subtotal, impuesto, total } = req.body;
+  const { id_cliente, estado, servicios, subtotal, impuesto, descuento,total } = req.body;
 
   try {
     const cotizacion = await Cotizacion.findByPk(id);
@@ -1494,6 +1579,7 @@ app.put('/cotizaciones/:id', async (req, res) => {
       fecha_emision: new Date(),
       subtotal,
       impuestos: impuesto,
+      descuento,
       total
     });
 

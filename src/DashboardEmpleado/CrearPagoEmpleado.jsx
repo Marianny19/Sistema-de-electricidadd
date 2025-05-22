@@ -15,6 +15,7 @@ const CrearPagoEmpleado = () => {
 
   const emailUsuario = localStorage.getItem('email');
 
+
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const cerrarSesion = () => {
     localStorage.clear();
@@ -34,15 +35,15 @@ const CrearPagoEmpleado = () => {
         <p className="subtexto-email">{emailUsuario}</p>
 
         <ul>
-          <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
-          <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-          <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
-          <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
-          <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
-          <li><Link to="/vercotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
-          <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
-        </ul>
+                        <li><a href="/dashboardempleado"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></a></li>
+                        <li><Link to="/clienteDempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
+                        <li><Link to="/registrarservicioempleado"><FontAwesomeIcon icon={faFileText} /> <span>Solicitar Servicios</span></Link></li>
+                        <li><Link to="/citaempleado"><FontAwesomeIcon icon={faCalendar} /> <span>Cita</span></Link></li>
+                        <li><Link to="/registrotrabajoempleado"><FontAwesomeIcon icon={faTasks} /> <span>Registro Trabajo</span></Link></li>
+                        <li><Link to="/vercotizacionempleado"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
+                        <li><Link to="/facturaempleado"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
+                        <li><Link to="/pagoempleado"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pago</span></Link></li>
+                      </ul>
         <ul>
           <li className="Cerrarsesion">
             <button
@@ -53,6 +54,7 @@ const CrearPagoEmpleado = () => {
             </button>
           </li>
         </ul>
+
         <button className="toggle-btn" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -72,11 +74,13 @@ const CrearPagoEmpleado = () => {
 function Crearcitas() {
   const [formulario, setFormulario] = useState({
     id_solicitud: '',
+    factura_id: '',
     fecha_pago: new Date().toISOString().split('T')[0],
     monto: '',
     hora_pago: new Date().toTimeString().split(' ')[0],
-    metodo_pago: '',
+    metodo_pago: 'efectivo',
     estado: 'activo',
+    descripcion: '',
   });
 
   const handleChange = (e) => {
@@ -100,18 +104,20 @@ function Crearcitas() {
         alert('Pago registrado correctamente');
         setFormulario({
           id_solicitud: '',
+          factura_id: '',
           fecha_pago: new Date().toISOString().split('T')[0],
           monto: '',
           hora_pago: new Date().toTimeString().split(' ')[0],
-          metodo_pago: '',
+          metodo_pago: 'efectivo',
           estado: 'activo',
+          descripcion: '',
         });
       } else {
-        alert('Error al registrar el pago');
+        alert('Error a registrar pago, la factura esta inactiva');
       }
     } catch (error) {
       console.error('Error en el pago: ', error);
-      alert('Error de red al registrar pago');
+      alert('Error a registrar pago, la factura esta inactiva');
     }
   };
 
@@ -125,6 +131,15 @@ function Crearcitas() {
           placeholder="Solicitud"
           className="campo-cita"
           value={formulario.id_solicitud}
+          onChange={handleChange}
+        />
+
+         <input
+          type="number"
+          name="factura_id"
+          placeholder="Factura"
+          className="campo-cita"
+          value={formulario.factura_id}
           onChange={handleChange}
         />
         <input
@@ -158,14 +173,24 @@ function Crearcitas() {
           value={formulario.metodo_pago}
           onChange={handleChange}
         >
-          <option value="">Método de pago</option>
           <option value="efectivo">Efectivo</option>
-          <option value="transferencia">Transferencia</option>
         </select>
+
+
+        <input
+          type="text"
+          name="descripcion"
+          placeholder="Descripcion"
+          className="campo-cita"
+          value={formulario.descripcion}
+          onChange={handleChange}
+        />
+
         <button type="submit" className="boton-cita">Registrar Pago</button>
       </form>
     </div>
   );
 }
+
 
 export default CrearPagoEmpleado;

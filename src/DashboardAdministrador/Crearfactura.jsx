@@ -77,7 +77,6 @@ function FormularioFactura() {
   const [detalles, setDetalles] = useState([]);
   const [cargandoTotal, setCargandoTotal] = useState(false);
 
-  // Función para obtener todos los montos desde backend según el id de solicitud
   const obtenerMontos = async (solicitud_id) => {
     try {
       const response = await fetch(`http://localhost:8081/solicitudservicio/${solicitud_id}/monto-total`);
@@ -93,13 +92,11 @@ function FormularioFactura() {
     }
   };
 
-  // Al cambiar el ID de solicitud, actualiza montos con info backend
   const handleSolicitudIdChange = async (e) => {
     const solicitud_id = e.target.value.trim();
     setFactura((prev) => ({ ...prev, solicitud_id }));
 
     if (!solicitud_id || isNaN(solicitud_id) || Number(solicitud_id) <= 0) {
-      // Limpiar montos si ID inválido
       setFactura((prev) => ({
         ...prev,
         total: '',
@@ -174,7 +171,6 @@ function FormularioFactura() {
         fecha_emision: factura.fecha_emision,
         estado: factura.estado,
 
-        // Aquí envías los montos
         monto_pendiente: Number(factura.monto_pendiente) || 0,
         monto_pagado: Number(factura.monto_pagado) || 0,
         total: Number(factura.total) || 0,
