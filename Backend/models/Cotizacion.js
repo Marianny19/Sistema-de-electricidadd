@@ -26,6 +26,10 @@ const Cotizacion = conexion.define('Cotizacion', {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true
     },
+    descuento: {
+      type: DataTypes.ENUM('1%', '10%', '15%', '20%', '25%', '30%'),
+      allowNull: false,
+    },
     total: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true

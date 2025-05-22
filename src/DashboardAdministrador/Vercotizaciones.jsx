@@ -215,6 +215,7 @@ const Vercotizaciones = () => {
                   <th>Servicios</th>
                   <th>Subtotal</th>
                   <th>Impuestos</th>
+                  <th>Descuento</th>
                   <th>Total</th>
                   <th>Estado</th>
                   <th>Acciones</th>
@@ -233,6 +234,8 @@ const Vercotizaciones = () => {
                     </td>
                     <td>{c.subtotal}</td>
                     <td>{c.impuestos}</td>
+                    <td>{c.descuento}</td>
+
                     <td>{c.total}</td>
                     <td>{c.estado}</td>
                     <td>

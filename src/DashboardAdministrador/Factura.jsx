@@ -13,6 +13,31 @@ const Factura = () => {
   const [facturas, setFacturas] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const navigate = useNavigate();
+ const desactivarfactura = async (id) => {
+  const confirmar = window.confirm("¿Estás seguro de que deseas desactivar este pago?");
+  if (!confirmar) return;
+
+  try {
+    const respuesta = await fetch(`http://localhost:8081/facturas/${id}`, {
+      method: 'DELETE'
+    });
+
+    if (respuesta.ok) {
+      setFacturas(prevFacturas =>
+        prevFacturas.map(f =>
+          f.id === id ? { ...f, estado: 'inactivo' } : f
+        )
+      );
+      alert("Factura marcada como inactiva");
+    } else {
+      alert("Error al desactivar factura");
+    }
+  } catch (error) {
+    console.error('Error al desactivar factura:', error);
+    alert("Error de red al desactivar factura");
+  }
+};
+
 
   const emailUsuario = localStorage.getItem('email');
 
@@ -157,7 +182,6 @@ const Factura = () => {
                   </tr>
                 ) : (
                   facturasFiltradas.map((factura) => {
-                    // Concatenar las descripciones de los detalles
                     const descripcionDetalles = factura.detalles && factura.detalles.length > 0
                       ? factura.detalles.map(d => d.descripcion).join(', ')
                       : 'N/A';
@@ -173,9 +197,11 @@ const Factura = () => {
                         <td>
                           <button
                             className="Eliminar"
-                            onClick={() => eliminarFactura(factura.id)}>
+                            disabled={factura.estado === 'inactivo'}
+                            onClick={() => desactivarfactura(factura.id)}>
                             Eliminar
                           </button>
+
                         </td>
                       </tr>
                     )

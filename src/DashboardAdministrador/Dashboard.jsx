@@ -36,25 +36,38 @@ const Dashboard = () => {
     };
   };
 
+   const formatearFechaHora = (fechaISO, hora) => {
+    const [horaStr, minutosStr] = hora.split(':');
+    const fecha = new Date(fechaISO);
+    fecha.setHours(parseInt(horaStr), parseInt(minutosStr), 0, 0);
+
+    const opcionesFecha = {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    };
+
+    const opcionesHora = {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    };
+
+    const fechaFormateada = fecha.toLocaleDateString('es-ES', opcionesFecha);
+    const horaFormateada = fecha.toLocaleTimeString('es-ES', opcionesHora);
+
+    return `${fechaFormateada} – ${horaFormateada}`;
+  };
+
   const formatearFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
-    const fechaLocal = new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000);
-    return fechaLocal.toLocaleDateString('es-ES', {
+    return fecha.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
   };
-
-  const formatearHora = (fechaISO) => {
-    const fecha = new Date(fechaISO);
-    const fechaLocal = new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000);
-    return fechaLocal.toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   useEffect(() => {
     const fetchDatosDashboard = async () => {
       try {
@@ -94,7 +107,7 @@ const Dashboard = () => {
           {
             label: "Cantidad",
             data: [
-              15,
+              15, 
               pendientes.length,
               atrasados.length
             ],
@@ -153,26 +166,25 @@ const Dashboard = () => {
         </button>
       </div>
 
-      <div className="dashboard-content">
-        <h2>Bienvenido al sistema de gestión de electricidad</h2>
-
-        <div className="widgets">
-          <div className="widget tarjeta">
-            <h3><FontAwesomeIcon icon={faCalendar} /> Próximas citas</h3>
-            <ul className="lista-personalizada">
-              {cargando ? (
-                <li>Cargando...</li>
-              ) : citas.length === 0 ? (
-                <li>No hay próximas citas.</li>
-              ) : (
-                citas.map((cita) => (
-                  <li key={cita.id_cita}>
-                    <strong>{formatearFecha(cita.fecha)}</strong> a las <strong>{formatearHora(cita.fecha)}</strong> – Estado: <em>{cita.estado}</em>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
+    <div className="dashboard-content">
+           <h2>Bienvenido al sistema de gestión de electricidad</h2>
+           <div className="widgets">
+             <div className="widget tarjeta">
+               <h3><FontAwesomeIcon icon={faCalendar} /> Próximas citas</h3>
+               <ul className="lista-personalizada">
+                 {cargando ? (
+                   <li>Cargando...</li>
+                 ) : citas.length === 0 ? (
+                   <li>No hay próximas citas.</li>
+                 ) : (
+                   citas.map((cita) => (
+                     <li key={cita.id_cita}>
+                       {formatearFechaHora(cita.fecha, cita.hora)} – Estado: <em>{cita.estado}</em>
+                     </li>
+                   ))
+                 )}
+               </ul>
+             </div>
 
           <div className="widget tarjeta">
             <h3><FontAwesomeIcon icon={faClipboard} /> Servicios pendientes</h3>

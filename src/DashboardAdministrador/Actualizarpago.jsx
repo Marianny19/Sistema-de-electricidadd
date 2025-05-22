@@ -8,69 +8,6 @@ import {
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import "../index.css";
 
-const Actualizarpago = () => {
-  const { id } = useParams(); 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-    const navigate = useNavigate();
-  
-    const emailUsuario = localStorage.getItem('email');
-  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-const cerrarSesion = () => {
-  localStorage.clear();
-  sessionStorage.clear();
-
-  navigate('/iniciarsesion', { replace: true });
-
-  window.history.pushState(null, '', '/iniciarsesion');
-  window.onpopstate = () => {
-    window.history.go(1);
-  };
-};
-
-  return (
-    <div className="dashboard">
-      <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <h2>Bienvenido</h2>
-                <p className="subtexto-email">{emailUsuario}</p>
-
-        <ul>
-          <li><Link to="/Dashboard"><FontAwesomeIcon icon={faHome} /> <span>Inicio</span></Link></li>
-          <li><Link to="/clienteempleado"><FontAwesomeIcon icon={faUsers} /> <span>Clientes</span></Link></li>
-          <li><Link to="/empleado"><FontAwesomeIcon icon={faUser} /> <span>Empleados</span></Link></li>
-          <li><Link to="/solicitudservicio"><FontAwesomeIcon icon={faFileText} /> <span>Solicitud servicio</span></Link></li>
-          <li><Link to="/formulariocita"><FontAwesomeIcon icon={faCalendar} /> <span>Citas</span></Link></li>
-          <li><Link to="/registrotrabajo"><FontAwesomeIcon icon={faTasks} /> <span>Registro trabajo</span></Link></li>
-          <li><Link to="/vercotizaciones"><FontAwesomeIcon icon={faFileInvoice} /> <span>Cotización</span></Link></li>
-          <li><Link to="/factura"><FontAwesomeIcon icon={faFileInvoiceDollar} /> <span>Factura</span></Link></li>
-          <li><Link to="/pago"><FontAwesomeIcon icon={faMoneyCheck} /> <span>Pagos</span></Link></li>
-        </ul>
-     
-             <ul>
-               <li className="Cerrarsesion">
-                 <button
-                   onClick={cerrarSesion}
-                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
-                 >
-                   <FontAwesomeIcon icon={faSignOut} /> <span>Cerrar sesión</span>
-                 </button>
-               </li>
-             </ul>
-        <button className="toggle-btn" onClick={toggleSidebar}>
-          <FontAwesomeIcon icon={faChevronLeft} />
-        </button>
-      </div>
-
-      <div className="dashboard-content">
-  <Link to="/pago" className="boton-retroceso" aria-label="Volver">
-    <FontAwesomeIcon icon={faChevronLeft} />
-  </Link>
-  <h2>Bienvenido a la sección de actualizar pago</h2>
-  <ActualizarPago /> 
-</div>
-</div>
-  );
-};
-
 const ActualizarPago = () => {
   const { id } = useParams();  
   const [formulario, setFormulario] = useState({
@@ -81,14 +18,23 @@ const ActualizarPago = () => {
     hora_pago: '',
     metodo_pago: '',
     estado: 'activo',
-    });
+  });
 
   useEffect(() => {
     fetch(`http://localhost:8081/pagos/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data) {
-          setFormulario(data); 
+          setFormulario({
+            ...data,
+            id_solicitud: data.id_solicitud || '',
+            factura_id: data.factura_id || '',
+            fecha_pago: data.fecha_pago ? data.fecha_pago.split('T')[0] : '',
+            hora_pago: data.hora_pago || '',
+            monto: data.monto || '',
+            metodo_pago: data.metodo_pago || '',
+            estado: data.estado || 'activo',
+          });
         } else {
           alert('Pago no encontrado');
         }
@@ -99,31 +45,48 @@ const ActualizarPago = () => {
       });
   }, [id]);
 
-
   const handleChange = (e) => {
-    setFormulario({
-      ...formulario,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormulario(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formulario.monto || !formulario.fecha_pago || !formulario.hora_pago || !formulario.metodo_pago) {
+      alert('Por favor completa todos los campos obligatorios');
+      return;
+    }
+
     try {
+      const body = {
+        id_solicitud: Number(formulario.id_solicitud),
+        factura_id: Number(formulario.factura_id),
+        fecha_pago: formulario.fecha_pago,
+        monto: parseFloat(formulario.monto),
+        hora_pago: formulario.hora_pago,
+        metodo_pago: formulario.metodo_pago,
+        estado: formulario.estado,
+      };
+
       const respuesta = await fetch(`http://localhost:8081/pagos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formulario),
+        body: JSON.stringify(body),
       });
 
       if (respuesta.ok) {
         alert('Pago actualizado correctamente');
       } else {
-        alert('Error al actualizar el pago');
+        const errorData = await respuesta.json();
+        alert('Error al actualizar el pago: ' + (errorData.error || 'Error desconocido'));
       }
     } catch (error) {
       console.error('Error en la actualización:', error);
-      alert('Error de red al actualizar pago');
+      alert('Error de red al actualizar el pago');
     }
   };
 
@@ -140,12 +103,12 @@ const ActualizarPago = () => {
           onChange={handleChange}
         />
 
-         <input
+        <input
           type="number"
           name="factura_id"
           placeholder="Factura"
           className="campo-cita"
-          value={formulario.id_solicitud}
+          value={formulario.factura_id}
           onChange={handleChange}
         />
         <input
@@ -181,6 +144,8 @@ const ActualizarPago = () => {
         >
           <option value="">Método de pago</option>
           <option value="efectivo">Efectivo</option>
+          <option value="transferencia">Transferencia</option>
+          <option value="tarjeta">Tarjeta</option>
         </select>
         <select
           name="estado"
@@ -193,8 +158,6 @@ const ActualizarPago = () => {
           <option value="inactivo">Inactivo</option>
         </select>
 
-
-
         <button type="submit" className="boton-cita">Actualizar Pago</button>
       </form>
     </div>
@@ -202,5 +165,6 @@ const ActualizarPago = () => {
 };
 
 
-export default Actualizarpago;  
+
+export default ActualizarPago;  
 
