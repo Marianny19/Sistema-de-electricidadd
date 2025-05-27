@@ -72,6 +72,8 @@ Servicio.belongsToMany(Solicitudservicio, {
   foreignKey: 'id_servicio',
   otherKey: 'id_solicitud'
 });
+Factura.belongsTo(Solicitudservicio, { as: 'solicitud', foreignKey: 'solicitud_id' });
+Solicitudservicio.hasMany(Factura, { foreignKey: 'solicitud_id' });
 
 Servicio.hasMany(DetalleCotizacion, { foreignKey: 'id_servicio' });
 
@@ -101,6 +103,9 @@ Cliente.hasMany(Nota, { foreignKey: 'id_cliente' });
 
 Solicitudservicio.hasMany(Registrotrabajo, { foreignKey: 'id_solicitud_servicio' });
 Registrotrabajo.belongsTo(Solicitudservicio, { foreignKey: 'id_solicitud_servicio' });
+
+Factura.hasMany(Pago, { foreignKey: 'factura_id', as: 'pagos' });
+Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 
 
 
@@ -594,6 +599,7 @@ app.get('/solicitudservicio', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener solicitudes' });
   }
 });
+ 
 
 app.get('/solicitudservicio/:id', async (req, res) => {
   try {
@@ -958,51 +964,150 @@ app.get('/pagos', async (req, res) => {
   }
 });
 
-
- 
 app.post('/pagos', async (req, res) => {
+  const {
+    id_solicitud,
+    factura_id,
+    fecha_pago,
+    monto,
+    hora_pago,
+    metodo_pago,
+    estado,
+    descripcion,
+  } = req.body;
+
+  const t = await Factura.sequelize.transaction();
+
   try {
-    const {
-      id_solicitud,
-      factura_id,
-      fecha_pago,
-      monto,
-      hora_pago,
-      metodo_pago,
-      estado,
-      descripcion,
-    } = req.body;
-
-    if (!monto) {
-      return res.status(400).json({ error: 'El campo monto es obligatorio' });
+    if (!id_solicitud || !monto) {
+      return res.status(400).json({ error: 'Los campos id_solicitud y monto son obligatorios' });
     }
 
-    const factura = await Factura.findByPk(factura_id);
-    if (!factura) {
-      return res.status(404).json({ error: 'Factura no encontrada' });
-    }
-    if (factura.estado !== 'activo') {
-      return res.status(400).json({ error: 'No se puede registrar pago para una factura inactiva' });
-    }
-
-    const nuevoPago = await Pago.create({
-      id_solicitud,
-      factura_id,
-      fecha_pago,
-      monto,
-      hora_pago,
-      metodo_pago,
-      estado,
-      descripcion,
+    // --- Calcular total real de la solicitud ---
+    const solicitud = await Solicitudservicio.findByPk(id_solicitud, {
+      include: [
+        { model: Servicio, attributes: ['costo_base'], through: { attributes: [] } },
+        { model: Registrotrabajo, attributes: ['costo_extra'] }
+      ],
+      transaction: t
     });
 
-    res.status(201).json({ message: 'Pago registrado correctamente', pago: nuevoPago });
+    if (!solicitud) {
+      await t.rollback();
+      return res.status(404).json({ error: 'Solicitud no encontrada para calcular total' });
+    }
+
+    let total = 0;
+    if (solicitud.Servicios && solicitud.Servicios.length > 0) {
+      total += solicitud.Servicios
+        .map(s => Number(s.costo_base))
+        .filter(c => !isNaN(c))
+        .reduce((acc, c) => acc + c, 0);
+    }
+    if (solicitud.Registrotrabajos && solicitud.Registrotrabajos.length > 0) {
+      total += solicitud.Registrotrabajos
+        .map(r => Number(r.costo_extra))
+        .filter(c => !isNaN(c))
+        .reduce((acc, c) => acc + c, 0);
+    }
+
+    // --- Buscar factura ---
+    let factura = null;
+
+    if (factura_id) {
+      factura = await Factura.findOne({ where: { id: factura_id }, transaction: t });
+    }
+
+    if (!factura) {
+      factura = await Factura.findOne({
+        where: { solicitud_id: id_solicitud, estado: 'activo' },
+        transaction: t
+      });
+    }
+
+    // --- Crear factura si no existe ---
+    if (!factura) {
+      factura = await Factura.create({
+        solicitud_id: id_solicitud,
+        fecha_emision: new Date(),
+        monto_pagado: 0,
+        monto_pendiente: total,
+        total: total,
+        estado: 'activo'
+      }, { transaction: t });
+    } else {
+      // Revisar estado activo
+      if (factura.estado !== 'activo') {
+        await t.rollback();
+        return res.status(400).json({ error: 'No se puede registrar pago para una factura inactiva' });
+      }
+      // Actualizar total en caso de que hayan cambiado servicios o costos extras
+      await factura.update({ total }, { transaction: t });
+    }
+
+    // --- Crear nuevo pago ---
+    const nuevoPago = await Pago.create({
+      id_solicitud,
+      factura_id: factura.id,
+      fecha_pago,
+      monto,
+      hora_pago,
+      metodo_pago,
+      estado,
+      descripcion,
+    }, { transaction: t });
+
+    // --- Recalcular monto pagado sumando todos los pagos ---
+    const pagos = await Pago.findAll({
+      where: { factura_id: factura.id },
+      transaction: t
+    });
+
+    const monto_pagado = pagos.reduce((acc, pago) => {
+      const m = parseFloat(pago.monto);
+      return acc + (isNaN(m) ? 0 : m);
+    }, 0);
+
+    // --- Recalcular monto pendiente ---
+    const monto_pendiente = total - monto_pagado < 0 ? 0 : total - monto_pagado;
+
+    // --- Actualizar factura con montos correctos ---
+    await factura.update({
+      monto_pagado,
+      monto_pendiente
+    }, { transaction: t });
+
+    // --- Crear detalle factura ---
+    await DetalleFactura.create({
+      factura_id: factura.id,
+      descripcion: descripcion || 'Sin descripción',
+      monto: monto,
+      estado: 'activo',
+    }, { transaction: t });
+
+    await t.commit();
+
+    // --- Retornar respuesta con pago y factura actualizados ---
+    const pagoConFactura = await Pago.findOne({
+      where: { id_pago: nuevoPago.id_pago },
+      include: [{
+        model: Factura,
+        attributes: ['total', 'monto_pagado', 'monto_pendiente']
+      }]
+    });
+
+    return res.status(201).json({
+      message: 'Pago registrado correctamente',
+      pago: pagoConFactura,
+      factura: pagoConFactura ? pagoConFactura.Factura : null
+    });
+
   } catch (error) {
-    console.error('Error al crear pago:', error);
-    res.status(500).json({ error: 'Error al crear pago' });
+    await t.rollback();
+    console.error('Error al registrar el pago:', error);
+    res.status(500).json({ error: 'Error al registrar el pago' });
   }
 });
-
 
 
 app.put('/pagos/:id', async (req, res) => {
@@ -1089,7 +1194,48 @@ app.delete('/pagos/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 });
+app.get('/facturas/:id', async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    // Buscamos la factura por PK e incluimos detalles y pagos
+    const factura = await Factura.findByPk(id, {
+      include: [
+        {
+          model: DetalleFactura,
+          as: 'detalles',  // asegúrate que esta asociación esté definida en tu modelo Factura
+          attributes: ['descripcion', 'monto']
+        },
+        {
+          model: Pago,
+          as: 'pagos',  // también debe existir esta asociación
+          attributes: ['id_pago', 'fecha_pago', 'monto']
+        },
+        {
+          model: Solicitudservicio,
+          as: 'solicitud', // si tienes la asociación en Factura a Solicitudservicio
+          include: [
+            {
+              model: Servicio,
+              as: 'Servicios',  // esta debe estar definida en Solicitudservicio con belongsToMany
+              attributes: ['nombre_servicio', 'costo_base']
+            }
+          ]
+        }
+      ]
+    });
 
+    if (!factura) {
+      return res.status(404).json({ error: 'Factura no encontrada' });
+    }
+
+    res.json(factura);
+
+  } catch (error) {
+    console.error('Error al obtener factura por ID:', error);
+    res.status(500).json({ error: 'Error al obtener la factura' });
+  }
+});
 
 
 app.post('/facturas', async (req, res) => {
@@ -1218,6 +1364,8 @@ app.get('/solicitudservicio/:id/monto-total', async (req, res) => {
   }
 });
 
+
+
 app.get('/facturas', async (req, res) => {
   try {
     const facturas = await Factura.findAll({
@@ -1226,25 +1374,34 @@ app.get('/facturas', async (req, res) => {
         'solicitud_id',
         'fecha_emision',
         'monto_pendiente',
-        'monto_pagado',
         'total',
-        'estado'
+        'estado',
+        // Agregamos la suma de pagos como campo adicional
+        [conexion.fn('SUM', conexion.col('pagos.monto')), 'monto_pagado']
       ],
       include: [
         {
           model: DetalleFactura,
           as: 'detalles',
           attributes: ['descripcion', 'monto']
+        },
+        {
+          model: Pago,
+          as: 'pagos',
+          attributes: [] // no traer detalles de cada pago, solo sumar
         }
       ],
+      group: ['Factura.id', 'detalles.id'], // Necesario para que Sequelize agrupe correctamente
       order: [['fecha_emision', 'DESC']]
     });
+
     res.json(facturas);
   } catch (error) {
     console.error('Error obteniendo facturas:', error);
     res.status(500).json({ message: 'Error al obtener facturas', error: error.message });
   }
 });
+
 
 app.delete('/facturas/:id', async (req, res) => {
   const { id } = req.params;

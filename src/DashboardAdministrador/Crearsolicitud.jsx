@@ -87,20 +87,20 @@ const FormRegistroTrabajo = () => {
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
 
-useEffect(() => {
-  fetch('http://localhost:8081/clientes')
-    .then(res => res.json())
-    .then(data => {
-      const clientesActivos = data.filter(cliente => cliente.estado === 'activo');
-      setClientes(clientesActivos);
-    })
-    .catch(err => console.error('Error cargando clientes:', err));
+  useEffect(() => {
+    fetch('http://localhost:8081/clientes')
+      .then(res => res.json())
+      .then(data => {
+        const clientesActivos = data.filter(cliente => cliente.estado === 'activo');
+        setClientes(clientesActivos);
+      })
+      .catch(err => console.error('Error cargando clientes:', err));
 
-  fetch('http://localhost:8081/servicios')
-    .then(res => res.json())
-    .then(data => setServiciosLista(data))
-    .catch(err => console.error('Error cargando servicios:', err));
-}, []);
+    fetch('http://localhost:8081/servicios')
+      .then(res => res.json())
+      .then(data => setServiciosLista(data))
+      .catch(err => console.error('Error cargando servicios:', err));
+  }, []);
 
 
   const handleChange = (e) => {
@@ -241,14 +241,18 @@ useEffect(() => {
           onChange={handleChange}
         />
 
-        <input
-          type="text"
+        <select
           name="via_comunicacion"
-          placeholder="Vía de comunicación"
           className="campo-cita"
           value={formulario.via_comunicacion}
           onChange={handleChange}
-        />
+        >
+          <option value="">Seleccione la vía de comunicación</option>
+          <option value="Teléfonica">Teléfonica</option>
+          <option value="Email">Email</option>
+          <option value="APP">App</option>
+        </select>
+
 
         <input
           type="date"
