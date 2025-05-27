@@ -749,6 +749,7 @@ table button {
   font-size: 32px;
   margin-bottom: 30px;
   letter-spacing: 1px;
+  
 }
 
 .formulario-cita {
@@ -763,6 +764,13 @@ table button {
   border: none;
   font-size: 16px;
   outline: none;
+  
+}
+.label-cita {
+  font-size: 16px;
+  color: black;
+  margin-bottom: 8px;
+  display: block;
 }
 
 .boton-cita {
