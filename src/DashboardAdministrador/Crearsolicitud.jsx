@@ -83,6 +83,7 @@ const FormRegistroTrabajo = () => {
     estado: 'pendiente'
   });
   const [errorValidacion, setErrorValidacion] = useState('');
+  const [errores, setErrores] = useState({});
   const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
   const [serviciosLista, setServiciosLista] = useState([]);
@@ -102,10 +103,10 @@ const FormRegistroTrabajo = () => {
       .catch(err => console.error('Error cargando servicios:', err));
   }, []);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormulario(prev => ({ ...prev, [name]: value }));
+    setErrores(prev => ({ ...prev, [name]: '' }));
   };
 
   const handleClienteChange = (selectedOption) => {
@@ -113,6 +114,7 @@ const FormRegistroTrabajo = () => {
       ...prev,
       id_cliente: selectedOption ? selectedOption.value : ''
     }));
+    setErrores(prev => ({ ...prev, id_cliente: '' }));
   };
 
   const handleServiciosChange = (selectedOptions) => {
@@ -120,39 +122,59 @@ const FormRegistroTrabajo = () => {
       ...prev,
       servicios: selectedOptions ? selectedOptions.map(option => option.value) : []
     }));
+    setErrores(prev => ({ ...prev, servicios: '' }));
   };
 
   const validarFormulario = () => {
+    let valid = true;
+    let nuevosErrores = {};
+
     if (!formulario.id_cliente) {
-      setErrorValidacion('Debe seleccionar un cliente');
-      return false;
+      nuevosErrores.id_cliente = 'Debe seleccionar un cliente';
+      valid = false;
     }
     if (formulario.servicios.length === 0) {
-      setErrorValidacion('Debe seleccionar al menos un servicio');
-      return false;
+      nuevosErrores.servicios = 'Debe seleccionar al menos un servicio';
+      valid = false;
     }
-    if (!formulario.direccion.trim()) {
-      setErrorValidacion('La dirección es requerida');
-      return false;
+    const direccion = formulario.direccion.trim();
+    const direccionValida = /^[a-zA-Z0-9\s,#]+$/.test(direccion);
+    const direccionSinEspacios = direccion.replace(/\s/g, '');
+    if (direccionSinEspacios.length < 10) {
+      nuevosErrores.direccion = 'La dirección debe tener al menos 10 caracteres (sin contar espacios)';
+      valid = false;
+    }
+    if (!direccion) {
+      nuevosErrores.direccion = 'La dirección es requerida';
+      valid = false;
+    } else if (direccion.length < 2) {
+      nuevosErrores.direccion = 'La dirección debe tener al menos 2 caracteres';
+      valid = false;
+    } else if (!direccionValida) {
+      nuevosErrores.direccion = 'La dirección solo puede contener letras, números, espacios, "," y "#"';
+      valid = false;
     }
     if (!formulario.via_comunicacion.trim()) {
-      setErrorValidacion('La vía de comunicación es requerida');
-      return false;
+      nuevosErrores.via_comunicacion = 'La vía de comunicación es requerida';
+      valid = false;
     }
     if (!formulario.fecha) {
-      setErrorValidacion('Debe seleccionar una fecha');
-      return false;
+      nuevosErrores.fecha = 'Debe seleccionar una fecha';
+      valid = false;
+    } else {
+      const hoy = new Date().toISOString().split('T')[0];
+      if (formulario.fecha < hoy) {
+        nuevosErrores.fecha = 'La fecha no puede ser anterior a hoy';
+        valid = false;
+      }
     }
     if (!formulario.hora) {
-      setErrorValidacion('Debe seleccionar una hora');
-      return false;
+      nuevosErrores.hora = 'Debe seleccionar una hora';
+      valid = false;
     }
-    if (!formulario.estado) {
-      setErrorValidacion('Debe seleccionar un estado');
-      return false;
-    }
+    setErrores(nuevosErrores);
     setErrorValidacion('');
-    return true;
+    return valid;
   };
 
   const handleSubmit = async (e) => {
@@ -177,6 +199,7 @@ const FormRegistroTrabajo = () => {
           hora: '',
           estado: 'pendiente'
         });
+        setErrores({});
         navigate('/solicitudservicio');
       } else {
         const error = await respuesta.json();
@@ -212,6 +235,7 @@ const FormRegistroTrabajo = () => {
             placeholder="Buscar cliente por nombre"
             isClearable
           />
+          {errores.id_cliente && <span className="error-validacion">{errores.id_cliente}</span>}
         </div>
 
         <div className="campo-cita">
@@ -230,6 +254,7 @@ const FormRegistroTrabajo = () => {
             onChange={handleServiciosChange}
             placeholder="Buscar y seleccionar servicios"
           />
+          {errores.servicios && <span className="error-validacion">{errores.servicios}</span>}
         </div>
 
         <input
@@ -240,6 +265,7 @@ const FormRegistroTrabajo = () => {
           value={formulario.direccion}
           onChange={handleChange}
         />
+        {errores.direccion && <span className="error-validacion">{errores.direccion}</span>}
 
         <select
           name="via_comunicacion"
@@ -252,7 +278,7 @@ const FormRegistroTrabajo = () => {
           <option value="Email">Email</option>
           <option value="APP">App</option>
         </select>
-
+        {errores.via_comunicacion && <span className="error-validacion">{errores.via_comunicacion}</span>}
 
         <input
           type="date"
@@ -262,6 +288,7 @@ const FormRegistroTrabajo = () => {
           onChange={handleChange}
           min={new Date().toISOString().split('T')[0]}
         />
+        {errores.fecha && <span className="error-validacion">{errores.fecha}</span>}
 
         <select
           name="hora"
@@ -276,6 +303,8 @@ const FormRegistroTrabajo = () => {
           <option value="15:00">15:00</option>
           <option value="18:00">18:00</option>
         </select>
+        {errores.hora && <span className="error-validacion">{errores.hora}</span>}
+
         {errorValidacion && <p className="error-validacion">{errorValidacion}</p>}
 
         <button type="submit" className="boton-cita">REGISTRAR</button>
