@@ -241,7 +241,7 @@ const Factura = () => {
                         <td>{factura.id}</td>
                         <td>{factura.solicitud_id}</td>
                         <td>{formatearFecha(factura.fecha_emision)}</td>
-                        <td>RD$ {factura.monto_total?.toFixed(2) ?? '0.00'}</td>
+<td>{factura.total ? `RD$ ${parseFloat(factura.total).toFixed(2)}` : 'N/A'}</td>
                         <td>{descripcionDetalles}</td>
                         <td>{factura.estado}</td>
                         <td>
