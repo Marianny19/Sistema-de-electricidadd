@@ -19,7 +19,7 @@ const DetalleCotizacion = require('./models/DetalleCotizacion');
 const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
 const Factura = require('./models/factura');
 const DetalleFactura = require('./models/detallefactura');
-const sequelize = require('./database'); // o './conexion' según el archivo correcto
+const sequelize = require('./database'); 
 
 
 
@@ -110,7 +110,7 @@ Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 
 
 const app = express();
-const port = 8081;
+const port = process.env.PORT || 8081;
 
 app.use(cors()); 
 app.use(express.json());
