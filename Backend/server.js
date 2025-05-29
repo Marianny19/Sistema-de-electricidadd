@@ -109,15 +109,15 @@ Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 
 
 
+const path = require('path');
+
 const app = express();
 const port = process.env.PORT || 8081;
 
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Servidor funcionando correctamente');
-});
+app.use(express.static(path.join(__dirname, '..', 'dist')));
 
 
 app.get('/clientes', async (req, res) => {
