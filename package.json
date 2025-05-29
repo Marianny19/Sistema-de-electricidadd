@@ -2,10 +2,10 @@
   "name": "sistema-eldad",
   "private": true,
   "version": "0.0.0",
+  "type": "commonjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "start": "node Backend/server.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest",
