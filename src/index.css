@@ -720,6 +720,11 @@ table button {
   border: none;
   padding: 14px 24px;
   border-radius: 999px;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .send-button:hover {
@@ -790,129 +795,9 @@ table button {
   max-height: fit-content;
   align-self: start;
 }
-
-.subtotal {
-  font-weight: bold;
-  text-align: right;
-  margin-top: 1rem;
-}
-
-.summary-row,
-.summary-total {
-  display: flex;
-  justify-content: space-between;
-  margin: 8px 0;
-}
-
-.summary-total {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-.button-group {
-  margin-top: 1rem;
-  display: flex;
-  gap: 1rem;
-}
-
-.button-group button {
-  padding: 8px 16px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.save {
-  background-color: #4caf50;
-  color: white;
-}
-
-.send {
-  background-color: #2196f3;
-  color: white;
-}
-
-.cancel {
-  background-color: #f44336;
-  color: white;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.input-group label {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.input-group input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-/* Table */
-.invoice-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.invoice-table th,
-.invoice-table td {
-  text-align: left;
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-}
-
-.subtotal {
-  text-align: right;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-/* Summary */
-.invoice-summary h2 {
-  font-size: 20px;
-  margin-bottom: 16px;
-}
-
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.summary-total {
-  display: flex;
-  justify-content: space-between;
-  border-top: 2px solid #eee;
-  font-weight: bold;
-  font-size: 18px;
-  padding-top: 8px;
-  margin-top: 12px;
-}
-
-/* Buttons */
-.button-group {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.button-group button {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button.save {
-  background-color: #2563eb;
-  color: white;
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 button.send {
@@ -1024,11 +909,19 @@ button.cancel {
   .alinear {
     align-items: stretch;
   }
-  a:hover {
-    color: #747bff;
+
+  .Registro {
+    margin-left: 0;
+    width: 100%;
+    font-size: 16px;
+    text-align: center;
   }
-  button {
-    background-color: #f9f9f9;
+
+  .input-container {
+    margin-left: 0;
+    max-width: 100%;
+    width: 100%;
+    margin-top: 10px;
   }
 
   .contenedor-cita {
