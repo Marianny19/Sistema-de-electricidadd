@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 
 const conexion = new Sequelize('sistema_electricidad', 'root', 'Marianny19', {
-  host: 'us-west-2.connect.psdb.cloud',
+  host: 'localhost',
   dialect: 'mysql',
 });
 
