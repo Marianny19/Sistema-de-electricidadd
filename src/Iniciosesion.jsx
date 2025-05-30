@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import iniciosesion from './imagenes/Inicio_sesion.png';
+import iniciosesion from './imagenes/inicio_sesion.png';
 import { FaArrowLeft } from "react-icons/fa";
 
 const Iniciosesion = () => {
