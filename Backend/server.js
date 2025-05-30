@@ -113,7 +113,8 @@ const port = 8081;
 
 const cors = require('cors');
 
-const allowedOrigins = ['https://serviciosmultiplesperez.onrender.com']; 
+const allowedOrigins = ['sistema-de-electricidadd-production-64cd.up.railway.app'];  
+//se supone que eso cambia no, porque ahora es a railway que la estas subiendo?
 
 app.use(cors({
   origin: allowedOrigins
