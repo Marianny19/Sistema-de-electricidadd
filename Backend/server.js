@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 const conexion = require('./database');
 const Cliente = require('./models/cliente');
 const Empleado = require('./models/empleado');
