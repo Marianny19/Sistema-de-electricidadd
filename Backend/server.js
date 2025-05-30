@@ -113,8 +113,8 @@ const port = 8081;
 
 const cors = require('cors');
 
-const allowedOrigins = ['https://sistema-de-electricidadd-j1mc.onrender.com']; 
-
+const allowedOrigins = ['https://sistema-de-electricidadd-j1mc..com']; 
+onrender
 app.use(cors({
   origin: allowedOrigins
 }));
