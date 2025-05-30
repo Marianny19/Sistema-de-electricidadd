@@ -25,16 +25,11 @@ const Dashboard = () => {
   };
 
   const cerrarSesion = () => {
-    localStorage.clear();
-    sessionStorage.clear();
+  localStorage.clear();
+  sessionStorage.clear();
+  navigate('/iniciarsesion', { replace: true });
+};
 
-    navigate('/iniciarsesion', { replace: true });
-
-    window.history.pushState(null, '', '/iniciarsesion');
-    window.onpopstate = () => {
-      window.history.go(1);
-    };
-  };
 
    const formatearFechaHora = (fechaISO, hora) => {
     const [horaStr, minutosStr] = hora.split(':');

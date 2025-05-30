@@ -19,7 +19,7 @@ const DetalleCotizacion = require('./models/DetalleCotizacion');
 const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
 const Factura = require('./models/factura');
 const DetalleFactura = require('./models/detallefactura');
-const sequelize = require('./database'); // o './conexion' según el archivo correcto
+const sequelize = require('./database'); 
 
 
 
@@ -109,14 +109,23 @@ Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 
 
 
-const app = express();
-const port = 8081;
+DetalleCotizacion.belongsTo(Servicio, { foreignKey: 'id_servicio', as: 'servicio' });
+DetalleCotizacion.belongsTo(Cotizacion, { foreignKey: 'id_cotizacion' });
 
-app.use(cors()); 
-app.use(express.json());
+Cotizacion.hasMany(DetalleCotizacion, { foreignKey: 'id_cotizacion', as: 'detalles' });
+Cotizacion.belongsTo(Cliente, { foreignKey: 'id_cliente', as: 'cliente' });
 
-app.get('/', (req, res) => {
-  res.send('Servidor funcionando correctamente');
+Registrotrabajo.belongsToMany(Servicio, {
+  through: 'detalleregistro',
+  foreignKey: 'id_registro_trabajo',
+  otherKey: 'id_servicio',
+  as: 'Servicios'   
+});
+Servicio.belongsToMany(Registrotrabajo, {
+  through: 'detalleregistro',
+  foreignKey: 'id_servicio',
+  otherKey: 'id_registro_trabajo',
+  as: 'RegistrosTrabajo'  
 });
 
 
