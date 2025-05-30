@@ -112,8 +112,16 @@ Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 const app = express();
 const port = 8081;
 
-app.use(cors()); 
+const cors = require('cors');
+
+const allowedOrigins = ['https://sistema-de-electricidadd-j1mc.onrender.com']; 
+
+app.use(cors({
+  origin: allowedOrigins
+}));
+
 app.use(express.json());
+
 
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente');
