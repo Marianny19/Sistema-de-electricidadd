@@ -1,7 +1,8 @@
 const { Sequelize } = require('sequelize');
 
-const conexion = new Sequelize('sistema_electricidad', 'root', 'Marianny19', {
-  host: 'localhost',
+const conexion = new Sequelize('railway', 'root', 'HDpNWUpKeFlKCtyETPUfsdYYcpTVdIBZ', {
+  host: 'nozomi.proxy.rlwy.net',
+  port: 40129,
   dialect: 'mysql',
 });
 
