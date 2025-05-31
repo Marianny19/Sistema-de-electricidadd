@@ -57,7 +57,7 @@ function FormularioRegistro() {
 
     try {
       // Registrar usuario
-      const resUsuario = await fetch('http://localhost:8081/cliente', {
+      const resUsuario = await fetch('cliente', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(usuario),
@@ -69,7 +69,7 @@ function FormularioRegistro() {
       }
 
       // Registrar cliente
-      const resCliente = await fetch('http://localhost:8081/clientes', {
+      const resCliente = await fetch('https://sistema-de-electricidadd-copy-production.up.railway.app/clientes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cliente),
