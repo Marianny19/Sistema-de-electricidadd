@@ -116,7 +116,6 @@ const cors = require('cors');
 const allowedOrigins = [
   'https://sistema-de-electricidadd-production-64cd.up.railway.app',
   'https://sistema-de-electricidadd-copy-production.up.railway.app',
-  'http://localhost:5173'
 ];
 
 app.use(cors({
