@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const conexion = require('./database');
 const Cliente = require('./models/cliente');
 const Empleado = require('./models/empleado');
@@ -18,7 +19,7 @@ const DetalleCotizacion = require('./models/DetalleCotizacion');
 const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
 const Factura = require('./models/factura');
 const DetalleFactura = require('./models/detallefactura');
-const sequelize = require('./database'); // o './conexion' según el archivo correcto
+const sequelize = require('./database'); 
 
 
 
@@ -108,29 +109,23 @@ Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 
 
 
-const app = express();
-const port = 8081;
+DetalleCotizacion.belongsTo(Servicio, { foreignKey: 'id_servicio', as: 'servicio' });
+DetalleCotizacion.belongsTo(Cotizacion, { foreignKey: 'id_cotizacion' });
 
-const cors = require('cors');
+Cotizacion.hasMany(DetalleCotizacion, { foreignKey: 'id_cotizacion', as: 'detalles' });
+Cotizacion.belongsTo(Cliente, { foreignKey: 'id_cliente', as: 'cliente' });
 
-const allowedOrigins = [
-  'https://sistema-de-electricidadd-production-64cd.up.railway.app',
-  'https://sistema-de-electricidadd-copy-production.up.railway.app',
-  'http://localhost:5173'
-];
-
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-app.use(express.json());
-
-
-app.get('/', (req, res) => {
-  res.send('Servidor funcionando correctamente');
+Registrotrabajo.belongsToMany(Servicio, {
+  through: 'detalleregistro',
+  foreignKey: 'id_registro_trabajo',
+  otherKey: 'id_servicio',
+  as: 'Servicios'   
+});
+Servicio.belongsToMany(Registrotrabajo, {
+  through: 'detalleregistro',
+  foreignKey: 'id_servicio',
+  otherKey: 'id_registro_trabajo',
+  as: 'RegistrosTrabajo'  
 });
 
 
@@ -1169,6 +1164,8 @@ app.put('/pagos/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el pago' });
   }
 });
+
+
 
 // Obtener un pago por ID
 app.get('/pagos/:id', async (req, res) => {
