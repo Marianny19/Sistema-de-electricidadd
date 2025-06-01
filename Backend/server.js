@@ -113,17 +113,11 @@ const port = 8081;
 
 const cors = require('cors');
 
-const allowedOrigins = [
-  'https://sistema-de-electricidadd-production-64cd.up.railway.app',
-  'https://sistema-de-electricidadd-copy-production.up.railway.app',
-  'http://localhost:5173'
-];
+const allowedOrigins = ['sistema-de-electricidadd-production-64cd.up.railway.app'];  
+//se supone que eso cambia no, porque ahora es a railway que la estas subiendo?
 
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: allowedOrigins
 }));
 
 app.use(express.json());
@@ -1170,6 +1164,8 @@ app.put('/pagos/:id', async (req, res) => {
   }
 });
 
+
+
 // Obtener un pago por ID
 app.get('/pagos/:id', async (req, res) => {
   const { id } = req.params;
@@ -1788,3 +1784,4 @@ app.delete('/cotizaciones/:id', async (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
+
