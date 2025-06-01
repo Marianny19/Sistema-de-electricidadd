@@ -117,7 +117,8 @@ const allowedOrigins = ['sistema-de-electricidadd-production-f62b.up.railway.app
 //se supone que eso cambia no, porque ahora es a railway que la estas subiendo?
 
 app.use(cors({
-  origin: allowedOrigins
+  origin: allowedOrigins,
+  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
 }));
 
 app.use(express.json());
