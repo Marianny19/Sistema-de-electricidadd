@@ -109,26 +109,38 @@ Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 
 
 const app = express();
-const port = 8081;
+const port = process.env.PORT || 8081;
 
 const cors = require('cors');
 
 const allowedOrigins = [
+  'http://localhost:5173',
   'http://localhost:8081',
-  'sistema-de-electricidadd-production-f62b.up.railway.app',
-  'sistema-de-electricidadd-production-64cd.up.railway.app',
+  'https://sistema-de-electricidadd-production-f62b.up.railway.app',
+  'https://sistema-de-electricidadd-production-64cd.up.railway.app'
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('No permitido por CORS'));
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if the origin is in our allowedOrigins list
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
     }
+    return callback(null, true);
   },
-  credentials: true // si estás usando cookies o headers con auth
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(express.json());
 
