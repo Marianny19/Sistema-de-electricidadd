@@ -57,7 +57,7 @@ function FormularioRegistro() {
 
     try {
       // Registrar usuario
-      const resUsuario = await fetch('https://sistema-de-electricidadd-production-64cd.up.railway.app/cliente', {
+      const resUsuario = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/cliente', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(usuario),
@@ -69,7 +69,7 @@ function FormularioRegistro() {
       }
 
       // Registrar cliente
-      const resCliente = await fetch('https://sistema-de-electricidadd-production-64cd.up.railway.app/clientes', {
+      const resCliente = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cliente),

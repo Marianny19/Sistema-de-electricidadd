@@ -72,9 +72,9 @@ const Dashboard = () => {
     const fetchDatosDashboard = async () => {
       try {
         const [resCitas, resPendientes, resAtrasados] = await Promise.all([
-          axios.get('https://sistema-de-electricidadd-production-64cd.up.railway.app/proximas-citas'),
-          axios.get('https://sistema-de-electricidadd-production-64cd.up.railway.app/servicios-pendientes'),
-          axios.get('https://sistema-de-electricidadd-production-64cd.up.railway.app/servicios-atrasados'),
+          axios.get('https://sistema-de-electricidadd-production-f62b.up.railway.app/proximas-citas'),
+          axios.get('https://sistema-de-electricidadd-production-f62b.up.railway.app/servicios-pendientes'),
+          axios.get('https://sistema-de-electricidadd-production-f62b.up.railway.app/servicios-atrasados'),
         ]);
 
         setCitas(Array.isArray(resCitas.data) ? resCitas.data : []);
