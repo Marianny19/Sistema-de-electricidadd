@@ -115,7 +115,7 @@ const cors = require('cors');
 
 const allowedOrigins = [
   'http://localhost:8081',
-  'http://localhost:5173', // 👈 Agrega esto
+  'http://localhost:5173',
   'https://sistema-de-electricidadd-production-f62b.up.railway.app',
   'https://sistema-de-electricidadd-production-64cd.up.railway.app',
 ];
@@ -125,13 +125,16 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('CORS bloqueado para:', origin); // útil para debug
+      console.log('CORS bloqueado para:', origin);
       callback(new Error('No permitido por CORS'));
     }
   },
   credentials: true
 }));
 
+app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente');
