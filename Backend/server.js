@@ -19,7 +19,8 @@ const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
 const Factura = require('./models/factura');
 const DetalleFactura = require('./models/detallefactura');
 const sequelize = require('./database'); // o './conexion' según el archivo correcto
-const cors = require('cors');
+
+
 
 Cliente.hasMany(Cita, { foreignKey: 'id_cliente' });
 Cita.belongsTo(Cliente, { foreignKey: 'id_cliente' });
@@ -75,6 +76,8 @@ Solicitudservicio.hasMany(Factura, { foreignKey: 'solicitud_id' });
 
 Servicio.hasMany(DetalleCotizacion, { foreignKey: 'id_servicio' });
 
+
+
 DetalleCotizacion.belongsTo(Servicio, { foreignKey: 'id_servicio', as: 'servicio' });
 DetalleCotizacion.belongsTo(Cotizacion, { foreignKey: 'id_cotizacion' });
 
@@ -103,19 +106,27 @@ Registrotrabajo.belongsTo(Solicitudservicio, { foreignKey: 'id_solicitud_servici
 Factura.hasMany(Pago, { foreignKey: 'factura_id', as: 'pagos' });
 Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 
+
+
 const app = express();
 const port = process.env.PORT || 8081;
+
+const cors = require('cors');
+
+const allowedOrigins = [
+  'http://localhost:8081',
+  'http://localhost:5173',
+  'https://sistema-de-electricidadd-production-f62b.up.railway.app',
+  'https://sistema-de-electricidadd-production-64cd.up.railway.app'
+];
 
 // Configure CORS
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    const allowedOrigins = [
-      'http://localhost:8081',
-      'http://localhost:5173',
-      'https://sistema-de-electricidadd-production-f62b.up.railway.app',
-      'https://sistema-de-electricidadd-production-64cd.up.railway.app'
-    ];
+    
+    // Check if the origin is in our allowedOrigins list
     if (allowedOrigins.indexOf(origin) === -1) {
       console.log('CORS bloqueado para:', origin);
       return callback(new Error('No permitido por CORS'));
@@ -141,6 +152,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente');
 });
+
 
 app.get('/clientes', async (req, res) => {
   try {
@@ -208,6 +220,8 @@ app.delete('/clientes/:id', async (req, res) => {
   }
 });
 
+
+
 // Ruta GET para obtener todos los empleados
 app.get('/empleados', async (req, res) => {
   try {
@@ -243,6 +257,7 @@ app.get('/empleados/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener empleado' });
   }
 });
+
 
 //Actualizar empleado
 app.put('/empleados/:id', async (req, res) => {
@@ -290,6 +305,7 @@ app.get('/notas', async (req, res) => {
   }
 });
 
+
 app.post('/notas', async (req, res) => {
   try {
     const { id_cliente, comentario, fecha_creacion, estado } = req.body;
@@ -315,6 +331,7 @@ app.post('/notas', async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
+
 
 app.get('/citas', async (req, res) => {
   try {
@@ -354,6 +371,8 @@ app.get('/citas', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener citas', detalles: error.message });
   }
 });
+
+
 
 // POST /citas
 app.post('/citas', async (req, res) => {
@@ -413,6 +432,8 @@ app.post('/citas', async (req, res) => {
     });
   }
 });
+
+
 
 //Actualizar cita
 app.put('/citas/:id', async (req, res) => {
@@ -482,6 +503,8 @@ app.put('/citas/:id', async (req, res) => {
     return res.status(500).json({ error: 'Error general al actualizar cita' });
   }
 });
+
+
 
 app.get('/citas/:id', async (req, res) => {
   try {
@@ -566,6 +589,7 @@ app.get('/validar-fecha', async (req, res) => {
   }
 });
 
+
 //get de servicios
 app.get('/servicios', async (req, res) => {
   try {
@@ -576,6 +600,7 @@ app.get('/servicios', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener servicios' });
   }
 });
+
 
 // Ruta GET para obtener todas las solicitudes de servicio
 app.get('/solicitudservicio', async (req, res) => {
@@ -609,6 +634,7 @@ app.get('/solicitudservicio', async (req, res) => {
   }
 });
  
+
 app.get('/solicitudservicio/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -644,6 +670,7 @@ app.get('/solicitudservicio/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener solicitud' });
   }
 });
+
 
 app.post('/solicitudservicio', async (req, res) => {
   try {
@@ -758,6 +785,8 @@ app.get('/servicios-mas-solicitados', async (req, res) => {
   }
 });
 
+
+
 app.get('/registrotrabajo', async (req, res) => {
   try {
     const registros = await Registrotrabajo.findAll({
@@ -790,6 +819,7 @@ app.get('/registrotrabajo', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener registro' });
   }
 });
+
 
 app.post('/registrotrabajo', async (req, res) => {
   try {
@@ -847,6 +877,7 @@ app.post('/registrotrabajo', async (req, res) => {
   }
 });
 
+
 app.get('/registrotrabajo/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -882,6 +913,8 @@ app.get('/registrotrabajo/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener registro de trabajo' });
   }
 });
+
+
 
 app.put('/registrotrabajo/:id', async (req, res) => {
   try {
@@ -950,6 +983,9 @@ app.delete('/registrotrabajo/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 });
+
+
+
 
 //GET PAGO
 app.get('/pagos', async (req, res) => {
@@ -1107,6 +1143,7 @@ app.post('/pagos', async (req, res) => {
   }
 });
 
+
 app.put('/pagos/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -1153,6 +1190,8 @@ app.put('/pagos/:id', async (req, res) => {
   }
 });
 
+
+
 // Obtener un pago por ID
 app.get('/pagos/:id', async (req, res) => {
   const { id } = req.params;
@@ -1167,6 +1206,8 @@ app.get('/pagos/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener pago' });
   }
 });
+
+
 
 //Eliminar pago
 app.delete('/pagos/:id', async (req, res) => {
@@ -1230,6 +1271,7 @@ app.get('/facturas/:id', async (req, res) => {
   }
 });
 
+
 app.post('/facturas', async (req, res) => {
   const {
     solicitud_id,
@@ -1283,6 +1325,7 @@ app.post('/facturas', async (req, res) => {
     res.status(500).json({ error: 'Error al crear la factura' });
   }
 });
+
 
 app.get('/solicitudservicio/:id/monto-total', async (req, res) => {
   try {
@@ -1355,6 +1398,8 @@ app.get('/solicitudservicio/:id/monto-total', async (req, res) => {
   }
 });
 
+
+
 app.get('/facturas', async (req, res) => {
   try {
     const facturas = await Factura.findAll({
@@ -1391,6 +1436,7 @@ app.get('/facturas', async (req, res) => {
   }
 });
 
+
 app.delete('/facturas/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -1409,6 +1455,8 @@ app.delete('/facturas/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 });
+
+
 
 app.post('/cliente', async (req, res) => {
   try {
@@ -1441,6 +1489,7 @@ app.post('/cliente', async (req, res) => {
     res.status(500).json({ error: 'Error al registrar usuario', details: error.message });
   }
 });
+
 
 app.post('/login', async (req, res) => {
   const { email, contrasena } = req.body;
@@ -1501,6 +1550,9 @@ app.post('/login', async (req, res) => {
   }
 });
 
+
+
+
 app.get('/usuario', async (req, res) => {
   const { email } = req.query;
 
@@ -1527,6 +1579,7 @@ app.get('/usuario', async (req, res) => {
     res.status(500).json({ error: 'Error interno en el servidor' });
   }
 });
+
 
 app.get('/cliente', async (req, res) => {
   try {
@@ -1561,6 +1614,8 @@ app.get('/proximas-citas', async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener próximas citas' });
   }
 });
+
+
 
 app.get('/servicios-pendientes', async (req, res) => {
   try {
@@ -1698,6 +1753,7 @@ app.get('/cotizaciones/:id', async (req, res) => {
   }
 });
 
+
 app.put('/cotizaciones/:id', async (req, res) => {
   const { id } = req.params;
   const { id_cliente, estado, servicios, subtotal, impuesto, descuento,total } = req.body;
@@ -1748,6 +1804,8 @@ app.delete('/cotizaciones/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al cancelar la cotizacio' });
   }
 });
+
+
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
