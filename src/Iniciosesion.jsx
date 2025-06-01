@@ -23,13 +23,9 @@ const Iniciosesion = () => {
     }
 
     try {
-      const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/login', {
+      const response = await fetch('http://localhost:8081/login', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credenciales)
       });
 

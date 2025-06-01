@@ -109,7 +109,7 @@ Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 
 
 const app = express();
-const port = process.env.PORT || 8081;
+const port = 8081;
 
 const cors = require('cors');
 
@@ -117,36 +117,23 @@ const allowedOrigins = [
   'http://localhost:8081',
   'http://localhost:5173',
   'https://sistema-de-electricidadd-production-f62b.up.railway.app',
-  'https://sistema-de-electricidadd-production-64cd.up.railway.app'
+  'https://sistema-de-electricidadd-production-64cd.up.railway.app',
 ];
 
-// Configure CORS
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Check if the origin is in our allowedOrigins list
-    if (allowedOrigins.indexOf(origin) === -1) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
       console.log('CORS bloqueado para:', origin);
-      return callback(new Error('No permitido por CORS'));
+      callback(new Error('No permitido por CORS'));
     }
-    return callback(null, true);
   },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  maxAge: 86400
+  credentials: true
 }));
 
-// Handle preflight requests
-app.options('*', cors());
-
-// Parse JSON bodies
 app.use(express.json());
 
-// Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
