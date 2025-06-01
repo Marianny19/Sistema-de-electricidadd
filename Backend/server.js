@@ -113,11 +113,21 @@ const port = 8081;
 
 const cors = require('cors');
 
-const allowedOrigins = ['sistema-de-electricidadd-production-64cd.up.railway.app'];  
-//se supone que eso cambia no, porque ahora es a railway que la estas subiendo?
+const allowedOrigins = [
+  'http://localhost:8081',
+  'sistema-de-electricidadd-production-f62b.up.railway.app',
+  'sistema-de-electricidadd-production-64cd.up.railway.app',
+];
 
 app.use(cors({
-  origin: allowedOrigins
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  credentials: true // si estás usando cookies o headers con auth
 }));
 
 app.use(express.json());
