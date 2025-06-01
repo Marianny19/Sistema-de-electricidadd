@@ -23,7 +23,7 @@ const Iniciosesion = () => {
     }
 
     try {
-      const response = await fetch('sistema-de-electricidadd-production-f62b.up.railway.app/login', {
+      const response = await fetch('https://sistema-de-electricidadd-copy-production.up.railway.app/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credenciales)
