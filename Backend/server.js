@@ -109,21 +109,30 @@ Pago.belongsTo(Factura, { foreignKey: 'factura_id' });
 
 
 const app = express();
-const port = 8081;
+const port = process.env.PORT || 8081;
 
 const cors = require('cors');
 
 const allowedOrigins = [
-  'sistema-de-electricidadd-production-64cd.up.railway.app',
-  'sistema-de-electricidadd-production-f62b.up.railway.app',
+  'https://sistema-de-electricidadd-production-64cd.up.railway.app',
+  'https://sistema-de-electricidadd-production-f62b.up.railway.app',
   'http://localhost:5173'
 ];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function(origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 app.use(express.json());
