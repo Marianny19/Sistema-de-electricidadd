@@ -78,7 +78,7 @@ function FormularioNota() {
 
     const cargarCliente = async () => {
       try {
-        const response = await fetch('hhttps://sistema-de-electricidadd-production-f62b.up.railway.app/clientes');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes');
         const data = await response.json();
         const cliente = data.find(
           c => c.email.toLowerCase() === emailUsuario && c.estado === 'activo'
