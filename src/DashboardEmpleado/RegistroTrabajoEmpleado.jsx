@@ -34,18 +34,19 @@ const RegistroTrabajoEmpleado = () => {
         console.log("Respuesta del backend registros:", data);
         setRegistros(data);
       } catch (error) {
+        console.error("Error al cargar registros:", error);
         alert("Error al cargar registros de trabajo");
-        console.error(error);
       }
     }
     cargarRegistros();
   }, []);
 
-
   const registrosFiltrados = registros.filter(r =>
     r.id_solicitud_servicio.toString().includes(filtro.toLowerCase()) ||
     r.id_empleado.toString().includes(filtro.toLowerCase())
   );
+
+  console.log("Registros filtrados:", registrosFiltrados);
 
   return (
     <div className="dashboard">
@@ -107,6 +108,7 @@ const RegistroTrabajoEmpleado = () => {
                 <tr>
                   <th>Código</th>
                   <th>Solicitud</th>
+                  <th>Cliente</th>
                   <th>Empleado</th>
                   <th>Servicios</th>
                   <th>Costo extra</th>
@@ -123,6 +125,7 @@ const RegistroTrabajoEmpleado = () => {
                     <tr key={registro.id_registro_trabajo || registro.id}>
                       <td>{registro.id_registro_trabajo || registro.id}</td>
                       <td>{registro.id_solicitud_servicio}</td>
+                      <td>{registro.nombre_cliente}</td>
                       <td>{registro.id_empleado}</td>
                       <td>
                         {registro.servicios && Array.isArray(registro.servicios)

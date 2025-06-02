@@ -776,6 +776,7 @@ app.get('/servicios-mas-solicitados', async (req, res) => {
 
 app.get('/registrotrabajo', async (req, res) => {
   try {
+    console.log('Fetching registros de trabajo...');
     const registros = await Registrotrabajo.findAll({
       include: [
         {
@@ -784,8 +785,17 @@ app.get('/registrotrabajo', async (req, res) => {
           attributes: ['id_servicio', 'nombre_servicio'],
           through: { attributes: [] }
         },
+        {
+          model: Solicitudservicio,
+          attributes: ['id_solicitud'],
+          include: [{
+            model: Cliente,
+            attributes: ['nombre']
+          }]
+        }
       ]
     });
+    console.log('Registros encontrados:', registros.length);
 
     const resultado = registros.map(r => ({
       id_registro_trabajo: r.id_registro_trabajo,
@@ -794,12 +804,14 @@ app.get('/registrotrabajo', async (req, res) => {
       costo_extra: r.costo_extra,
       fecha: r.fecha,
       estado: r.estado,
+      nombre_cliente: r.Solicitudservicio?.Cliente?.nombre || 'Cliente no encontrado',
       servicios: r.Servicios?.map(s => ({
         id_servicio: s.id_servicio,
         nombre_servicio: s.nombre_servicio,
       })) || []
     }));
 
+    console.log('Resultado procesado:', resultado);
     res.json(resultado);
   } catch (error) {
     console.error('Error al obtener registro:', error);
