@@ -78,7 +78,7 @@ function FormularioNota() {
 
     const cargarCliente = async () => {
       try {
-        const response = await fetch('http://localhost:8081/clientes');
+        const response = await fetch('hhttps://sistema-de-electricidadd-production-f62b.up.railway.app/clientes');
         const data = await response.json();
         const cliente = data.find(
           c => c.email.toLowerCase() === emailUsuario && c.estado === 'activo'
@@ -117,7 +117,7 @@ function FormularioNota() {
     }
 
     try {
-      const respuesta = await fetch('http://localhost:8081/notas', {
+      const respuesta = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/notas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formulario, id_cliente: Number(id_cliente) }),

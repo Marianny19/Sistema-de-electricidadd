@@ -19,7 +19,7 @@ const CitaEmpelado = () => {
   useEffect(() => {
     async function cargarCitas() {
       try {
-        const response = await fetch('http://localhost:8081/citas');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/citas');
         const data = await response.json();
         setCitas(data);
       } catch (error) {

@@ -83,7 +83,7 @@ const FormRegistroTrabajo = () => {
   const [serviciosLista, setServiciosLista] = useState([]);
 
  useEffect(() => {
-  fetch('http://localhost:8081/clientes')
+  fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes')
     .then(res => res.json())
     .then(data => {
       const clientesActivos = data.filter(cliente => cliente.estado === 'activo');
@@ -91,7 +91,7 @@ const FormRegistroTrabajo = () => {
     })
     .catch(err => console.error('Error cargando clientes:', err));
 
-  fetch('http://localhost:8081/servicios')
+  fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/servicios')
     .then(res => res.json())
     .then(data => setServiciosLista(data))
     .catch(err => console.error('Error cargando servicios:', err));
@@ -125,7 +125,7 @@ const FormRegistroTrabajo = () => {
     }
 
     try {
-      const respuesta = await fetch('http://localhost:8081/solicitudservicio', {
+      const respuesta = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/solicitudservicio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

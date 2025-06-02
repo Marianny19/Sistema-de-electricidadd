@@ -19,7 +19,7 @@ const RegistrarServicioEmpleado = () => {
   useEffect(() => {
     async function cargarSolicitud() {
       try {
-        const response = await fetch('http://localhost:8081/solicitudservicio');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/solicitudservicio');
         if (!response.ok) throw new Error('Error en la solicitud');
         const data = await response.json();
         console.log('Datos recibidos:', data);

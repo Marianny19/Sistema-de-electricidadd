@@ -20,7 +20,7 @@ const Facturaempleado = () => {
   useEffect(() => {
     async function cargarFacturas() {
       try {
-        const response = await fetch('http://localhost:8081/facturas');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/facturas');
         if (!response.ok) throw new Error('Error al cargar facturas');
         const data = await response.json();
         setFacturas(data);

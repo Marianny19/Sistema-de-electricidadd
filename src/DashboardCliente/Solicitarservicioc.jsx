@@ -72,7 +72,7 @@ function FormRegistroSolicitud() {
   useEffect(() => {
     const emailUsuario = localStorage.getItem('email')?.toLowerCase();
 
-    fetch('http://localhost:8081/clientes')
+    fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes')
       .then(res => res.json())
       .then(data => {
         const clienteActivo = data.find(
@@ -87,7 +87,7 @@ function FormRegistroSolicitud() {
       })
       .catch(err => console.error('Error al cargar cliente:', err));
 
-    fetch('http://localhost:8081/servicios')
+    fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/servicios')
       .then(res => res.json())
       .then(data => setServiciosLista(data))
       .catch(err => console.error('Error cargando servicios:', err));
@@ -115,7 +115,7 @@ function FormRegistroSolicitud() {
     }
 
     try {
-      const res = await fetch('http://localhost:8081/solicitudservicio', {
+      const res = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/solicitudservicio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formulario)

@@ -21,7 +21,7 @@ const Vercotizacionempleado = () => {
   useEffect(() => {
     async function cargarCotizaciones() {
       try {
-        const response = await fetch('http://localhost:8081/cotizaciones');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/cotizaciones');
         const data = await response.json();
         setCotizaciones(data);
       } catch (error) {

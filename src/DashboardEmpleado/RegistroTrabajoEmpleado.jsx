@@ -28,7 +28,7 @@ const RegistroTrabajoEmpleado = () => {
   useEffect(() => {
     async function cargarRegistros() {
       try {
-        const response = await fetch("http://localhost:8081/registrotrabajo");
+        const response = await fetch("https://sistema-de-electricidadd-production-f62b.up.railway.app/registrotrabajo");
         if (!response.ok) throw new Error("Error en la solicitud");
         const data = await response.json();
         console.log("Respuesta del backend registros:", data);
