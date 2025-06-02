@@ -5,7 +5,7 @@ const Empleado = require('./models/empleado');
 const Nota = require('./models/nota')
 const Cita = require('./models/cita');
 const Solicitudservicio = require('./models/solicitudservicio');
-const Registrotrabajo = require('./models/Detalleregistrotrabajo');
+const Registrotrabajo = require('./models/registrotrabajo');
 const Pago = require('./models/pago');
 const Servicio = require('./models/Servicio');
 const DetalleSolicitudServicio = require('./models/DetalleSolicitudServicio');
@@ -18,7 +18,7 @@ const DetalleCotizacion = require('./models/DetalleCotizacion');
 const Detalleregistrotrabajo = require('./models/Detalleregistrotrabajo');
 const Factura = require('./models/factura');
 const DetalleFactura = require('./models/detallefactura');
-const sequelize = require('./database'); // o './conexion' según el archivo correcto
+const sequelize = require('./database'); 
 
 
 
