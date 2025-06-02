@@ -85,7 +85,7 @@ function FormularioActualizarCliente({ id }) {
 
   // Cargar datos del cliente al montar el componente
   useEffect(() => {
-    fetch(`http://localhost:8081/clientes/${id}`)
+    fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('Error al obtener cliente');
         return res.json();
@@ -118,7 +118,7 @@ function FormularioActualizarCliente({ id }) {
     e.preventDefault();
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/clientes/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formulario)

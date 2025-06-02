@@ -21,7 +21,7 @@ const ActualizarPago = () => {
   });
 
   useEffect(() => {
-    fetch(`http://localhost:8081/pagos/${id}`)
+    fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/pagos/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data) {
@@ -72,7 +72,7 @@ const ActualizarPago = () => {
         estado: formulario.estado,
       };
 
-      const respuesta = await fetch(`http://localhost:8081/pagos/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/pagos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

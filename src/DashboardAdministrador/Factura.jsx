@@ -22,7 +22,7 @@ const Factura = () => {
     if (!confirmar) return;
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/facturas/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/facturas/${id}`, {
         method: 'DELETE'
       });
 
@@ -46,7 +46,7 @@ const Factura = () => {
 
   const imprimirFactura = async (id) => {
   try {
-    const response = await fetch(`http://localhost:8081/facturas/${id}`);
+    const response = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/facturas/${id}`);
     if (!response.ok) throw new Error(`Error al cargar detalles de factura: ${response.status}`);
     const factura = await response.json();
 
@@ -126,7 +126,7 @@ const Factura = () => {
   useEffect(() => {
     async function cargarFacturas() {
       try {
-        const response = await fetch('http://localhost:8081/facturas');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/facturas');
         if (!response.ok) throw new Error('Error al cargar facturas');
         const data = await response.json();
         setFacturas(data);

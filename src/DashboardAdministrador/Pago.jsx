@@ -18,7 +18,7 @@ const Pago = () => {
   useEffect(() => {
     async function cargarPagos() {
       try {
-        const response = await fetch('http://localhost:8081/pagos');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/pagos');
         const data = await response.json();
         setPagos(data);
       } catch (error) {
@@ -34,7 +34,7 @@ const Pago = () => {
     if (!confirmar) return;
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/pagos/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/pagos/${id}`, {
         method: 'DELETE'
       });
 

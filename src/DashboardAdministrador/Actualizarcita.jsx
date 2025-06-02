@@ -90,22 +90,22 @@ function FormularioActualizarCita() {
     const cargarDatos = async () => {
       try {
         // Carga clientes activos
-        const resClientes = await fetch('http://localhost:8081/clientes');
+        const resClientes = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes');
         const clientesData = await resClientes.json();
         setClientes(clientesData.filter(c => c.estado === 'activo'));
 
         // Carga empleados activos
-        const resEmpleados = await fetch('http://localhost:8081/empleados');
+        const resEmpleados = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/empleados');
         const empleadosData = await resEmpleados.json();
         setEmpleados(empleadosData.filter(e => e.estado === 'activo'));
 
         // Carga servicios
-        const resServicios = await fetch('http://localhost:8081/servicios');
+        const resServicios = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/servicios');
         const serviciosData = await resServicios.json();
         setServiciosLista(serviciosData);
 
         // Carga cita
-        const resCita = await fetch(`http://localhost:8081/citas/${id}`);
+        const resCita = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/citas/${id}`);
         const citaData = await resCita.json();
 
         if (citaData) {
@@ -150,7 +150,7 @@ function FormularioActualizarCita() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:8081/citas/${id}`, {
+      const res = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/citas/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formulario)

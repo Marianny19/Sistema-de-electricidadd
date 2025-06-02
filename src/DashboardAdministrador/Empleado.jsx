@@ -19,7 +19,7 @@ const Empleado = () => {
   useEffect(() => {
     async function cargarEmpleados() {
       try {
-        const response = await fetch('http://localhost:8081/empleados');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/empleados');
         const data = await response.json();
         setEmpleados(data);
       } catch (error) {
@@ -35,7 +35,7 @@ const Empleado = () => {
     if (!confirmar) return;
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/empleados/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/empleados/${id}`, {
         method: 'DELETE'
       });
 

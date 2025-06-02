@@ -20,7 +20,7 @@ const FormularioCitas = () => {
   useEffect(() => {
     async function cargarCitas() {
       try {
-        const response = await fetch('http://localhost:8081/citas');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/citas');
         const data = await response.json();
         setCitas(data);
       } catch (error) {
@@ -36,7 +36,7 @@ const FormularioCitas = () => {
     if (!confirmar) return;
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/citas/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/citas/${id}`, {
         method: 'DELETE'
       });
 

@@ -112,7 +112,7 @@ const generarReportePago = (datosPago, factura) => {
     e.preventDefault();
 
     try {
-      const respuesta = await fetch('http://localhost:8081/pagos', {
+      const respuesta = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/pagos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formulario)

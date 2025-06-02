@@ -79,7 +79,7 @@ function FormularioFactura() {
 
   const obtenerMontos = async (solicitud_id) => {
     try {
-      const response = await fetch(`http://localhost:8081/solicitudservicio/${solicitud_id}/monto-total`);
+      const response = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/solicitudservicio/${solicitud_id}/monto-total`);
       if (!response.ok) throw new Error('Solicitud no encontrada');
       const data = await response.json();
       return {
@@ -163,7 +163,7 @@ function FormularioFactura() {
   }
 
   try {
-    const res = await fetch('http://localhost:8081/facturas', {
+    const res = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/facturas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

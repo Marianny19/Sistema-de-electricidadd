@@ -86,7 +86,7 @@ function Crearcitas() {
   });
 
 useEffect(() => {
-  fetch('http://localhost:8081/clientes')
+  fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes')
     .then(res => res.json())
     .then(data => {
       const clientesActivos = data.filter(cliente => cliente.estado === 'activo');
@@ -94,7 +94,7 @@ useEffect(() => {
     })
     .catch(err => console.error('Error al cargar clientes:', err));
 
-fetch('http://localhost:8081/empleados')
+fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/empleados')
   .then(res => res.json())
   .then(data => {
     const empleadosActivos = data.filter(empleado => empleado.estado === 'activo');
@@ -103,7 +103,7 @@ fetch('http://localhost:8081/empleados')
   .catch(err => console.error('Error al cargar empleados:', err));
 
 
-  fetch('http://localhost:8081/servicios')
+  fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/servicios')
     .then(res => res.json())
     .then(data => setServiciosLista(data))
     .catch(err => console.error('Error cargando servicios:', err));
@@ -113,7 +113,7 @@ fetch('http://localhost:8081/empleados')
   useEffect(() => {
     const { fecha, id_empleado } = formulario;
     if (fecha && id_empleado) {
-      fetch(`http://localhost:8081/validar-fecha?fecha=${fecha}&id_empleado=${id_empleado}`)
+      fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/validar-fecha?fecha=${fecha}&id_empleado=${id_empleado}`)
         .then(res => {
           if (!res.ok) throw new Error('No hay horas disponibles');
           return res.json();
@@ -157,7 +157,7 @@ fetch('http://localhost:8081/empleados')
   const horaFormateada = hora.length === 5 ? `${hora}:00` : hora;
 
   try {
-    const res = await fetch('http://localhost:8081/citas', {  
+    const res = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/citas', {  
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

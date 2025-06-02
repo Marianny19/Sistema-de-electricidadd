@@ -20,7 +20,7 @@ const Solicitudservicio = () => {
   useEffect(() => {
     async function cargarSolicitud() {
       try {
-        const response = await fetch('http://localhost:8081/solicitudservicio');
+        const response = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/solicitudservicio');
         if (!response.ok) throw new Error('Error en la solicitud');
         const data = await response.json();
         console.log('Datos recibidos:', data);
@@ -38,7 +38,7 @@ const Solicitudservicio = () => {
     if (!confirmar) return;
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/solicitudservicio/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/solicitudservicio/${id}`, {
         method: 'DELETE'
       });
 

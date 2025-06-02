@@ -26,7 +26,7 @@ const ActualizarCotizacion = () => {
 
     async function cargarCotizacion() {
       try {
-        const response = await fetch(`http://localhost:8081/cotizaciones/${id}`);
+        const response = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/cotizaciones/${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -51,14 +51,14 @@ const ActualizarCotizacion = () => {
   }, [id]);
 
   useEffect(() => {
-    fetch("http://localhost:8081/clientes")
+    fetch("https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes")
       .then(res => res.json())
       .then(data => setClientes(data))
       .catch(err => console.error("Error cargando clientes:", err));
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:8081/servicios")
+    fetch("https://sistema-de-electricidadd-production-f62b.up.railway.app/servicios")
       .then(res => res.json())
       .then(data => setServicios(data))
       .catch(err => console.error("Error cargando servicios:", err));
@@ -109,7 +109,7 @@ const ActualizarCotizacion = () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:8081/cotizaciones/${id}`, {
+      const response = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/cotizaciones/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(datosActualizados)

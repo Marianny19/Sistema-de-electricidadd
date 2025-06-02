@@ -92,17 +92,17 @@ const FormRegistroTrabajo = () => {
   const [serviciosLista, setServiciosLista] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8081/solicitudservicio')
+    fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/solicitudservicio')
       .then(res => res.json())
       .then(data => setSolicitudes(data))
       .catch(err => console.error('Error cargando solicitudes:', err));
 
-    fetch('http://localhost:8081/empleados')
+    fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/empleados')
       .then(res => res.json())
       .then(data => setEmpleados(data))
       .catch(err => console.error('Error cargando empleados:', err));
 
-    fetch('http://localhost:8081/servicios')
+    fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/servicios')
       .then(res => res.json())
       .then(data => setServiciosLista(data))
       .catch(err => console.error('Error cargando servicios:', err));
@@ -111,7 +111,7 @@ const FormRegistroTrabajo = () => {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`http://localhost:8081/registrotrabajo/${id}`)
+    fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/registrotrabajo/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('No se encontró el registro');
         return res.json();
@@ -186,7 +186,7 @@ const FormRegistroTrabajo = () => {
     }
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/registrotrabajo/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/registrotrabajo/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -41,15 +41,15 @@ function Editarsolicitud() {
     const obtenerDatos = async () => {
       try {
         // Traemos la solicitud
-        const resSolicitud = await fetch(`http://localhost:8081/solicitudservicio/${id}`);
+        const resSolicitud = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/solicitudservicio/${id}`);
         const data = await resSolicitud.json();
 
         // Traemos el cliente para obtener su nombre
-        const resCliente = await fetch(`http://localhost:8081/clientes/${data.id_cliente}`);
+        const resCliente = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/clientes/${data.id_cliente}`);
         const clienteData = await resCliente.json();
 
         // Traemos lista de servicios
-        const resServicios = await fetch('http://localhost:8081/servicios');
+        const resServicios = await fetch('https://sistema-de-electricidadd-production-f62b.up.railway.app/servicios');
         const serviciosData = await resServicios.json();
 
         setFormulario({
@@ -95,7 +95,7 @@ function Editarsolicitud() {
     }
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/solicitudservicio/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/solicitudservicio/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -90,7 +90,7 @@ function FormularioActualizarEmpleado() {
   useEffect(() => {
     const obtenerEmpleado = async () => {
       try {
-        const respuesta = await fetch(`http://localhost:8081/empleados/${id}`);
+        const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/empleados/${id}`);
         if (respuesta.ok) {
           const datos = await respuesta.json();
           setFormulario(datos);
@@ -117,7 +117,7 @@ function FormularioActualizarEmpleado() {
     e.preventDefault();
 
     try {
-      const respuesta = await fetch(`http://localhost:8081/empleados/${id}`, {
+      const respuesta = await fetch(`https://sistema-de-electricidadd-production-f62b.up.railway.app/empleados/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formulario)
